@@ -1,9 +1,10 @@
+var config = require('./config.js');
 var express = require('express');                                                                                                                             
 
 var User = require('./models/user.js');
 
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://' + process.env.IP + '/test');
+mongoose.connect('mongodb://' + config.mongodb.host + ':' + config.mongodb.port + '/test');
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
