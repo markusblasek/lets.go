@@ -1,9 +1,10 @@
-var config = {};
+module.exports = {
+    // the port express listens on
+    port: 3000,
 
-// mongodb configuration
-config.mongodb = {
-    host: 'localhost',
-    port: 27017
+    // mongodb configuration
+    mongodb: {
+        host: 'localhost',
+        port: 27017
+    }
 };
-
-module.exports = config;
