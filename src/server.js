@@ -10,7 +10,10 @@ var routes = require('./routes');
 mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 mongoose.connect('mongodb://' + config.mongodb.host + ':' + config.mongodb.port + '/test');
 
-var app = express();
+// create app, http server and websocket server instances
+var app = express(),
+    server = require('http').createServer(app),
+    io = require('socket.io').listen(server);
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -37,6 +40,16 @@ if ('development' == app.get('env')) {
 // routes below
 app.get('/', routes.index);
 
-http.createServer(app).listen(config.port, function() {
-  console.log('Express server listening on port ' + config.port);
+// websocket stuff below
+io.sockets.on('connection', function (socket) {
+    socket.emit('news', { hello: 'world' });
+    socket.on('my other event', function (data) {
+        console.log(data);
+    });
 });
+
+// start to listen for incoming connections
+server.listen(config.port, function() {
+    console.log('Express server listening on port ' + config.port);
+});
+
