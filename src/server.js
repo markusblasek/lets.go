@@ -4,6 +4,7 @@ var express = require('express'),
     mongoose = require('mongoose');
 
 var config = require('./config.js');
+var log = require('./log.js');
 var routes = require('./routes');
 
 // establish mongodb connection
@@ -50,6 +51,6 @@ io.sockets.on('connection', function (socket) {
 
 // start to listen for incoming connections
 server.listen(config.port, function() {
-    console.log('Express server listening on port ' + config.port);
+    log.info('Express server listening on port %d', config.port);
 });
 
