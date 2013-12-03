@@ -6,5 +6,11 @@ module.exports = {
     mongodb: {
         host: 'localhost',
         port: 27017
+    },
+
+    session: {
+        // name of the session cookie
+        name: 'express.sid',
+        secret: 'asdf1234'
     }
 };
