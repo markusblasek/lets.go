@@ -3,3 +3,6 @@ extends layout
 block content
   h1= title
   p Welcome to #{title}
+  div#messages(style='height:500px;overflow:scroll;')
+  input#message
+  button#send Send

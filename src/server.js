@@ -73,10 +73,13 @@ io.configure(function() {
                 return callback('Unable to retrieve session.', false);
             } else {
                 data.session = session;
+                data.sessionId = sid;
 
+                /*
                 if (!data.session.user_id) {
                     return callback('You need to be logged in.', false);
                 }
+                */
 
                 return callback(null, true);
             }
@@ -94,18 +97,26 @@ io.configure('production', function() {
 io.sockets.on('connection', function(socket) {
     log.info('New socket.io connection');
 
+    io.sockets.emit('message', {session: socket.handshake.sessionId, text: 'Joined'});
+
     // store socket to access later
     //user = socket.handshake.user;
     //users[user.id] = socket;
 
     // messaging
     socket.on('message', function(data) {
+        data.session = socket.handshake.sessionId;
+        io.sockets.emit('message', data);
         /*log.debug('New message by user %s', user, data);
 
         if (data.target.type === 'user') {
             var target = users[data.target.id];
             target.emit('message', data);
         }*/
+    });
+
+    socket.on('disconnect', function() {
+        log.info('Socket.io connection stopped');
     });
 });
 
