@@ -29,7 +29,8 @@
         "winston": "0.7.2",
         "cookie": "0.1.0",
         "connect": "2.11.2",
-        "connect-mongo": "0.4.0"
+        "connect-mongo": "0.4.0",
+        "jsonschema": "0.4.0"
     },
     "engines": {
         "node": "0.10.21"
