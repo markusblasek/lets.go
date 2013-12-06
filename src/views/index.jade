@@ -1,6 +1,13 @@
 extends layout
 
 block content
+  if (!user)
+    a(href="/login") Login
+    br
+    a(href="/register") Register
+  if (user)
+    p You are currently logged in as #{user.username}
+    a(href="/logout") Logout
   h1= title
   p Welcome to #{title}
   div#messages(style='height:500px;overflow:scroll;')

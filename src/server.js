@@ -3,7 +3,9 @@ var express = require('express'),
     http = require('http'),
     mongoose = require('mongoose'),
     cookie = require('cookie'),
-    connect = require('connect');
+    connect = require('connect'),
+	passport = require('passport'),
+	LocalStrategy = require('passport-local').Strategy;
 
 var config = require('./config.js'),
     log = require('./log.js'),
@@ -19,6 +21,7 @@ mongoose.connect('mongodb://' + config.mongodb.host + ':' + config.mongodb.port 
 var app = express(),
     server = require('http').createServer(app),
     io = require('socket.io').listen(server);
+	
 
 var MongoStore = require('connect-mongo')(express);
 var sessionStore = new MongoStore({
@@ -39,6 +42,8 @@ app.use(express.session({
     secret: config.session.secret,
     store: sessionStore
 }));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(app.router);
 app.use(require('less-middleware')({
     src: path.join(__dirname, 'public'),
@@ -52,7 +57,13 @@ if ('development' == app.get('env')) {
 }
 
 // routes below
-app.get('/', routes.index);
+require('./routes/index')(app);
+
+// passport config
+var Account = require('./models/user');
+passport.use(new LocalStrategy(Account.authenticate()));
+passport.serializeUser(Account.serializeUser());
+passport.deserializeUser(Account.deserializeUser());
 
 // websocket stuff below
 io.configure(function() {
