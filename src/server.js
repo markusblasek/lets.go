@@ -3,11 +3,15 @@ var express = require('express'),
     http = require('http'),
     mongoose = require('mongoose'),
     cookie = require('cookie'),
-    connect = require('connect');
+    connect = require('connect'),
+	passport = require('passport'),
+	LocalStrategy = require('passport-local').Strategy;
 
-var config = require('./config.js');
-var log = require('./log.js');
-var routes = require('./routes');
+var config = require('./config.js'),
+    log = require('./log.js'),
+    routes = require('./routes'),
+    protocol = require('./protocol.js'),
+    User = require('./models/user.js');
 
 // establish mongodb connection
 mongoose.connection.on('error', log.error.bind(log, 'connection error:'));
@@ -17,6 +21,7 @@ mongoose.connect('mongodb://' + config.mongodb.host + ':' + config.mongodb.port 
 var app = express(),
     server = require('http').createServer(app),
     io = require('socket.io').listen(server);
+	
 
 var MongoStore = require('connect-mongo')(express);
 var sessionStore = new MongoStore({
@@ -37,6 +42,8 @@ app.use(express.session({
     secret: config.session.secret,
     store: sessionStore
 }));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(app.router);
 app.use(require('less-middleware')({
     src: path.join(__dirname, 'public'),
@@ -50,7 +57,13 @@ if ('development' == app.get('env')) {
 }
 
 // routes below
-app.get('/', routes.index);
+require('./routes/index')(app);
+
+// passport config
+var Account = require('./models/user');
+passport.use(new LocalStrategy(Account.authenticate()));
+passport.serializeUser(Account.serializeUser());
+passport.deserializeUser(Account.deserializeUser());
 
 // websocket stuff below
 io.configure(function() {
@@ -81,6 +94,12 @@ io.configure(function() {
                 }
                 */
 
+                //User.findById(
+                
+                data.user = new User({
+                    alias: 'testUser'
+                });
+
                 return callback(null, true);
             }
         });
@@ -94,31 +113,7 @@ io.configure('production', function() {
     io.set('log level', 1);
 });
 
-io.sockets.on('connection', function(socket) {
-    log.info('New socket.io connection');
-
-    io.sockets.emit('message', {session: socket.handshake.sessionId, text: 'Joined'});
-
-    // store socket to access later
-    //user = socket.handshake.user;
-    //users[user.id] = socket;
-
-    // messaging
-    socket.on('message', function(data) {
-        data.session = socket.handshake.sessionId;
-        io.sockets.emit('message', data);
-        /*log.debug('New message by user %s', user, data);
-
-        if (data.target.type === 'user') {
-            var target = users[data.target.id];
-            target.emit('message', data);
-        }*/
-    });
-
-    socket.on('disconnect', function() {
-        log.info('Socket.io connection stopped');
-    });
-});
+protocol(io);
 
 // start to listen for incoming connections
 server.listen(config.port, function() {

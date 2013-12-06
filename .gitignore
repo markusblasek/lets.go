@@ -7,3 +7,4 @@ node_modules
 src/src.njsproj
 src/src.v12.suo
 src/src.sln
+src/package.json
