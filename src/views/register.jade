@@ -2,10 +2,14 @@
 html
   head
     title= title
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    link(href='/css/bootstrap.min.css', rel='stylesheet', media='screen')
+    script(src='http://code.jquery.com/jquery.js')
+    script(src='js/bootstrap.min.js')
   body
   .container
     h1 Register Page
-    p.lead Say something worthwhile here.
+    p.lead Pick a username and a password.
     br
     form(role='form', action="/register",method="post", style='max-width: 300px;')
       .form-group
