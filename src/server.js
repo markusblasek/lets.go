@@ -124,4 +124,3 @@ io.sockets.on('connection', function(socket) {
 server.listen(config.port, function() {
     log.info('Express server listening on port %d', config.port);
 });
-
