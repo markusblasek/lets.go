@@ -4,8 +4,7 @@ var express = require('express'),
     mongoose = require('mongoose'),
     cookie = require('cookie'),
     connect = require('connect'),
-	passport = require('passport'),
-	LocalStrategy = require('passport-local').Strategy;
+	passport = require('passport');
 
 var config = require('./config.js'),
     log = require('./log.js'),
@@ -61,7 +60,7 @@ require('./routes/index')(app);
 
 // passport config
 var Account = require('./models/user');
-passport.use(new LocalStrategy(Account.authenticate()));
+passport.use(Account.createStrategy());
 passport.serializeUser(Account.serializeUser());
 passport.deserializeUser(Account.deserializeUser());
 
