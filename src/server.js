@@ -4,7 +4,7 @@ var express = require('express'),
     mongoose = require('mongoose'),
     cookie = require('cookie'),
     connect = require('connect'),
-	passport = require('passport');
+    passport = require('passport');
 
 var config = require('./config.js'),
     log = require('./log.js'),
@@ -20,7 +20,7 @@ mongoose.connect('mongodb://' + config.mongodb.host + ':' + config.mongodb.port 
 var app = express(),
     server = require('http').createServer(app),
     io = require('socket.io').listen(server);
-	
+
 
 var MongoStore = require('connect-mongo')(express);
 var sessionStore = new MongoStore({
