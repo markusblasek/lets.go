@@ -118,4 +118,3 @@ protocol(io);
 server.listen(config.port, function() {
     log.info('Express server listening on port %d', config.port);
 });
-
