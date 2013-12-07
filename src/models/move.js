@@ -7,6 +7,7 @@ var moveSchema = new mongoose.Schema({
     type: { type: String, enum: ['pass', 'surrender', 'play'], required: true },
     row: { type: Number, min: 0 },
     column: { type: Number, min: 0 },
+    board: { type: [String], required: true },
     created: { type: Date, default: Date.now }
 });
 

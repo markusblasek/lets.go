@@ -1,6 +1,7 @@
 var jsonschema = require('jsonschema');
 
 var log = require('./log.js'),
+    logic = require('./logic.js'),
     Game = require('./models/game.js'),
     Move = require('./models/move.js');
 
