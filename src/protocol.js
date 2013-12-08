@@ -40,7 +40,7 @@ module.exports = function(io) {
 
         //users[user.id] = socket;
 
-        log.info('New socket.io connection from %s', user.alias);
+        log.info('New socket.io connection from %s', user.email);
 
         // messaging
         socket.on('message', function(data) {
@@ -104,7 +104,7 @@ module.exports = function(io) {
         });
 
         socket.on('disconnect', function() {
-            log.info('User %s disconnected.', user.alias);
+            log.info('User %s disconnected.', user.email);
         });
     });
 }

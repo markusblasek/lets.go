@@ -61,20 +61,18 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
+// passport config
+passport.use(User.createStrategy());
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 // routes below
 app.get('/', routes.index);
-
 app.get('/user/register', routes.user.register);
 app.post('/user/register', routes.user.register);
 app.get('/user/login', routes.user.login);
 app.post('/user/login', routes.user.login);
 app.get('/user/logout', routes.user.logout);
-
-// passport config
-var Account = require('./models/user');
-passport.use(Account.createStrategy());
-passport.serializeUser(Account.serializeUser());
-passport.deserializeUser(Account.deserializeUser());
 
 // websocket stuff below
 io.configure(function() {
@@ -99,19 +97,19 @@ io.configure(function() {
                 data.session = session;
                 data.sessionId = sid;
 
-                /*
-                if (!data.session.user_id) {
+                if (!data.session.passport.user) {
                     return callback('You need to be logged in.', false);
                 }
-                */
 
-                //User.findById(
-                
-                data.user = new User({
-                    alias: 'testUser'
+                User.findOne({ email: data.session.passport.user }, function(err, user) {
+                    if (err) {
+                        return callback('Unable to retrieve user object: ' + err, false);
+                    }
+
+                    data.user = user;
+
+                    return callback(null, true);
                 });
-
-                return callback(null, true);
             }
         });
     });
