@@ -1,9 +1,9 @@
 var jsonschema = require('jsonschema');
 
-var log = require('./log.js'),
-    logic = require('./logic.js'),
-    Game = require('./models/game.js'),
-    Move = require('./models/move.js');
+var log = require('./log'),
+    logic = require('./logic'),
+    Game = require('./models/game'),
+    Move = require('./models/move');
 
 var messageSchema = {
     type: 'object',

@@ -6,11 +6,11 @@ var express = require('express'),
     connect = require('connect'),
     passport = require('passport');
 
-var config = require('./config.js'),
-    log = require('./log.js'),
+var config = require('./config'),
+    log = require('./log'),
     routes = require('./routes'),
-    protocol = require('./protocol.js'),
-    User = require('./models/user.js');
+    protocol = require('./protocol'),
+    User = require('./models/user');
 
 // establish mongodb connection
 mongoose.connection.on('error', log.error.bind(log, 'connection error:'));
@@ -43,6 +43,11 @@ app.use(express.session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+// this should be done by passport, shouldn't it?
+app.use(function(req, res, next) {
+    res.locals.user = req.user;
+    next();
+});
 app.use(app.router);
 app.use(require('less-middleware')({
     src: path.join(__dirname, 'public'),
@@ -50,13 +55,20 @@ app.use(require('less-middleware')({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+
 // development only
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
 // routes below
-require('./routes/index')(app);
+app.get('/', routes.index);
+
+app.get('/user/register', routes.user.register);
+app.post('/user/register', routes.user.register);
+app.get('/user/login', routes.user.login);
+app.post('/user/login', routes.user.login);
+app.get('/user/logout', routes.user.logout);
 
 // passport config
 var Account = require('./models/user');
