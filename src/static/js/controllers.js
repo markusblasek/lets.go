@@ -4,6 +4,11 @@ angular.module('letsGo.controllers', []).
   controller('AppCtrl', function($scope, $route, $http, $location, user) {
     $scope.$route = $route;
 
+
+    $scope.$on('$routeChangeStart', NProgress.start);
+    $scope.$on('$routeChangeSuccess', NProgress.done);
+    $scope.$on('$routeChangeError', NProgress.done);
+
     user.check();
 
     $scope.user = null;
