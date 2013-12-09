@@ -39,8 +39,8 @@ exports.register = function(req, res) {
 
             User.register(user, form.data.password, function(err) {
                 if (err) {
-                    return res.render('register', { form: form.toHTML(renderSemanticField),
-                                                    message: err.message });
+                    form.fields.email.error = err.message;
+                    return res.render('register', { form: form.toHTML(renderSemanticField) });
                 }
 
                 passport.authenticate('local')(req, res, function () {
