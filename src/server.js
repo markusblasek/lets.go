@@ -54,10 +54,10 @@ app.use(function(req, res, next) {
 });
 app.use(app.router);
 app.use(require('less-middleware')({
-    src: path.join(__dirname, 'public'),
+    src: path.join(__dirname, 'static'),
     compress: true
 }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/static', express.static(path.join(__dirname, 'static')));
 
 
 // development only
@@ -70,13 +70,21 @@ passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+var auth = function(req, res, next){
+  if (!req.isAuthenticated())
+    res.send(401);
+  else
+    next();
+};
+
 // routes below
 app.get('/', routes.index);
-app.get('/user/register', routes.user.register);
+
 app.post('/user/register', routes.user.register);
-app.get('/user/login', routes.user.login);
 app.post('/user/login', routes.user.login);
-app.get('/user/logout', routes.user.logout);
+app.post('/user/logout', routes.user.logout);
+app.get('/user', auth, routes.user.get);
+
 app.get('/setUpGame', routes.game.setUpGame(db));
 app.get('/showGames', routes.game.showGames(db));
 app.post('/addGame', routes.game.addGame(db));
