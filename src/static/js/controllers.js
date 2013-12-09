@@ -7,14 +7,21 @@ angular.module('letsGo.controllers', []).
     user.check();
 
     $scope.user = null;
+    $scope.online = 0;
     $scope.logout = user.logout;
 
     $scope.$on('userChanged', function(event, user) {
       $scope.user = user;
     });
+
+    $scope.$on('online', function(event, online) {
+      $scope.$apply(function() {
+        $scope.online = online;
+      });
+    });
   }).
 
-  controller('LoginCtrl', function($scope, $rootScope, $http, $location, user) {
+  controller('LoginCtrl', function($scope, $http, $location, user) {
     $scope.email = '';
     $scope.password = '';
 
@@ -24,7 +31,6 @@ angular.module('letsGo.controllers', []).
 
       return user.login($scope.email, $scope.password).
         success(function(user){
-          $rootScope.message = 'Authentication successful!';
           $location.url('/');
         }).
         error(function(error){
@@ -36,16 +42,18 @@ angular.module('letsGo.controllers', []).
     };
   }).
 
-  controller('RegisterCtrl', function($scope, $rootScope, $http, $location) {
-    $scope.user = {};
+  controller('RegisterCtrl', function($scope, $http, $location, user) {
+    $scope.email = '';
+    $scope.alias = '';
+    $scope.name = '';
+    $scope.password = '';
 
     $scope.register = function() {
       $scope.loading = true;
       $scope.error = null;
 
-      $http.post('/user/register', $scope.user).
+      user.register($scope.email, $scope.alias, $scope.name, $scope.password).
         success(function(user) {
-          $rootScope.message = 'registered';
           $location.url('/');
         }).
         error(function(error) {

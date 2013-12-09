@@ -115,3 +115,11 @@
 }
 
 }
+/* bla */
+
+body {
+    max-width: 1024px;
+    margin: 0 auto;
+    font-size: 15px;
+    font-family: "Open Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+}

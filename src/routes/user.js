@@ -4,7 +4,9 @@ var User = require('../models/user');
 
 exports.register = function(req, res) {
   var user = new User({
-    email: req.body.email
+    email: req.body.email,
+    alias: req.body.alias,
+    name: req.body.name
   });
 
   User.register(user, req.body.password, function(err) {
@@ -13,7 +15,7 @@ exports.register = function(req, res) {
     }
 
     passport.authenticate('local')(req, res, function () {
-      res.send(200, '');
+      res.send(user);
     });
   });
 };

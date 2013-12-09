@@ -2,17 +2,28 @@ doctype 5
 html(lang='en', ng-app='letsGo')
   head
     title= title
+    link(href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Open+Sans:300italic,400,300,700', rel='stylesheet', type='text/css')
     link(href='/static/lib/semantic/css/semantic.min.css', rel='stylesheet', type='text/css')
+    link(href='/static/css/main.css', rel='stylesheet', type='text/css')
   body(ng-controller='AppCtrl')
     h1.ui.header let's go!
-    div(ng-if='!user')
-      a(href='#/user/login') Login
-      a(href='#/user/register') Register
-    div(ng-if='user')
-      | User: {{ user.email }}
-      a(href='#', ng-click='logout()') Logout
-    div
-      | {{ message }}
+
+    div.ui.secondary.pointing.menu
+      a.item
+        i.home.icon
+        | Home
+      a.item
+        i.user.icon
+        | Chat
+      div.right.menu(ng-if='user')
+        div.ui.item(ng-bind='"Online " + online')
+        div.ui.item
+          i.icon.user
+          b(ng-bind='user.alias')
+        a.item(href='#', ng-click='logout()') Logout
+      div.right.menu(ng-if='!user')
+        a.ui.item(href='#/user/login') Login
+        a.ui.item(href='#/user/register') Sign-up
 
     div(ng-view)
 

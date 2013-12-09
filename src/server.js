@@ -59,7 +59,6 @@ app.use(require('less-middleware')({
 }));
 app.use('/static', express.static(path.join(__dirname, 'static')));
 
-
 // development only
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
@@ -80,7 +79,7 @@ var auth = function(req, res, next){
 // routes below
 app.get('/', routes.index);
 
-app.post('/user/register', routes.user.register);
+app.post('/user', routes.user.register);
 app.post('/user/login', routes.user.login);
 app.post('/user/logout', routes.user.logout);
 app.get('/user', auth, routes.user.get);
