@@ -16,6 +16,10 @@ var config = require('./config'),
 mongoose.connection.on('error', log.error.bind(log, 'connection error:'));
 mongoose.connect('mongodb://' + config.mongodb.host + ':' + config.mongodb.port + '/test');
 
+// TODO:use mongooseinstead
+var monk = require('monk');
+var db = monk('localhost:27017/games');
+
 // create app, http server and websocket server instances
 var app = express(),
     server = require('http').createServer(app),
@@ -73,6 +77,9 @@ app.post('/user/register', routes.user.register);
 app.get('/user/login', routes.user.login);
 app.post('/user/login', routes.user.login);
 app.get('/user/logout', routes.user.logout);
+app.get('/setUpGame', routes.game.setUpGame(db));
+app.get('/showGames', routes.game.showGames(db));
+app.post('/addGame', routes.game.addGame(db));
 
 // websocket stuff below
 io.configure(function() {

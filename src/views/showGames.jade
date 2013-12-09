@@ -1,0 +1,27 @@
+doctype 5
+extends layout
+block content
+        table(border=1)
+            thead
+                tr
+                    th Name
+                    th Settings
+                    th RuleSet
+                    th BoardSize
+                    th StartColor
+                    th Player
+            tbody
+                each user, i in userlist
+                    tr
+                        td
+                            label(for='gameName')=user.gameName
+                        td
+                            label(for='settings')=user.settings
+                        td
+                            label(for='ruleSet')=user.rSet
+                        td
+                            label(for='boardSize')=user.boardSize
+                        td
+                            label(for='startColor')=user.sColor
+                        td
+                            label(for='user1')=user.username1

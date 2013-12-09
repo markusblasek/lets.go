@@ -2,25 +2,11 @@ doctype 5
 html
   head
     title= title
-    script(type='text/javascript', src='/socket.io/socket.io.js')
     link(href='/lib/semantic/css/semantic.min.css', rel='stylesheet', type='text/css')
   body
     block content
-    script(type='text/javascript').
-        var socket = io.connect('/');
-
-        var input = document.getElementById('message'),
-            messages = document.getElementById('messages'),
-            button = document.getElementById('send');
-
-        socket.on('message', function(data) {
-            messages.innerHTML = messages.innerHTML + '<p>' + data.session + ': ' + data.text + '</p>';
-        });
-
-        button.onclick = function() {
-            if (input.value) {
-                socket.emit('message', {text: input.value});
-            }
-        }
     script(src='/lib/jQuery/jquery-1.10.2.min.js')
-    script(src="/lib/semantic/javascript/semantic.min.js")
+    script(src='/lib/semantic/javascript/semantic.min.js')
+    script(type='text/javascript', src='/socket.io/socket.io.js')
+    script(type='text/javascript').
+      var socket = io.connect('/');
