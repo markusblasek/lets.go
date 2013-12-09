@@ -1,0 +1,122 @@
+doctype 5
+extends layout
+
+block content
+  -var temp=0
+        //iterates over all gameObjects. There should only be one possibility
+      each user, i in userlist
+        if user.userID === id
+          -temp=1
+
+          //only for debbugging
+          //input#inputGameName(type="text", placeholder=user.userID, name="joa")
+
+          h1='Wainting for an opponent . . .'
+          div
+              tr
+                  td
+                    label(for='username1')=user.username1
+                  td
+                    -var vsText = '     vs     ';
+                    label(for='text')=vsText
+                  td
+                    label(for='username2')=user.username2
+          p
+          form#formAddGame(name="addGame",method="post",action="/addGame")
+            div
+                if user.gameName === ""
+                    input(type="text", placeholder="Type in the name for your game (optional):", name="gameName" size="50")
+                else
+                    input(type="text", value=user.gameName , name="gameName" size="50")
+            p
+                input(type='radio', name='setting1', value='0', checked= (user.settings==0))
+                |Free
+                input(type='radio', name='setting1', value='1', checked= (user.settings==1))
+                |Demonstration
+                input(type='radio', name='setting1', value='2', checked= (user.settings==2))
+                |Teaching
+                input(type='radio', name='setting1', value='3', checked= (user.settings==3))
+                |Simul
+                input(type='radio', name='setting1', value='4', checked= (user.settings==4))
+                |Rengo
+            p
+                |Rule Set:
+                input(type='radio', name='ruleSet', value='0', checked= (user.rSet==0))
+                |Japanese
+                input(type='radio', name='ruleSet', value='1', checked= (user.rSet==1))
+                |Chinese
+                input(type='radio', name='ruleSet', value='2', checked= (user.rSet==2))
+                |AGA
+                input(type='radio', name='ruleSet', value='3', checked= (user.rSet==3))
+                |New Zealand
+            p
+                |Board Size:
+                input(type='radio', name='boardSize', value='0', checked= (user.boardSize==0))
+                |9x9
+                input(type='radio', name='boardSize', value='1', checked= (user.boardSize==1))
+                |13x13
+                input(type='radio', name='boardSize', value='2', checked= (user.boardSize==2))
+                |19x19
+            p
+                |Who should start:
+                input(type='radio', name='startColor', value='0', checked= (user.sColor==0))
+                |black
+                input(type='radio', name='startColor', value='1', checked= (user.sColor==1))
+                |white
+            p
+                button#btnSubmit(type="submit") Edit game
+                button#btnReset(type="reset") Cancel game
+                button#btnStart(type="name") Start game
+
+          script(type='text/javascript').
+            //alle 100 sec wird neu geladen
+            window.setTimeout("location.reload()", 100000);
+
+
+
+      if temp !=1
+          h1= 'Please select your game settings:'
+
+          form#formAddGame(name="addGame",method="post",action="/addGame")
+              div
+                input(type="text", placeholder="Type in the name for your game (optional):", name="gameName" size="50")
+              p
+                  input(type='radio', name='setting1', value='0', checked)
+                  | Free
+                  input(type='radio', name='setting1', value='1')
+                  | Demonstration
+                  input(type='radio', name='setting1', value='2')
+                  | Teaching
+                  input(type='radio', name='setting1', value='3')
+                  | Simul
+                  input(type='radio', name='setting1', value='4')
+                  | Rengo
+              p
+                  | Rule Set:
+                  input(type='radio', name='ruleSet', value='0', checked)
+                  | Japanese
+                  input(type='radio', name='ruleSet', value='1')
+                  | Chinese
+                  input(type='radio', name='ruleSet', value='2')
+                  | AGA
+                  input(type='radio', name='ruleSet', value='3')
+                  | New Zealand
+              p
+                  | Board Size:
+                  input(type='radio', name='boardSize', value='0', checked)
+                  | 9x9
+                  input(type='radio', name='boardSize', value='1')
+                  | 13x13
+                  input(type='radio', name='boardSize', value='2')
+                  | 19x19
+              p
+                  | Who should start:
+                  input(type='radio', name='startColor', value='0', checked)
+                  | black
+                  input(type='radio', name='startColor', value='1')
+                  | white
+              p
+                  button#btnSubmit(type="submit") searching
+                  button#btnReset(type="reset") cancel
+
+
