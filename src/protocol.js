@@ -29,35 +29,42 @@ var moveSchema = {
     }
 }
 
+var users = {};
+
 module.exports = function(io) {
     io.sockets.on('connection', function(socket) {
-
-        //io.sockets.emit('message', {session: socket.handshake.sessionId, text: 'Joined'});
-
-        // store socket to access later
         var user = socket.handshake.user;
-        var session = socket.handshake.session;
 
-        //users[user.id] = socket;
+        users[user.id] = socket;
 
         log.info('New socket.io connection from %s', user.email);
 
         // messaging
         socket.on('message', function(data) {
-            /*log.debug('New message by user %s', user, data);
+            log.debug('New message by user %s: ', user.email, data);
 
-             if (data.target.type === 'user') {
-             var target = users[data.target.id];
-             target.emit('message', data);
-             }*/
-            // we need to..
-            // 1. find the game/user or error out
-            // 2. broadcast to appropriate room
+            var validation = jsonschema.validate(data, messageSchema);
+
+            if (validation.errors.length > 0) {
+                return log.warn('Message data is invalid: ', validation.errors);
+            }
+
+            if (data.target.type === 'user') {
+                var target = users[data.target.id];
+
+                if (!target) {
+                    return log.warn('User does not exist or is offline.');
+                }
+
+                target.emit('message', data);
+            } else if (data.target.type === 'game') {
+                // TODO: All user in game have to join a socket.io room, the room shall be identified by the game _id.
+            }
         });
 
         // making moves in a game
         socket.on('move', function(data) {
-            log.debug('move', data);
+            log.debug('New move by user %s: ', user.email, data);
 
             var validation = jsonschema.validate(data, moveSchema);
 
@@ -85,9 +92,16 @@ module.exports = function(io) {
                 });
 
                 if (data.type === 'play') {
-                    // game logic: check whether the move is actually a legit move!
-                    move.row = data.row;
                     move.column = data.column;
+                    move.row = data.row;
+
+                    var board = logic.move(game.board, 'x', move.column, move.row);
+
+                    if (!board) {
+                        return log.warn('Illegal move.');
+                    }
+
+                    move.board;
                 }
 
                 move.save(function(err) {
@@ -105,6 +119,7 @@ module.exports = function(io) {
 
         socket.on('disconnect', function() {
             log.info('User %s disconnected.', user.email);
+            users[user.id] = undefined;
         });
     });
 }
