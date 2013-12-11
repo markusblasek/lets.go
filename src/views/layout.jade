@@ -4,8 +4,11 @@ html
     title= title
     script(type='text/javascript', src='/socket.io/socket.io.js')
     link(href='/lib/semantic/css/semantic.min.css', rel='stylesheet', type='text/css')
+    link(href='/css/main.css', rel='stylesheet', type='text/css')
   body
-    block content
+    include partials/menu
+    div.ui.grid#container
+        block content
     script(type='text/javascript').
         var socket = io.connect('/');
 

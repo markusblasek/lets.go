@@ -4,14 +4,3 @@ block content
   h1.ui.header
     | lets go!
     div.sub.header Online Go gaming platform
-  div.ui.menu
-    if (!user)
-      a.item(href='/user/register')
-        div.ui.teal.button Sign up
-      a.item(href='/user/login')
-        div.ui.button Log-in
-    if (user)
-      div.item
-        div.ui.button Welcom #{user.email}
-      a.item(href='/user/logout')
-        div.ui.button Log-out
