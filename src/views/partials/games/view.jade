@@ -1,0 +1,4 @@
+div.board
+  div.row(ng-repeat='row in board')
+    div.cell(ng-repeat='item in row', ng-class='{black: item.cell === "B", white: item.cell === "W"}')
+      | {{ item.cell }}

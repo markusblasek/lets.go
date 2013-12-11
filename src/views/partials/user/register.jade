@@ -1,0 +1,31 @@
+form(name='form', ng-submit='register()', novalidate)
+  div.ui.form.segment(ng-class='{loading: loading, warning: error}')
+    div.ui.warning.message(ng-if='error')
+      div.header Something went wrong, sorry!
+      ul.list
+        li(ng-bind='error')
+    div.field(ng-class='{error: form.email.$dirty && form.email.$invalid}')
+      label E-Mail
+      div.ui.left.labeled.icon.input
+        input(placeholder='E-Mail', type='email', name='email', ng-modal='email', required)
+        i.user.icon
+        div.ui.corner.label
+          i.asterisk.icon
+    div.field(ng-class='{error: form.alias.$dirty && form.alias.$invalid}')
+      label Display Name
+      div.ui.left.labeled.icon.input
+        input(placeholder='GameLord1337', type='text', name='alias', ng-modal='alias', required)
+        i.user.icon
+        div.ui.corner.label
+          i.asterisk.icon
+    div.field
+      label Real Name
+      input(placeholder='John Doe (Optional)', type='text', ng-model='name')
+    div.field(ng-class='{error: form.password.$dirty && form.password.$invalid}')
+      label Password
+      div.ui.left.labeled.icon.input
+        input(placeholder='Password', type='password', name='password', ng-modal='password', required)
+        i.lock.icon
+        div.ui.corner.label
+          i.asterisk.icon
+    button.ui.blue.submit.button(type='submit', ng-disabled='form.$invalid', ng-class='{disabled: form.$invalid}') Register

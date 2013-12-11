@@ -79,6 +79,8 @@ var auth = function(req, res, next){
 // routes below
 app.get('/', routes.index);
 
+app.get('/static/partials/*', routes.partials);
+
 app.post('/user', routes.user.register);
 app.post('/user/login', routes.user.login);
 app.post('/user/logout', routes.user.logout);

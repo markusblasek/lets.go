@@ -13,9 +13,11 @@ html(lang='en', ng-app='letsGo')
       a.item
         i.home.icon
         | Home
-      a.item
-        i.user.icon
-        | Chat
+      a.item(href='#/messages')
+        i.mail.icon
+        | Messages
+      a.item(href='#/game')
+        | Game View
       div.right.menu(ng-if='user')
         div.ui.item(ng-bind='"Online " + online')
         div.ui.item
@@ -40,3 +42,10 @@ html(lang='en', ng-app='letsGo')
     script(src='/static/js/app.js')
     script(src='/static/js/services.js')
     script(src='/static/js/controllers.js')
+
+    script.
+      NProgress.configure({
+        showSpinner: false,
+        ease: 'ease',
+        speed: 100
+      });

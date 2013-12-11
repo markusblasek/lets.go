@@ -28,14 +28,20 @@ config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvide
 
   $routeProvider.
     when('/user/login', {
-      templateUrl: '/static/views/user/login.html',
+      templateUrl: '/static/partials/user/login.jade',
       controller: 'LoginCtrl'
     }).
     when('/user/register', {
-      templateUrl: '/static/views/user/register.html',
+      templateUrl: '/static/partials/user/register.jade',
       controller: 'RegisterCtrl'
+    }).
+    when('/messages', {
+      templateUrl: '/static/partials/messages/index.jade',
+      controller: 'MessagesCtrl'
+    }).
+    when('/game', {
+      templateUrl: '/static/partials/games/view.jade',
+      controller: 'GamesViewCtrl'
     }).
     otherwise({redirectTo: '/'});
 }]);
-
-
