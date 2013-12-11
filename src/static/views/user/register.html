@@ -1,0 +1,42 @@
+<form name="form" ng-submit="register()" novalidate>
+    <div class="ui form segment" ng-class="{loading: loading, warning: error}">
+        <div class="ui warning message" ng-if="error">
+            <div class="header">Something went wrong, sorry!</div>
+            <ul class="list">
+              <li>{{error}}</li>
+            </ul>
+        </div>
+        <div class="field" ng-class="{error: form.email.$dirty && form.email.$invalid}">
+            <label>E-Mail</label>
+            <div class="ui left labeled input">
+                <input placeholder="E-Mail" type="email" name="email" ng-model="email" required>
+                <div class="ui corner label">
+                    <i class="asterisk icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="field" ng-class="{error: form.alias.$dirty && form.alias.$invalid}">
+            <label>Display Name</label>
+            <div class="ui left labeled input">
+                <input placeholder="Nickname" type="text" name="alias" ng-model="alias" required>
+                <div class="ui corner label">
+                    <i class="asterisk icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="field">
+            <label>Real Name</label>
+            <input placeholder="John Doe (Optional)" type="text" ng-model="name">
+        </div>
+        <div class="field" ng-class="{error: form.password.$dirty && form.password.$invalid}">
+            <label>Password</label>
+            <div class="ui left labeled input">
+                <input placeholder="Password" type="password" name="password" ng-model="password" required>
+                <div class="ui corner label">
+                    <i class="asterisk icon"></i>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="ui blue submit button" ng-class="{disabled: form.$invalid}" ng-disabled="form.$invalid">Register</button>
+    </div>
+</form>

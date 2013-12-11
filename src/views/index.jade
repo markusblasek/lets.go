@@ -1,6 +1,42 @@
-extends layout
+doctype 5
+html(lang='en', ng-app='letsGo')
+  head
+    title= title
+    link(href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Open+Sans:300italic,400,300,700', rel='stylesheet', type='text/css')
+    link(href='/static/lib/semantic/css/semantic.min.css', rel='stylesheet', type='text/css')
+    link(href='/static/lib/nprogress/css/nprogress.css', rel='stylesheet', type='text/css')
+    link(href='/static/css/main.css', rel='stylesheet', type='text/css')
+  body(ng-controller='AppCtrl')
+    h1.ui.header let's go!
 
-block content
-  h1.ui.header
-    | lets go!
-    div.sub.header Online Go gaming platform
+    div.ui.secondary.pointing.menu
+      a.item
+        i.home.icon
+        | Home
+      a.item
+        i.user.icon
+        | Chat
+      div.right.menu(ng-if='user')
+        div.ui.item(ng-bind='"Online " + online')
+        div.ui.item
+          i.icon.user
+          b(ng-bind='user.alias')
+        a.item(href='#', ng-click='logout()') Logout
+      div.right.menu(ng-if='!user')
+        a.ui.item(href='#/user/login') Login
+        a.ui.item(href='#/user/register') Sign-up
+
+    div(ng-view)
+
+    script(src='/static/lib/jQuery/jquery-1.10.2.min.js')
+    script(src='/static/lib/semantic/javascript/semantic.min.js')
+    script(src='/static/lib/nprogress/js/nprogress.js')
+    script(src='/socket.io/socket.io.js')
+    script(src='/static/lib/angular/angular.min.js')
+    script(src='/static/lib/angular/angular-route.min.js')
+    script(src='/static/lib/angular/angular-sanitize.min.js')
+    script(src='/static/lib/angular/angular-resource.min.js')
+
+    script(src='/static/js/app.js')
+    script(src='/static/js/services.js')
+    script(src='/static/js/controllers.js')
