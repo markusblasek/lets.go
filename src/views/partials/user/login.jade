@@ -9,14 +9,14 @@ div.ui.two.column.middle.aligned.relaxed.grid.basic.segment
         div.field(ng-class='{error: form.email.$dirty && form.email.$invalid}')
           label E-Mail
           div.ui.left.labeled.icon.input
-            input(placeholder='E-Mail', type='email', name='email', ng-modal='email', required)
+            input(placeholder='E-Mail', type='email', name='email', ng-model='email', required)
             i.user.icon
             div.ui.corner.label
               i.asterisk.icon
         div.field(ng-class='{error: form.password.$dirty && form.password.$invalid}')
           label Password
           div.ui.left.labeled.icon.input
-            input(placeholder='Password', type='password', name='password', ng-modal='password', required)
+            input(placeholder='Password', type='password', name='password', ng-model='password', required)
             i.lock.icon
             div.ui.corner.label
               i.asterisk.icon
