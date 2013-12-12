@@ -1,0 +1,7 @@
+div.ui.secondary.vertical.pointing.menu
+  div.item
+    i.users.icon
+    | Users
+    div.menu(ng-repeat='user in users')
+      a.item
+        | {{ user }}

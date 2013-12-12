@@ -137,3 +137,23 @@ body {
 #registerform {
     max-width: 600px;
 }
+.board .row {
+    height: 50px;
+    clear: left;
+}
+
+.board .cell {
+    float: left;
+    width: 50px;
+    height: 50px;
+    border: 1px solid #ddd;
+    background: #FFCB08;
+}
+
+.board .cell.white {
+    background: #fff;
+}
+
+.board .cell.black {
+    background: #111;
+}

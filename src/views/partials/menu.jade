@@ -11,6 +11,9 @@ div.ui.inverted.fixed.small.borderless.main.menu(style='margin: 0;')
     a.item
         i.user.icon
         | CHAT
+    a.item(href='#/game')
+        i.gamepad.icon
+        | Game View
     div.right.menu.borderless(ng-if='!user')
         a.ui.item(href='#/user/login')
             div.ui.button login
@@ -21,3 +24,4 @@ div.ui.inverted.fixed.small.borderless.main.menu(style='margin: 0;')
             div.ui.item
                 i.icon.user
                 b(ng-bind='user.alias')
+            a.item(href='#', ng-click='logout()') Logout
