@@ -118,8 +118,22 @@
 /* bla */
 
 body {
-    max-width: 1024px;
-    margin: 0 auto;
+    margin: 0;
     font-size: 15px;
     font-family: "Open Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+    background: #FCFCFC url('/static/img/bg.jpg') repeat;
+}
+
+#container {
+    padding: 70px 100px 0 100px;
+    width: 100%;
+}
+
+#logo {
+    width: 70px;
+    height: 14px;
+}
+
+#registerform {
+    max-width: 600px;
 }

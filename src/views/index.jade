@@ -7,26 +7,10 @@ html(lang='en', ng-app='letsGo')
     link(href='/static/lib/nprogress/css/nprogress.css', rel='stylesheet', type='text/css')
     link(href='/static/css/main.css', rel='stylesheet', type='text/css')
   body(ng-controller='AppCtrl')
-    h1.ui.header let's go!
+    include partials/menu
 
-    div.ui.secondary.pointing.menu
-      a.item
-        i.home.icon
-        | Home
-      a.item
-        i.user.icon
-        | Chat
-      div.right.menu(ng-if='user')
-        div.ui.item(ng-bind='"Online " + online')
-        div.ui.item
-          i.icon.user
-          b(ng-bind='user.alias')
-        a.item(href='#', ng-click='logout()') Logout
-      div.right.menu(ng-if='!user')
-        a.ui.item(href='#/user/login') Login
-        a.ui.item(href='#/user/register') Sign-up
-
-    div(ng-view)
+    div#container.ui.grid.aligned.middle
+        div.column(ng-view)
 
     script(src='/static/lib/jQuery/jquery-1.10.2.min.js')
     script(src='/static/lib/semantic/javascript/semantic.min.js')

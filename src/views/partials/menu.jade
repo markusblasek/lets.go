@@ -2,31 +2,22 @@
 
 div.ui.inverted.fixed.small.borderless.main.menu(style='margin: 0;')
     a.item(href='/')
-        img.ui.small.image(src='/img/ic_logo.png')
+        img#logo.ui.image(src='/static/img/ic_logo.png')
     a.item
         i.mail.icon
         | MESSAGES
         if(messages > 0)
             div.ui.small.teal.label #{messages}
-    a.itemc
+    a.item
         i.user.icon
-        | FRIENDS
-    div.right.menu.borderless
-        if (!user)
-            div.item
-                div.ui.icon.input
-                    input(type='text' placeholder='Username')
-                    i.user.icon
-            div.item
-                div.ui.icon.input
-                    input(type='password' placeholder='Password')
-                    i.lock.basic.icon
-            a.item(href='/user/login')
-                div.ui.button login
-            a.item(href='/user/register')
-                div.ui.teal.button sign up
-        if(user)
-            div.item
-                div.ui.button Welcom #{user.email}
-            a.item(href='/user/logout')
-                div.ui.button Log-out
+        | CHAT
+    div.right.menu.borderless(ng-if='!user')
+        a.ui.item(href='#/user/login')
+            div.ui.button login
+        a.ui.item(href='#/user/register')
+            div.ui.teal.button sign up
+    div.right.menu.borderless(ng-if='user')
+        div.ui.item(ng-bind='"Online " + online')
+            div.ui.item
+                i.icon.user
+                b(ng-bind='user.alias')
