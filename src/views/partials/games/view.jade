@@ -1,0 +1,14 @@
+div.board
+  div.row(ng-repeat='row in board')
+    div.cell(ng-repeat='item in row', ng-class='{black: item.cell === "B", white: item.cell === "W"}')
+      | {{ item.cell }}
+      
+div(style="clear:both")
+div.videochat
+    video(style="width: 250px; height: 200px; float: left;", id="video_callee", autoplay="true")
+    video(style="width: 100px; height: 75px; float: left;", id="video_caller", muted="true", autoplay="true")
+    div(style="clear:both")
+    input(value="Connect", type="button", onclick="connectChat();")
+    input(value="Stop", type="button", onclick="closeChat();")
+script(src='/static/lib/webrtc/adapter.js')
+script(src='/static/lib/webrtc/webrtc.js')

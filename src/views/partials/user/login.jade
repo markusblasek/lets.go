@@ -1,0 +1,28 @@
+div.ui.two.column.middle.aligned.relaxed.grid.basic.segment
+  div.column
+    form(name='form', ng-submit='login()', novalidate)
+      div.ui.form.segment(ng-class='{loading: loading, warning: error}')
+        div.ui.warning.message(ng-if='error')
+          div.header Something went wrong, sorry!
+          ul.list
+            li(ng-bind='error')
+        div.field(ng-class='{error: form.email.$dirty && form.email.$invalid}')
+          label E-Mail
+          div.ui.left.labeled.icon.input
+            input(placeholder='E-Mail', type='email', name='email', ng-model='email', required)
+            i.user.icon
+            div.ui.corner.label
+              i.asterisk.icon
+        div.field(ng-class='{error: form.password.$dirty && form.password.$invalid}')
+          label Password
+          div.ui.left.labeled.icon.input
+            input(placeholder='Password', type='password', name='password', ng-model='password', required)
+            i.lock.icon
+            div.ui.corner.label
+              i.asterisk.icon
+        button.ui.blue.submit.button(type='submit', ng-disabled='form.$invalid', ng-class='{disabled: form.$invalid}') Login
+  div.ui.vertical.divider Or
+  div.center.aligned.column
+    a.huge.green.ui.labeled.icon.button(href='#/user/register')
+      i.signup.icon
+      | Signup

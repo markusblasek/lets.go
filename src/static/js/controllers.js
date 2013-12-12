@@ -68,4 +68,40 @@ angular.module('letsGo.controllers', []).
           $scope.loading = false;
         });
     }
+  }).
+
+  controller('MessagesCtrl', function($scope, $http, $location) {
+    $scope.users = ['ich', 'du'];
+  }).
+
+  controller('GamesViewCtrl', function($scope, $http, $location) {
+    var board = [
+      '      B  ',
+      '  W      ',
+      '      B  ',
+      '  W      ',
+      '      B  ',
+      '  W      ',
+      '      B  ',
+      '  W      ',
+      '  W      '
+    ].join('');
+
+    var better = [];
+
+    for (var i = 0; i < board.length; ++i) {
+      if (i % 9 == 0) {
+        better.push([]);
+      }
+
+      better[parseInt(i/9)].push({
+        cell: board[i]
+      });
+    };
+
+    $scope.board = better;
+
+    console.log($scope.board);
+
+    console.log('bla');
   });
