@@ -12,16 +12,13 @@ block content
 
           h1='Wainting for an opponent . . .'
           div
-              tr
-                  td
-                    label(for='username1')=user.username1
-                  td
-                    -var vsText = '     vs     ';
-                    label(for='text')=vsText
-                  td
-                    label(for='username2')=user.username2
+
+            label(for='username1')=user.username1
+            -var vsText = '     vs     ';
+            label(for='text')=vsText
+            label(for='username2')=user.username2
           p
-          form#formAddGame(name="addGame",method="post",action="/addGame")
+          form
             div
                 if user.gameName === ""
                     input(type="text", placeholder="Type in the name for your game (optional):", name="gameName" size="50")
@@ -63,8 +60,8 @@ block content
                 input(type='radio', name='startColor', value='white', checked= (user.startColor=='white'))
                 |white
             p
-                button#btnSubmit(type="submit") Edit game
-                button#btnReset(type="reset") Cancel game
+                button#btnSubmit(type="submit", formaction="/addGame", formmethod="post") Edit game
+                button#btnSubmit(type="submit", formaction="/removeGame", formmethod="post") Back
 
 
           script(type='text/javascript').
@@ -75,7 +72,7 @@ block content
       if temp !=1
           h1= 'Please select your game settings:'
 
-          form#formAddGame(name="addGame",method="post",action="/addGame")
+          form
               div
                 input(type="text", placeholder="Type in the name for your game (optional):", name="gameName" size="50")
               p
@@ -114,7 +111,7 @@ block content
                   input(type='radio', name='startColor', value='white')
                   | white
               p
-                  button#btnSubmit(type="submit") searching
-                  button#btnReset(type="reset") cancel
+                  button#btnSubmit(type="submit", formaction="/addGame", formmethod="post") Edit game
+                  button#btnSubmit(type="submit", formaction="/removeGame", formmethod="post") Back
 
 

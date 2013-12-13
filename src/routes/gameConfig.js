@@ -63,3 +63,27 @@ exports.showGames = function(req, res){
             }
         })
 };
+
+exports.removeGame = function(reg, res){
+    console.log("please remove the current game");
+
+    var gameName = reg.body.gameName;
+    var setting1 = reg.body.setting;
+    var ruleSet = reg.body.ruleSet;
+    var boardSize = reg.body.boardSize;
+    var startColor = reg.body.startColor;
+
+    var objGC = new GameConfig({
+        gameName: gameName,
+        settings: setting1,
+        ruleSet: ruleSet,
+        boardSize: boardSize,
+        startColor: startColor,
+        username1: someUsername,
+        gameID: someID,
+        userID: someID
+    })
+
+    GameConfig.find({gameID: someID}).remove();
+    res.redirect('/');
+}

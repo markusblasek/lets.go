@@ -85,6 +85,7 @@ app.get('/user', auth, routes.user.get);
 app.get('/setUpGame', routes.gameConfig.setUpGame);
 app.get('/showGames', routes.gameConfig.showGames);
 app.post('/addGame', routes.gameConfig.addGame);
+app.post('/removeGame', routes.gameConfig.removeGame);
 
 // websocket stuff below
 io.configure(function() {
