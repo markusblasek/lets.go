@@ -1,7 +1,7 @@
 var fs = require('fs');
 
 exports.user = require('./user');
-exports.game = require('./game');
+exports.gameConfig = require('./gameConfig');
 
 exports.index = function(req, res) {
     res.render('index');

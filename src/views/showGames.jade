@@ -1,5 +1,4 @@
 doctype 5
-extends index
 block content
         table(border=1)
             thead
@@ -10,6 +9,8 @@ block content
                     th BoardSize
                     th StartColor
                     th Player
+                    th Opponent
+                    th gameID
             tbody
                 each user, i in userlist
                     tr
@@ -18,10 +19,14 @@ block content
                         td
                             label(for='settings')=user.settings
                         td
-                            label(for='ruleSet')=user.rSet
+                            label(for='ruleSet')=user.ruleSet
                         td
                             label(for='boardSize')=user.boardSize
                         td
-                            label(for='startColor')=user.sColor
+                            label(for='startColor')=user.startColor
                         td
                             label(for='user1')=user.username1
+                        td
+                            label(for='id')=user.username2
+                        td
+                            label(for='gameID')=user.gameID

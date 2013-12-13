@@ -1,11 +1,10 @@
 doctype 5
-extends index
 
 block content
   -var temp=0
         //iterates over all gameObjects. There should only be one possibility
       each user, i in userlist
-        if user.userID === id
+        if user.gameID == gID
           -temp=1
 
           //only for debbugging
@@ -29,49 +28,48 @@ block content
                 else
                     input(type="text", value=user.gameName , name="gameName" size="50")
             p
-                input(type='radio', name='setting1', value='0', checked= (user.settings==0))
+                input(type='radio', name='setting', value='Free', checked= (user.settings=='Free'))
                 |Free
-                input(type='radio', name='setting1', value='1', checked= (user.settings==1))
+                input(type='radio', name='setting', value='Demonstration', checked= (user.settings=='Demonstration'))
                 |Demonstration
-                input(type='radio', name='setting1', value='2', checked= (user.settings==2))
+                input(type='radio', name='setting', value='Teaching', checked= (user.settings=='Teaching'))
                 |Teaching
-                input(type='radio', name='setting1', value='3', checked= (user.settings==3))
+                input(type='radio', name='setting', value='Simul', checked= (user.settings=='Simul'))
                 |Simul
-                input(type='radio', name='setting1', value='4', checked= (user.settings==4))
+                input(type='radio', name='setting', value='Rengo', checked= (user.settings=='Rengo'))
                 |Rengo
             p
                 |Rule Set:
-                input(type='radio', name='ruleSet', value='0', checked= (user.rSet==0))
+                input(type='radio', name='ruleSet', value='Japanese', checked= (user.ruleSet=='Japanese'))
                 |Japanese
-                input(type='radio', name='ruleSet', value='1', checked= (user.rSet==1))
+                input(type='radio', name='ruleSet', value='Chinese', checked= (user.ruleSet=='Chinese'))
                 |Chinese
-                input(type='radio', name='ruleSet', value='2', checked= (user.rSet==2))
+                input(type='radio', name='ruleSet', value='AGA', checked= (user.ruleSet=='AGA'))
                 |AGA
-                input(type='radio', name='ruleSet', value='3', checked= (user.rSet==3))
+                input(type='radio', name='ruleSet', value='New Zealand', checked= (user.ruleSet=='New Zealand'))
                 |New Zealand
             p
                 |Board Size:
-                input(type='radio', name='boardSize', value='0', checked= (user.boardSize==0))
+                input(type='radio', name='boardSize', value='9x9', checked= (user.boardSize=='9x9'))
                 |9x9
-                input(type='radio', name='boardSize', value='1', checked= (user.boardSize==1))
+                input(type='radio', name='boardSize', value='13x13', checked= (user.boardSize=='13x13'))
                 |13x13
-                input(type='radio', name='boardSize', value='2', checked= (user.boardSize==2))
+                input(type='radio', name='boardSize', value='19x19', checked= (user.boardSize=='19x19'))
                 |19x19
             p
                 |Who should start:
-                input(type='radio', name='startColor', value='0', checked= (user.sColor==0))
+                input(type='radio', name='startColor', value='black', checked= (user.startColor=='black'))
                 |black
-                input(type='radio', name='startColor', value='1', checked= (user.sColor==1))
+                input(type='radio', name='startColor', value='white', checked= (user.startColor=='white'))
                 |white
             p
                 button#btnSubmit(type="submit") Edit game
                 button#btnReset(type="reset") Cancel game
-                button#btnStart(type="name") Start game
+
 
           script(type='text/javascript').
             //alle 100 sec wird neu geladen
             window.setTimeout("location.reload()", 100000);
-
 
 
       if temp !=1
@@ -81,39 +79,39 @@ block content
               div
                 input(type="text", placeholder="Type in the name for your game (optional):", name="gameName" size="50")
               p
-                  input(type='radio', name='setting1', value='0', checked)
+                  input(type='radio', name='setting', value='Free', checked)
                   | Free
-                  input(type='radio', name='setting1', value='1')
+                  input(type='radio', name='setting', value='Demonstration')
                   | Demonstration
-                  input(type='radio', name='setting1', value='2')
+                  input(type='radio', name='setting', value='Teaching')
                   | Teaching
-                  input(type='radio', name='setting1', value='3')
+                  input(type='radio', name='setting', value='Simul')
                   | Simul
-                  input(type='radio', name='setting1', value='4')
+                  input(type='radio', name='setting', value='Rengo')
                   | Rengo
               p
                   | Rule Set:
-                  input(type='radio', name='ruleSet', value='0', checked)
+                  input(type='radio', name='ruleSet', value='Japanese', checked)
                   | Japanese
-                  input(type='radio', name='ruleSet', value='1')
+                  input(type='radio', name='ruleSet', value='Chinese')
                   | Chinese
-                  input(type='radio', name='ruleSet', value='2')
+                  input(type='radio', name='ruleSet', value='AGA')
                   | AGA
-                  input(type='radio', name='ruleSet', value='3')
+                  input(type='radio', name='ruleSet', value='New Zealand')
                   | New Zealand
               p
                   | Board Size:
-                  input(type='radio', name='boardSize', value='0', checked)
+                  input(type='radio', name='boardSize', value='9x9', checked)
                   | 9x9
-                  input(type='radio', name='boardSize', value='1')
+                  input(type='radio', name='boardSize', value='13x13')
                   | 13x13
-                  input(type='radio', name='boardSize', value='2')
+                  input(type='radio', name='boardSize', value='19x19')
                   | 19x19
               p
                   | Who should start:
-                  input(type='radio', name='startColor', value='0', checked)
+                  input(type='radio', name='startColor', value='black', checked)
                   | black
-                  input(type='radio', name='startColor', value='1')
+                  input(type='radio', name='startColor', value='white')
                   | white
               p
                   button#btnSubmit(type="submit") searching
