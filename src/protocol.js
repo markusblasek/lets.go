@@ -15,7 +15,7 @@ var messageSchema = {
         id: { type: 'string', required: true }
       }
     },
-    message: { type: 'string', required: true }
+    text: { type: 'string', required: true }
   }
 };
 
@@ -53,6 +53,8 @@ module.exports = function(io) {
         return log.warn('Message data is invalid: ', validation.errors);
       }
 
+      data.user = user.alias;
+
       if (data.target.type === 'user') {
         var target = users[data.target.id];
 
@@ -62,7 +64,8 @@ module.exports = function(io) {
 
         target.emit('message', data);
       } else if (data.target.type === 'game') {
-        // TODO: All user in game have to join a socket.io room, the room shall be identified by the game _id.
+        // TODO: ensure that user joined the channel ...
+        io.sockets.in(data.target.id).emit('message', data);
       }
     });
 
@@ -108,6 +111,12 @@ module.exports = function(io) {
 
           socket.join(game.id);
           socket.emit('game', game);
+
+          io.sockets.in(game.id).emit('message', {
+            target: {type: 'game', id: game.id},
+            user: 'System',
+            text: 'User ' + user.alias + ' joined.'
+          });
         });
     });
 

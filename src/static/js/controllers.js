@@ -128,6 +128,15 @@ angular.module('letsGo.controllers', []).
 
     $scope.game = {};
     $scope.board = [];
+    $scope.messages = [];
+
+    $scope.send = function(text) {
+      text = $('#text').val();
+      if (text && text != '') {
+        console.log('send ', text);
+        socket.message('game', gameId, text);
+      }
+    };
 
     var board = [
       '      B  ',
@@ -149,6 +158,14 @@ angular.module('letsGo.controllers', []).
       $scope.$apply(function() {
         $scope.game = game;
       });
+    });
+
+    $scope.$on('message', function(event, message) {
+      if (message.target.type === 'game' && message.target.id === gameId) {
+        $scope.$apply(function() {
+          $scope.messages.push(message);
+        });
+      }
     });
 
     socket.join(gameId);
