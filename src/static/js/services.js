@@ -2,28 +2,13 @@
 
 angular.module('letsGo.services', []).
 
-  service('user', function($rootScope, $http) {
+  service('user', function($rootScope, $http, socket) {
     var user = null;
-    var socket = null;
 
-    //TODO: Socket management should be moved into a separate service
     var setUser = function(aUser) {
       user = aUser;
-
       $rootScope.$broadcast('userChanged', user);
-
-      if (!socket) {
-        socket = io.connect('/');
-
-        socket.on('status', function(data) {
-          console.log('status', data);
-          $rootScope.$broadcast('online', data.online);
-        });
-
-      } else {
-        // due to https://github.com/LearnBoost/socket.io-client/issues/251
-        socket.socket.reconnect();
-      }
+      socket.connect();
     }
 
     return {
@@ -56,6 +41,45 @@ angular.module('letsGo.services', []).
         }).success(setUser);
       }
     }
+  }).
+
+  service('socket', function($rootScope) {
+    var socket = null;
+    var connected = false;
+
+    var statusHandler = function(data) {
+      $rootScope.$broadcast('online', data.online);
+    };
+
+    return {
+      connect: function() {
+        if (!socket) {
+          socket = io.connect('/');
+
+          socket.on('status', statusHandler);
+
+        } else if (!connected) {
+          // due to https://github.com/LearnBoost/socket.io-client/issues/251
+          socket.socket.reconnect();
+        } else {
+          return false;
+        }
+
+        connected = true;
+
+        return true;
+      },
+      disconnect: function() {
+        if (!connected) {
+          return false;
+        }
+
+        socket.disconnect();
+        connected = false;
+
+        return true;
+      }
+    };
   }).
 
   service('Game', function($resource) {

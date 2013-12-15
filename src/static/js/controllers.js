@@ -9,7 +9,6 @@ angular.module('letsGo.controllers', []).
     $scope.$on('$routeChangeError', NProgress.done);
 
     $scope.$on('$viewContentLoaded', function() {
-      console.log('loaded ', $('.ui.dropdown'));
       $('.ui.dropdown').dropdown();
     });
 
