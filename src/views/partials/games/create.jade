@@ -1,0 +1,20 @@
+form(name='form', ng-submit='create()', novalidate)
+  div.ui.form.segment(ng-class='{loading: loading, warning: error}')
+    div.ui.warning.message(ng-if='error')
+      div.header Something went wrong, sorry!
+      ul.list
+        li(ng-bind='error')
+    div.field(ng-class='{error: form.name.$dirty && form.name.$invalid}')
+      label Name
+      input(placeholder='Game description (Optional)', name='name' type='text', ng-model='game.gameName')
+    div.field(ng-class='{error: form.size.$dirty && form.size.$invalid}')
+      label Board Size
+      div.ui.dropdown.selection
+        input(name='size', type='hidden', ng-model='game.boardSize')
+        div.default.text 9x9
+        i.dropdown.icon
+        div.menu
+          div.item(data-value='9x9') 9x9
+          div.item(data-value='13x13') 13x13
+          div.item(data-value='19x19') 19x19
+    button.ui.blue.submit.button(type='submit', ng-disabled='form.$invalid', ng-class='{disabled: form.$invalid}') Create
