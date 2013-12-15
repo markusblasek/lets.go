@@ -95,7 +95,7 @@ angular.module('letsGo.controllers', []).
   }).
 
   controller('GamesCreateCtrl', function($scope, $location, Game) {
-    $scope.game = {};
+    $scope.game = {size: 9};
     $scope.loading = false;
 
     $scope.create = function() {
@@ -110,7 +110,8 @@ angular.module('letsGo.controllers', []).
     };
   }).
 
-  controller('GamesViewCtrl', function($scope, $http, $location) {
+  controller('GamesViewCtrl', function($scope, $http, $location, socket) {
+
     var board = [
       '      B  ',
       '  W      ',
