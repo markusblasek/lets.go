@@ -23,6 +23,6 @@ div.ui.inverted.fixed.small.borderless.main.menu(style='margin: 0;')
         div.ui.item(ng-bind='"Online " + online')
         div.ui.item
             i.icon.user
-            b(ng-bind='user.alias')
+            b(ng-bind='user.alias + " " + user._id')
         a.item(href='#', ng-click='logout()')
             div.ui.teal.button logout

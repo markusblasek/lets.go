@@ -128,15 +128,6 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
 
     $scope.game = {};
     $scope.board = [];
-    $scope.messages = [];
-
-    $scope.send = function(text) {
-      text = $('#text').val();
-      if (text && text != '') {
-        console.log('send ', text);
-        socket.message('game', gameId, text);
-      }
-    };
 
     var board = [
       '      B  ',
