@@ -82,6 +82,11 @@ app.post('/user/login', routes.user.login);
 app.post('/user/logout', routes.user.logout);
 app.get('/user', auth, routes.user.get);
 
+app.post('/games', routes.games.create);
+app.get('/games', routes.games.list);
+app.get('/games/:id', routes.games.get);
+app.delete('/games/:id', routes.games.remove);
+
 app.get('/setUpGame', routes.gameConfig.setUpGame);
 app.get('/showGames', routes.gameConfig.showGames);
 app.post('/addGame', routes.gameConfig.addGame);

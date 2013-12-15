@@ -56,4 +56,8 @@ angular.module('letsGo.services', []).
         }).success(setUser);
       }
     }
+  }).
+
+  service('Game', function($resource) {
+    return $resource('/games/:id', {id: '@id'});
   });

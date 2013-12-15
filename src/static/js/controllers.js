@@ -4,10 +4,14 @@ angular.module('letsGo.controllers', []).
   controller('AppCtrl', function($scope, $route, $http, $location, user) {
     $scope.$route = $route;
 
-
     $scope.$on('$routeChangeStart', NProgress.start);
     $scope.$on('$routeChangeSuccess', NProgress.done);
     $scope.$on('$routeChangeError', NProgress.done);
+
+    $scope.$on('$viewContentLoaded', function() {
+      console.log('loaded ', $('.ui.dropdown'));
+      $('.ui.dropdown').dropdown();
+    });
 
     user.check();
 
@@ -72,6 +76,39 @@ angular.module('letsGo.controllers', []).
 
   controller('MessagesCtrl', function($scope, $http, $location) {
     $scope.users = ['ich', 'du'];
+  }).
+
+  controller('GamesListCtrl', function($scope, Game) {
+
+    $scope.games = [];
+
+    var update = function() {
+      Game.query(function(games) {
+        $scope.games = games;
+      });
+    };
+
+    $scope.remove = function(id) {
+      Game.delete({id: id}, update);
+    };
+
+    update();
+  }).
+
+  controller('GamesCreateCtrl', function($scope, $location, Game) {
+    $scope.game = {};
+    $scope.loading = false;
+
+    $scope.create = function() {
+      $scope.loading = true;
+
+      var game = new Game($scope.game);
+      game.$save(function(game) {
+        $location.url('/games');
+      }, function(err) {
+        $scope.error = 'Failed ' + err;
+      });
+    };
   }).
 
   controller('GamesViewCtrl', function($scope, $http, $location) {
