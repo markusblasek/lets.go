@@ -5,7 +5,8 @@ angular.module('letsGo', [
   'ngSanitize',
   'ngResource',
   'letsGo.services',
-  'letsGo.controllers'
+  'letsGo.controllers',
+  'letsGo.directives'
 ]).
 config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvider) {
   // add an interceptor for AJAX errors

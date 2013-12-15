@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('letsGo.controllers', []).
+angular.module('letsGo.controllers', ['letsGo.directives']).
   controller('AppCtrl', function($scope, $route, $http, $location, user) {
     $scope.$route = $route;
 
