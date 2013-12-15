@@ -22,10 +22,10 @@ var messageSchema = {
 var moveSchema = {
   type: 'object',
   properties: {
-    game_id: { type: 'string', required: true },
-    type: { type: 'string', enum: ['pass', 'surrender', 'play'], required: true },
-    row: { type: 'integer', minimum: 0, required: true },
-    column: { type: 'integer', minimum: 0, required: true }
+    gameId: {type: 'string', required: true},
+    type: {type: 'string', enum: ['pass', 'surrender', 'play'], required: true},
+    row: {type: 'integer', minimum: 0},
+    column: {type: 'integer', minimum: 0}
   }
 };
 
@@ -93,6 +93,7 @@ module.exports = function(io) {
 
         game.challengee = user._id;
         game.state = 'live';
+        game.board = Array(game.config.size * game.config.size + 1).join(' ');
 
         game.save(function(err) {
           if (err) {
@@ -114,7 +115,7 @@ module.exports = function(io) {
         .populate('challenger', 'alias')
         .populate('challengee', 'alias')
         .exec(function(err, game) {
-          if (err) {
+          if (err || !game) {
             return log.warn('Failed to get game: ', err);
           }
 
@@ -139,49 +140,59 @@ module.exports = function(io) {
         return log.warn('Invalid data supplied in move command', data, validation.errors);
       }
 
-      var game = Game.findById(data.game_id, function(err, game) {
-        if (err) {
-          return log.warn('Unable to find game by id %s', data.game_id);
-        }
-
-        if (game.state !== 'live') {
-          return log.warn('Moves are only allowed for games that are live');
-        }
-
-        if (game.playing_id !== user.id) {
-          return log.warn('User is not allowed to make a move.');
-        }
-
-        var move = new Move({
-          game_id: game.id,
-          player_id: user.id,
-          type: data.type
-        });
-
-        if (data.type === 'play') {
-          move.column = data.column;
-          move.row = data.row;
-
-          var board = logic.move(game.board, 'x', move.column, move.row);
-
-          if (!board) {
-            return log.warn('Illegal move.');
+      Game
+        .findById(data.gameId)
+        .populate('challenger', 'alias')
+        .populate('challengee', 'alias')
+        .exec(function(err, game) {
+          if (err || !game) {
+            return log.warn('Unable to find game by id %s', data.gameId);
           }
 
-          move.board;
-        }
-
-        move.save(function(err) {
-          if (err) {
-            return log.warn('Unable to save move', move, err);
+          if (game.state !== 'live') {
+            return log.warn('Moves are only allowed for games that are live');
           }
 
-          // update game and broadcast move to other players
-          // MOVE HAS TO INCORPORATE NEW BOARD!111
+          /*
+          if (game.playing_id !== user.id) {
+            return log.warn('User is not allowed to make a move.');
+          }
+          */
 
-          io.sockets.in(data.game_id).emit('move', data);
+          var move = new Move({
+            game: game.id,
+            user: user.id,
+            type: data.type
+          });
+
+          if (data.type === 'play') {
+            move.column = data.column;
+            move.row = data.row;
+
+            var board = logic.move(game.board, user.id == game.challenger.id ? 'B' : 'W', move.column, move.row);
+
+            if (!board) {
+              return log.warn('Illegal move.');
+            }
+
+            move.board = board;
+            game.board = board;
+          }
+
+          move.save(function(err) {
+            if (err) {
+              return log.warn('Unable to save move', move, err);
+            }
+
+            game.save(function(err) {
+              if (err) {
+                return log.warn('Unable to save game', game, err);
+              }
+
+              io.sockets.in(game.id).emit('game', game);
+            });
+          });
         });
-      });
     });
 
     // exchange messages between two clients to initialise the video chat

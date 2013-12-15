@@ -61,7 +61,7 @@ angular.module('letsGo.services', []).
 
     var messageHandler = function(data) {
       $rootScope.$broadcast('message', data);
-    }
+    };
 
     var acceptAction = function(game_id) {
       if (connected) {
@@ -82,7 +82,18 @@ angular.module('letsGo.services', []).
           text: text
         });
       }
-    }
+    };
+
+    var moveAction = function(gameId, column, row) {
+      if (connected) {
+        socket.emit('move', {
+          gameId: gameId,
+          type: 'play',
+          column: column,
+          row: row
+        });
+      }
+    };
 
     return {
       connect: function() {
@@ -118,6 +129,7 @@ angular.module('letsGo.services', []).
       accept: acceptAction,
       join: joinAction,
       message: messageAction,
+      move: moveAction,
 
       //temporary solution
       emit: function(event, data){

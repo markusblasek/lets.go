@@ -5,8 +5,9 @@ div.ui.grid.vertical.segment
     div.ui.segment
       div.board
         div.row(ng-repeat='row in board')
-          div.cell(ng-repeat='item in row', ng-class='{black: item.cell === "B", white: item.cell === "W"}')
-            | {{ item.cell }}
+          div.cell(ng-repeat='item in row')
+            div.stone(ng-class='{black: item.cell === "B", white: item.cell === "W"}',
+                      ng-click='move($index, $parent.$index)')
   div.four.wide.column
     div.ui.segment
       p

@@ -129,58 +129,33 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
     $scope.game = {};
     $scope.board = [];
 
-    var board = [
-      '      B  ',
-      '  W      ',
-      '      B  ',
-      '  W      ',
-      '      B  ',
-      '  W      ',
-      '      B  ',
-      '  W      ',
-      '  W      '
-    ].join('');
-
-    var updateBoard = function(data) {
-
+    $scope.move = function(column, row) {
+      console.log('move ', $scope.board, column, row);
+      if ($scope.board[row][column].cell === ' ') {
+        socket.move(gameId, column, row);
+      }
     };
 
     $scope.$on('gameState', function(event, game) {
       $scope.$apply(function() {
         $scope.game = game;
-      });
-    });
 
-    $scope.$on('message', function(event, message) {
-      if (message.target.type === 'game' && message.target.id === gameId) {
-        $scope.$apply(function() {
-          $scope.messages.push(message);
-        });
-      }
+        $scope.board = [];
+        for (var i = 0; i < game.board.length; ++i) {
+          if (i % game.config.size == 0) {
+            $scope.board.push([]);
+          }
+
+          $scope.board[parseInt(i/game.config.size)].push({
+            cell: game.board[i]
+          });
+        }
+
+        console.log('new board', $scope.board);
+      });
     });
 
     socket.join(gameId);
-
-    /*
-
-    var better = [];
-
-    for (var i = 0; i < board.length; ++i) {
-      if (i % 9 == 0) {
-        better.push([]);
-      }
-
-      better[parseInt(i/9)].push({
-        cell: board[i]
-      });
-    };
-
-    $scope.board = better;
-
-    console.log($scope.board);
-
-    console.log('bla');
-    */
 
     var idcaller = getUrlVars()["idcaller"];
     var idcallee = getUrlVars()["idcallee"];

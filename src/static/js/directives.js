@@ -11,8 +11,6 @@ angular.module('letsGo.directives', []).
       },
       templateUrl: '/static/partials/directives/message-box.jade',
       link: function(scope, element, attrs) {
-        console.log('link ', scope, ' element ', element, ' attrs ', attrs);
-
         var messages = element.find('.messages');
         var input = element.find('input.text');
         var send = element.find('.send');

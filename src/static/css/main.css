@@ -138,22 +138,42 @@ body {
     max-width: 600px;
 }
 .board .row {
-    height: 50px;
     clear: left;
 }
 
 .board .cell {
     float: left;
-    width: 50px;
-    height: 50px;
-    border: 1px solid #ddd;
-    background: #FFCB08;
+    border-top: 1px solid #111;
+    border-left: 1px solid #111;
+    width: 20px;
+    height: 20px;
+}
+.board .cell:first-child {
+    margin-left: 10px;
+}
+.board .cell:last-child {
+    width: 0px;
+}
+.board .row:first-child {
+    margin-top: 10px;
+}
+.board .row:last-child .cell {
+    height: 0px;
 }
 
-.board .cell.white {
+.board .stone {
+    margin-left: -10px;
+    margin-top: -10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 11px;
+}
+.board .stone.white {
     background: #fff;
+    border: 1px solid #333;
 }
 
-.board .cell.black {
+.board .stone.black {
     background: #111;
+    border: 1px solid #333;
 }

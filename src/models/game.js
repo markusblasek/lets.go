@@ -18,7 +18,7 @@ var gameSchema = new mongoose.Schema({
   },
   challenger: {type: ObjectId, ref: 'User', required: true},
   challengee: {type: ObjectId, ref: 'User'},
-  board: {type: [String]},
+  board: {type: String},
   created: {type: Date, default: Date.now}
 });
 
