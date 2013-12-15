@@ -1,7 +1,19 @@
-div.board
-  div.row(ng-repeat='row in board')
-    div.cell(ng-repeat='item in row', ng-class='{black: item.cell === "B", white: item.cell === "W"}')
-      | {{ item.cell }}
+h2(ng-bind='"Game: " + game.name + "(" + game._id + ")"')
+
+div.ui.grid
+  div.twelve.wide.column
+    div.ui.segment
+      div.board
+        div.row(ng-repeat='row in board')
+          div.cell(ng-repeat='item in row', ng-class='{black: item.cell === "B", white: item.cell === "W"}')
+            | {{ item.cell }}
+  div.four.wide.column
+    div.ui.segment
+      p
+        | Challenger: {{ game.challenger.alias }}
+    div.ui.segment
+      p
+        | Challengee: {{ game.challengee.alias }}
       
 div(style="clear:both")
 div.videochat

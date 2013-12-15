@@ -17,6 +17,7 @@ angular.module('letsGo.controllers', []).
     $scope.user = null;
     $scope.online = 0;
     $scope.logout = user.logout;
+    $scope.running_games = [];
 
     $scope.$on('userChanged', function(event, user) {
       $scope.user = user;
@@ -26,6 +27,10 @@ angular.module('letsGo.controllers', []).
       $scope.$apply(function() {
         $scope.online = online;
       });
+    });
+
+    $scope.$on('gameStarted', function(event, game) {
+      $location.url('/games/' + game._id);
     });
   }).
 
@@ -77,7 +82,7 @@ angular.module('letsGo.controllers', []).
     $scope.users = ['ich', 'du'];
   }).
 
-  controller('GamesListCtrl', function($scope, Game) {
+  controller('GamesListCtrl', function($scope, $location, Game, socket) {
 
     $scope.games = [];
 
@@ -89,6 +94,14 @@ angular.module('letsGo.controllers', []).
 
     $scope.remove = function(id) {
       Game.delete({id: id}, update);
+    };
+
+    $scope.accept = function(id) {
+      socket.accept(id);
+    };
+
+    $scope.view = function(id) {
+      $location.url('/games/' + id);
     };
 
     update();
@@ -110,7 +123,11 @@ angular.module('letsGo.controllers', []).
     };
   }).
 
-  controller('GamesViewCtrl', function($scope, $http, $location, socket) {
+  controller('GamesViewCtrl', function($scope, $http, $location, $routeParams, socket, Game) {
+    var gameId = $routeParams.gameId;
+
+    $scope.game = {};
+    $scope.board = [];
 
     var board = [
       '      B  ',
@@ -123,6 +140,20 @@ angular.module('letsGo.controllers', []).
       '  W      ',
       '  W      '
     ].join('');
+
+    var updateBoard = function(data) {
+
+    };
+
+    $scope.$on('gameState', function(event, game) {
+      $scope.$apply(function() {
+        $scope.game = game;
+      });
+    });
+
+    socket.join(gameId);
+
+    /*
 
     var better = [];
 
@@ -141,4 +172,5 @@ angular.module('letsGo.controllers', []).
     console.log($scope.board);
 
     console.log('bla');
+    */
   });

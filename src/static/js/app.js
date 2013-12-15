@@ -39,10 +39,6 @@ config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvide
       templateUrl: '/static/partials/messages/index.jade',
       controller: 'MessagesCtrl'
     }).
-    when('/game', {
-      templateUrl: '/static/partials/games/view.jade',
-      controller: 'GamesViewCtrl'
-    }).
     when('/games', {
       templateUrl: '/static/partials/games/list.jade',
       controller: 'GamesListCtrl'
@@ -50,6 +46,10 @@ config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvide
     when('/games/create', {
       templateUrl: '/static/partials/games/create.jade',
       controller: 'GamesCreateCtrl'
+    }).
+    when('/games/:gameId', {
+      templateUrl: '/static/partials/games/view.jade',
+      controller: 'GamesViewCtrl'
     }).
     otherwise({redirectTo: '/'});
 }]);

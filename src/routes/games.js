@@ -19,7 +19,7 @@ exports.create = function(req, res) {
 
 exports.list = function(req, res) {
   Game
-    .find({state: 'waiting'})
+    .find()
     .populate('challenger', 'alias')
     .exec(function(err, games) {
       if (err) {
@@ -30,17 +30,24 @@ exports.list = function(req, res) {
 };
 
 exports.get = function(req, res) {
-  Game.find({_id: req.params.id}, function(err, game) {
-    if (err) {
-      res.send(400, err);
-    }
-    res.send(game);
-  });
+  Game.
+    findOne({_id: req.params.id}).
+    populate('challenger', 'alias').
+    populate('challengee', 'alias').
+    exec(function(err, game) {
+      if (err) {
+        res.send(400, err);
+      }
+      res.send(game);
+    });
 };
 
 exports.remove = function(req, res) {
-  // TODO: Check whether the user is allowed to remove the game!
-  Game.remove({_id: req.params.id}, function(err) {
+  Game.remove({
+    _id: req.params.id,
+    challenger: req.user._id,
+    state: 'waiting'
+  }, function(err) {
     if (err) {
       res.send(400, err);
     }

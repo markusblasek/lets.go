@@ -66,6 +66,51 @@ module.exports = function(io) {
       }
     });
 
+    // accepting a game
+    socket.on('accept', function(data) {
+      log.debug('New accept request by user %s: ', user.email, data);
+
+      Game.findOne({_id: data.game_id, state: 'waiting'}, function(err, game) {
+        if (err) {
+          return log.warn('Unable to find waiting game by id %s', data.game_id);
+        }
+
+        if (game.challenger == user._id) {
+          return log.warn('Unable to accept own game!');
+        }
+
+        game.challengee = user._id;
+        game.state = 'live';
+
+        game.save(function(err) {
+          if (err) {
+            return log.warn('Failed to save new game state: ', err);
+          }
+
+          socket.emit('start', game);
+          users[game.challenger].emit('start', game);
+        });
+      })
+    });
+
+    // joining a game
+    socket.on('join', function(data) {
+      log.debug('New join request by user %s: ', user.email, data);
+
+      Game
+        .findById(data.game_id)
+        .populate('challenger', 'alias')
+        .populate('challengee', 'alias')
+        .exec(function(err, game) {
+          if (err) {
+            return log.warn('Failed to get game: ', err);
+          }
+
+          socket.join(game.id);
+          socket.emit('game', game);
+        });
+    });
+
     // making moves in a game
     socket.on('move', function(data) {
       log.debug('New move by user %s: ', user.email, data);

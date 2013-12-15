@@ -51,12 +51,34 @@ angular.module('letsGo.services', []).
       $rootScope.$broadcast('online', data.online);
     };
 
+    var startHandler = function(data) {
+      $rootScope.$broadcast('gameStarted', data);
+    };
+
+    var gameHandler = function(data) {
+      $rootScope.$broadcast('gameState', data);
+    };
+
+    var acceptAction = function(game_id) {
+      if (connected) {
+        socket.emit('accept', {game_id: game_id});
+      }
+    };
+
+    var joinAction = function(game_id) {
+      if (connected) {
+        socket.emit('join', {game_id: game_id});
+      }
+    };
+
     return {
       connect: function() {
         if (!socket) {
           socket = io.connect('/');
 
           socket.on('status', statusHandler);
+          socket.on('start', startHandler);
+          socket.on('game', gameHandler);
 
         } else if (!connected) {
           // due to https://github.com/LearnBoost/socket.io-client/issues/251
@@ -78,7 +100,9 @@ angular.module('letsGo.services', []).
         connected = false;
 
         return true;
-      }
+      },
+      accept: acceptAction,
+      join: joinAction
     };
   }).
 

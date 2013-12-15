@@ -2,14 +2,23 @@ a.ui.button(href='#/games/create') New Game
 table.ui.basic.table
   thead
     tr
+      th State
       th User
       th Description
       th Size
       th
   tbody
     tr(ng-repeat='game in games')
+      td(ng-bind='game.state')
       td(ng-bind='game.challenger.alias')
       td(ng-bind='game.name')
-      td(ng-bind='game.config.size')
-      td
+      td(ng-bind='game.config.size + "x" + game.config.size')
+
+      td(ng-if='game.challenger._id == user._id && game.state == "waiting"')
         a.ui.red.button(ng-click='remove(game._id)') Remove
+
+      td(ng-if='game.challenger._id != user._id && game.state == "waiting"')
+        a.ui.red.button(ng-click='accept(game._id)') Play
+
+      td(ng-if='game.state == "live"')
+        a.ui.red.button(ng-click='view(game._id)') View
