@@ -27,7 +27,16 @@ var moveSchema = {
     row: { type: 'integer', minimum: 0, required: true },
     column: { type: 'integer', minimum: 0, required: true }
   }
-}
+};
+
+var videoChatSchema = {
+    type: 'object',
+    properties: {
+        idcallee: { type: 'string', required: true },
+        type: { type: 'string', enum: ['sdp', 'candidate', 'callend'], required: true },
+        message: { type: 'string', required: true }
+    }
+};
 
 var users = {};
 
@@ -175,8 +184,23 @@ module.exports = function(io) {
       });
     });
 
+    // exchange messages between two clients to initialise the video chat
+    socket.on('videochat', function (data){
+        log.debug('New video chat message by user %s: ', user.email, data);
+        var validation = jsonschema.validate(data, videoChatSchema);
+        if (validation.errors.length > 0) {
+            return log.warn('Video chat message data is invalid: ', validation.errors);
+        };
+        var target = users[data.idcallee];
+        if (!target) {
+            return log.warn('User does not exist or is offline.');
+        }
+        // set the id of the caller, so the callee does know who is calling
+        data.idcaller = user.id;
+        target.emit('videochat', data);
+    });
     socket.on('disconnect', function() {
-      log.info('User %s disconnected.', user.email);
+     log.info('User %s disconnected.', user.email);
       delete users[user.id];
 
       io.sockets.emit('status', {

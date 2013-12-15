@@ -117,7 +117,19 @@ angular.module('letsGo.services', []).
       },
       accept: acceptAction,
       join: joinAction,
-      message: messageAction
+      message: messageAction,
+
+      //temporary solution
+      emit: function(event, data){
+        if (socket) {
+            socket.emit(event, data);
+        }
+      },
+      on: function(event, handler){
+        if(socket){
+            socket.on(event, handler);
+        }
+      }
     };
   }).
 
