@@ -1,4 +1,6 @@
-h2(ng-bind='"Game: " + game.name + "(" + game._id + ")"')
+h2.ui.header
+  i.icon.inverted.circular.green.gamepad
+  | {{ game.challenger.alias }} vs. {{ game.challengee.alias }}
 
 div.ui.grid.vertical.segment
   div.twelve.wide.column
@@ -15,7 +17,6 @@ div.ui.grid.vertical.segment
     div.ui.segment
       p
         | Challengee: {{ game.challengee.alias }}
-h3 Chat
 lg-message-box(lg-target-type='game', lg-target-id='{{ game._id }}')
 
 div(style="clear:both")
