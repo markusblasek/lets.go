@@ -281,6 +281,7 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
             }
 
             pcLocal.onaddstream = function (evt) {
+                reattachMediaStream(video_caller, localstream);
                 attachMediaStream(video_callee, evt.stream);
             };
 
