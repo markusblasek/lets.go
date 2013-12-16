@@ -79,13 +79,13 @@ app.get('/static/partials/*', routes.partials);
 
 app.post('/user', routes.user.register);
 app.post('/user/login', routes.user.login);
-app.post('/user/logout', routes.user.logout);
+app.post('/user/logout', auth, routes.user.logout);
 app.get('/user', auth, routes.user.get);
 
-app.post('/games', routes.games.create);
-app.get('/games', routes.games.list);
-app.get('/games/:id', routes.games.get);
-app.delete('/games/:id', routes.games.remove);
+app.post('/games', auth, routes.games.create);
+app.get('/games', auth, routes.games.list);
+app.get('/games/:id', auth, routes.games.get);
+app.delete('/games/:id', auth, routes.games.remove);
 
 app.get('/setUpGame', routes.gameConfig.setUpGame);
 app.get('/showGames', routes.gameConfig.showGames);
