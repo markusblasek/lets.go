@@ -160,7 +160,7 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
     var idcaller = getUrlVars()["idcaller"];
     var idcallee = getUrlVars()["idcallee"];
     var videochat_candidate = {'type': 'candidate', 'message': null, 'idcaller': idcaller, 'idcallee': idcallee};
-    var videochat_sdp = {'type': 'sdp', 'message': null, 'idcaller': idcaller, 'idcallee': idcallee};
+    var videochat_sdp = {'type': 'sdp', 'message': '', 'idcaller': idcaller, 'idcallee': idcallee};
     var videochat_callend = {'type': 'callend', 'message': null, 'idcaller': idcaller, 'idcallee': idcallee};
     var id_video_caller = 'video_caller';
     var id_video_callee = 'video_callee';
@@ -169,7 +169,7 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
     video_caller = document.getElementById(id_video_caller);
     var pcLocal, localstream;
     //Enter the configuration like stun-servers and ice-servers
-    var rtcPeerConfiguration = null;//{ "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] };
+    var rtcPeerConfiguration = { "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] };
 
     //Enter the session constrains of the offer
     var sdpConstraints = {'mandatory': {
@@ -181,12 +181,12 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
         "video": {
             "mandatory": {
                 "minWidth": "320",
-                "maxWidth": "1080",
+                "maxWidth": "720",
                 "minHeight": "180",
-                "maxHeight": "720",
+                "maxHeight": "480",
                 "minFrameRate": "30"
             },
-            "optional": []
+            "optional": [{'DtlsSrtpKeyAgreement': 'true'}]
         }
     };
     // Some helper functions....
