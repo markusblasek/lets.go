@@ -186,7 +186,7 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
                 "maxHeight": "480",
                 "minFrameRate": "30"
             },
-            "optional": [{'DtlsSrtpKeyAgreement': 'true'}]
+            "optional": []
         }
     };
     // Some helper functions....
@@ -261,7 +261,7 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
                 }
             });
         function connectChat(){
-            pcLocal = new RTCPeerConnection(rtcPeerConfiguration);
+            pcLocal = new RTCPeerConnection(rtcPeerConfiguration, {"optional": [{"DtlsSrtpKeyAgreement": true}]});
             pcLocal.oniceconnectionstatechange =
                 function(evt){
                     if(evt.currentTarget.iceConnectionState === 'disconnected'){
