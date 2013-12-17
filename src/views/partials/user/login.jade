@@ -22,7 +22,17 @@ div.ui.two.column.middle.aligned.relaxed.grid.basic.segment
               i.asterisk.icon
         button.ui.blue.submit.button(type='submit', ng-disabled='form.$invalid', ng-class='{disabled: form.$invalid}') Login
   div.ui.vertical.divider Or
-  div.center.aligned.column
+  div.left.aligned.column
     a.huge.green.ui.labeled.icon.button(href='#/user/register')
       i.signup.icon
       | Signup
+    a(href='/auth/facebook')
+      div.ui.facebook.button
+        i.facebook.icon
+        |Sign in with Facebook
+    a(href='/auth/google')
+      div.ui.google.plus.button
+        i.google.plus.icon
+        |Sign In with Google
+
+

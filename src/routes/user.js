@@ -38,6 +38,6 @@ exports.logout = function(req, res) {
 };
 
 exports.get = function(req, res) {
-  // TODO: We shouldnt not expose hash and salt this way, we also might hide __v.
+  // TODO: We should not expose hash and salt this way, we also might hide __v.
   res.send(req.user);
 };
