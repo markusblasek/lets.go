@@ -217,9 +217,11 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
     }
     function closeStreamAndPeerConn(){
         //Close the peerconnection and close the localstream
-        pcLocal.close();
+        if(pcLocal)
+            pcLocal.close();
         pcLocal = null;
-        localstream.stop();
+        if(localstream)
+            localstream.stop();
         localstream = null;
         //Reset the video-tags.
         video_callee.src = '';
@@ -232,34 +234,34 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
             });
         return vars;
     }
-        // Listening on video chat events
-        socket.on('videochat',
-            function (data) {
-                trace("received videochat of type '" + data.type + "'");
-                //trace(data);
-                if(typeof data.type === 'string' && (data.type === 'candidate' || data.type === 'sdp' || data.type === 'callend')){
-                    if(data.type === 'candidate'){
-                        pcLocal.addIceCandidate(new RTCIceCandidate(JSON.parse(data.message)));
-                    }else if(data.type === 'sdp'){
-                        if(!pcLocal){
-                            connectChat();
-                        }
-                        pcLocal.setRemoteDescription(new RTCSessionDescription(JSON.parse(data.message)), function () {
-                            // if we received an offer, we need to answer
-                            if (pcLocal.remoteDescription.type == 'offer'){
-                                pcLocal.createAnswer(localDescCreated, onfailure);
-                            }
-                        }, onfailure)
-                    }else if(data.type === 'callend'){
-                        trace("Callee stopped video chat.");
-                        closeStreamAndPeerConn();
-                    }else{
-                        trace("ERROR: received videochat of not implemented type '" + data.type + "'");
+    // Listening on video chat events
+    socket.on('videochat',
+        function (data) {
+            trace("received videochat of type '" + data.type + "'");
+            //trace(data);
+            if(typeof data.type === 'string' && (data.type === 'candidate' || data.type === 'sdp' || data.type === 'callend')){
+                if(data.type === 'candidate'){
+                    pcLocal.addIceCandidate(new RTCIceCandidate(JSON.parse(data.message)));
+                }else if(data.type === 'sdp'){
+                    if(!pcLocal){
+                        connectChat();
                     }
+                    pcLocal.setRemoteDescription(new RTCSessionDescription(JSON.parse(data.message)), function () {
+                        // if we received an offer, we need to answer
+                        if (pcLocal.remoteDescription.type == 'offer'){
+                            pcLocal.createAnswer(localDescCreated, onfailure);
+                        }
+                        }, onfailure);
+                }else if(data.type === 'callend'){
+                    trace("Callee stopped video chat.");
+                    closeStreamAndPeerConn();
                 }else{
-                    trace("ERROR: received videochat of UNKNOWN type '" + data.type + "'");
+                    trace("ERROR: received video chat of not implemented type '" + data.type + "'");
                 }
-            });
+            }else{
+                trace("ERROR: received video chat of UNKNOWN type '" + data.type + "'");
+            }
+        });
         function connectChat(){
             pcLocal = new RTCPeerConnection(rtcPeerConfiguration, {"optional": [{"DtlsSrtpKeyAgreement": true}]});
             pcLocal.oniceconnectionstatechange =
@@ -281,7 +283,7 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
             }
 
             pcLocal.onaddstream = function (evt) {
-                reattachMediaStream(video_caller, localstream);
+                //reattachMediaStream(video_caller, localstream);
                 attachMediaStream(video_callee, evt.stream);
             };
 
