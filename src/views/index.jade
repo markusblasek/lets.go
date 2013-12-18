@@ -7,7 +7,11 @@ html(lang='en', ng-app='letsGo')
     link(href='/static/lib/nprogress/css/nprogress.css', rel='stylesheet', type='text/css')
     link(href='/static/css/main.css', rel='stylesheet', type='text/css')
   body(ng-controller='AppCtrl')
+    include partials/sidebarChat
     include partials/menu
+
+    div#toggleChat.ui.black.inverted.fixed.left.attached.button(ng-if='user', style='position: relative; margin-top: 50px; float: right;', onclick="$('.sidebar').sidebar('toggle');")
+        i.icon.chat.layout.large
 
     div#container.ui.grid.aligned.middle
         div.column(ng-view)

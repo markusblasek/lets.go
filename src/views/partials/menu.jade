@@ -1,6 +1,6 @@
 - var messages = 5;
 
-div.ui.inverted.fixed.small.borderless.main.menu(style='margin: 0;')
+div.ui.inverted.small.borderless.main.menu(style='margin: 0;')
     a.item(href='/')
         img#logo.ui.image(src='/static/img/ic_logo.png')
     a.item
@@ -20,9 +20,14 @@ div.ui.inverted.fixed.small.borderless.main.menu(style='margin: 0;')
         a.ui.item(href='#/user/register')
             div.ui.teal.button sign up
     div.right.menu.borderless(ng-if='user')
-        div.ui.item(ng-bind='"Online " + online')
         div.ui.item
+            i.users.icon
+            | Online
+            div.ui.small.teal.label {{online}}
+        div.ui.dropdown.item.simple
             i.icon.user
-            b(ng-bind='user.alias + " " + user._id')
+            b(ng-bind='user.alias')
+            div.menu.left
+                div.ui.label.item ID: {{user._id}}
         a.item(href='#', ng-click='logout()')
             div.ui.teal.button logout
