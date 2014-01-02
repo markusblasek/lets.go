@@ -21,21 +21,21 @@
     "url": "https://github.com/markusblasek/lets.go.git"
   },
   "dependencies": {
-    "express": "3.4.3",
-    "mongoose": "3.6.20",
-    "jade": "0.35.0",
-    "less-middleware": "0.1.12",
+    "express": "3.4.7",
+    "mongoose": "3.8.3",
+    "jade": "1.0.2",
+    "less-middleware": "0.1.14",
     "socket.io": "0.9.16",
     "winston": "0.7.2",
     "cookie": "0.1.0",
-    "connect": "2.11.2",
+    "connect": "2.12.0",
     "connect-mongo": "0.4.0",
     "jsonschema": "0.4.0",
     "passport": "0.1.17",
     "passport-local": "0.1.6",
     "passport-local-mongoose": "~0.2.5",
-	"passport-facebook": "1.0.2",
-	"passport-google": "0.3.0",
+    "passport-facebook": "1.0.2",
+    "passport-google": "0.3.0",
     "forms": "0.3.0"
   },
   "engines": {

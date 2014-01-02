@@ -1,5 +1,4 @@
 exports.user = require('./user');
-exports.gameConfig = require('./gameConfig');
 exports.games = require('./games');
 
 exports.index = function(req, res) {

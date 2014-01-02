@@ -1,22 +1,16 @@
-var express = require('express'),
-    path = require('path'),
-    http = require('http'),
-    mongoose = require('mongoose'),
-    cookie = require('cookie'),
-    connect = require('connect'),
-    passport = require('passport'),
-    GoogleStrategy = require('passport-google').Strategy,
-    FacebookStrategy = require('passport-facebook').Strategy;
+var express = require('express');
+var path = require('path');
+var http = require('http');
+var mongoose = require('mongoose');
+var cookie = require('cookie');
+var connect = require('connect');
+var passport = require('passport');
 
-// don't abuse it plz
-var FACEBOOK_APP_ID = "723348891027933";
-var FACEBOOK_APP_SECRET = "b82698180e06348651c4cf1a8285f54b";
-
-var config = require('./config'),
-    log = require('./log'),
-    routes = require('./routes'),
-    protocol = require('./protocol'),
-    User = require('./models/user');
+var config = require('./config');
+var log = require('./log');
+var routes = require('./routes');
+var protocol = require('./protocol');
+var User = require('./models/user');
 
 // establish mongodb connection
 mongoose.connection.on('error', log.error.bind(log, 'connection error:'));
@@ -61,133 +55,13 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-// passport config
-passport.use(User.createStrategy());
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
-
-// Use the GoogleStrategy within Passport.
-//   Strategies in passport require a `validate` function, which accept
-//   credentials (in this case, an OpenID identifier and profile), and invoke a
-//   callback with a user object.
-passport.use(new GoogleStrategy({
-        returnURL: 'http://localhost:3000/auth/google/return',
-        realm: 'http://localhost:3000/'
-    },
-    function(identifier, profile, done) {
-        // check, if user with this email already exists
-        var query = User.findOne({ email: profile.emails[0].value});
-        query.exec(function (err, oldUser) {
-            if(oldUser) {
-                console.log('Google user: ' + oldUser.email + ' found and logged in!');
-                done(null, oldUser);
-            }
-            else
-            {
-                var newUser = new User();
-                newUser.alias = profile.name.givenName;
-                newUser.name = profile.displayName;
-                newUser.email = profile.emails[0].value;
-
-                newUser.save(function(err) {
-                    if(err) {throw err;}
-                    console.log('New Google user: ' + newUser.email + ' created and logged in!');
-                    done(null, newUser);
-                });
-            }
-        });
-    }
-));
-
-// Use the FacebookStrategy within Passport.
-//   Strategies in Passport require a `verify` function, which accept
-//   credentials (in this case, an accessToken, refreshToken, and Facebook
-//   profile), and invoke a callback with a user object.
-passport.use(new FacebookStrategy({
-        clientID: FACEBOOK_APP_ID,
-        clientSecret: FACEBOOK_APP_SECRET,
-        callbackURL: "http://localhost:3000/auth/facebook/callback"
-    },
-    function(accessToken, refreshToken, profile, done) {
-        //check, if user with this email already exists
-        var query = User.findOne({ email: profile.emails[0].value});
-        query.exec(function (err, oldUser) {
-                if(oldUser) {
-                    console.log('Facebook user: ' + oldUser.email + ' found and logged in!');
-                    done(null, oldUser);
-                }
-                else
-                {
-                    var newUser = new User();
-                    newUser.alias = profile.name.givenName;
-                    newUser.name = profile.displayName;
-                    newUser.email = profile.emails[0].value;
-
-                    newUser.save(function(err) {
-                        if(err) {throw err;}
-                        console.log('New Facebook user: ' + newUser.email + ' created and logged in!');
-                        done(null, newUser);
-                    });
-                }
-        });
-    }
-));
-
-var auth = function(req, res, next){
-  if (!req.isAuthenticated())
-    res.send(401);
-  else
-    next();
-};
+routes.user.setup(app);
 
 // routes below
 
-// TODO: move passport app.gets to routes/user (did not work for some reason...)
-// GET /auth/google
-//   Use passport.authenticate() as route middleware to authenticate the
-//   request.  The first step in Google authentication will involve redirecting
-//   the user to google.com.  After authenticating, Google will redirect the
-//   user back to this application at /auth/google/return
-app.get('/auth/google',
-    passport.authenticate('google', { failureRedirect: '/user/login' }),
-    function(req, res) {
-        res.redirect('/');
-    });
-
-// GET /auth/google/return
-//   Use passport.authenticate() as route middleware to authenticate the
-//   request.  If authentication fails, the user will be redirected back to the
-//   login page.  Otherwise, the primary route function function will be called,
-//   which, in this example, will redirect the user to the home page.
-app.get('/auth/google/return',
-    passport.authenticate('google', { failureRedirect: '/user/login' }),
-    function(req, res) {
-        res.redirect('/');
-    });
-
-
-// GET /auth/facebook
-//   Use passport.authenticate() as route middleware to authenticate the
-//   request.  The first step in Facebook authentication will involve
-//   redirecting the user to facebook.com.  After authorization, Facebook will
-//   redirect the user back to this application at /auth/facebook/callback
-app.get('/auth/facebook',
-    passport.authenticate('facebook', { scope: ['email']}),
-    function(req, res){
-        // The request will be redirected to Facebook for authentication, so this
-        // function will not be called.
-    });
-
-// GET /auth/facebook/callback
-//   Use passport.authenticate() as route middleware to authenticate the
-//   request.  If authentication fails, the user will be redirected back to the
-//   login page.  Otherwise, the primary route function function will be called,
-//   which, in this example, will redirect the user to the home page.
-app.get('/auth/facebook/callback',
-    passport.authenticate('facebook', { failureRedirect: '/user/login' }),
-    function(req, res) {
-        res.redirect('/');
-    });
+var home = function(req, res) {
+  res.redirect('/');
+};
 
 app.get('/', routes.index);
 
@@ -195,18 +69,18 @@ app.get('/static/partials/*', routes.partials);
 
 app.post('/user', routes.user.register);
 app.post('/user/login', routes.user.login);
-app.post('/user/logout', auth, routes.user.logout);
-app.get('/user', auth, routes.user.get);
+app.post('/user/logout', routes.user.isAuthed, routes.user.logout);
+app.get('/user', routes.user.isAuthed, routes.user.get);
+app.get('/user/:id', routes.user.isAuthed, routes.user.get);
+app.get('/user/auth/google', routes.user.authGoogle, home);
+app.get('/user/auth/google/return', routes.user.authGoogle, home);
+app.get('/user/auth/facebook', routes.user.authFacebook, function(){});
+app.get('/user/auth/facebook/callback', routes.user.authFacebookCb, home);
 
-app.post('/games', auth, routes.games.create);
-app.get('/games', auth, routes.games.list);
-app.get('/games/:id', auth, routes.games.get);
-app.delete('/games/:id', auth, routes.games.remove);
-
-app.get('/setUpGame', routes.gameConfig.setUpGame);
-app.get('/showGames', routes.gameConfig.showGames);
-app.post('/addGame', routes.gameConfig.addGame);
-app.post('/removeGame', routes.gameConfig.removeGame);
+app.post('/games', routes.user.isAuthed, routes.games.create);
+app.get('/games', routes.user.isAuthed, routes.games.list);
+app.get('/games/:id', routes.user.isAuthed, routes.games.get);
+app.delete('/games/:id', routes.user.isAuthed, routes.games.remove);
 
 // websocket stuff below
 io.configure(function() {
