@@ -8,29 +8,112 @@
  * @param {Number} row - Row of the new stone (0-indexed).
  * @returns {String} Either a new board or null in case the move isn't legit.
  */
-function move(board, turn, col, row) {
-    var n = Math.sqrt(board.length);
+var move = function(board, turn, col, row) {
+  var n = Math.sqrt(board.length);
 
-    // quadratic boards only
-    if (n % 1 !== 0) {
-        return null;
+  // quadratic boards only
+  if (n % 1 !== 0) {
+    return null;
+  }
+
+  // ensure that position is within the board
+  if (col < 0 || row < 0 || col >= n || row >= n) {
+    return null;
+  }
+
+  var index = n*row + col;
+  var opponent = (turn === 'W') ? 'B' : 'W';
+
+  // check whether the place is already taken
+  if (board[index] !== ' ') {
+    return null;
+  }
+
+  // place our stone
+  board = replace(board, index, turn);
+
+  // remove all stones that are dead now
+  var neighbors = neighborhood(n, index);
+  for (var i = 0; i < neighbors.length; ++i) {
+    var neighbor = neighbors[i];
+    if (board[neighbor] === opponent) {
+      var grp = group(board, n, neighbor % n, Math.floor(neighbor / n));
+      if (liberties(board, n, grp) === 0) {
+        for (var j = 0; j < grp.length; ++j) {
+          board = replace(board, grp[j], ' ');
+        }
+      }
     }
+  }
 
-    // check whether the place is already taken
-    if (board[n*row + col] !== ' ') {
-        return null;
+  var indices = group(board, n, col, row);
+
+  // ensure that it's not a suicide move
+  if (liberties(board, n, indices) === 0) {
+    return null;
+  }
+
+  // TODO: Add check for Ko!
+
+  return board;
+};
+
+// return 1d indexes of all group members
+var group = function(board, n, x, y, checked) {
+  var index = y * n + x;
+
+  checked = checked || [];
+  checked.push(index);
+
+  var candidates = neighborhood(n, index);
+  for (var i = 0; i < candidates.length; ++i) {
+    var c = candidates[i];
+    if (checked.indexOf(c) === -1 && board[c] === board[index]) {
+      group(board, n, c % n, Math.floor(c / n), checked);
     }
+  }
 
-    // TODO: Incorporate check for KO, that requires a history of boards though!
+  return checked;
+};
 
-    var index = n*row + col;
-    board = board.substr(0, index) + turn + board.substr(index + 1);
+// return number of free crosses for group
+var liberties = function(board, n, indices) {
+  var checked = [];
+  var count = 0;
 
-    // TODO: Remove dead stones!
+  for (var i = 0; i < indices.length; ++i) {
+    var candidates = neighborhood(n, indices[i]);
+    for (var j = 0; j < candidates.length; ++j) {
+      var c = candidates[j];
+      if (checked.indexOf(c) === -1 && board[c] === ' ') {
+        count += 1;
+        checked.push(c);
+      }
+    }
+  }
 
-    return board;
-}
+  return count;
+};
+
+// create list of valid neighborhood indices
+var neighborhood = function(n, index) {
+  var neighborhood = [];
+  var x = index % n;
+  var y = Math.floor(index / n);
+
+  if (x > 0) neighborhood.push(index - 1);
+  if (x < n - 1) neighborhood.push(index + 1);
+  if (y > 0) neighborhood.push(index - n);
+  if (y < n - 1) neighborhood.push(index + n);
+
+  return neighborhood;
+};
+
+// helper method to create new string by replacing a char
+var replace = function(board, index, value) {
+  return board.substr(0, index) + value + board.substr(index + 1);
+};
 
 module.exports = {
-    move: move
+  move: move
 };
