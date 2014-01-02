@@ -36,10 +36,14 @@
     "passport-local-mongoose": "~0.2.5",
     "passport-facebook": "1.0.2",
     "passport-google": "0.3.0",
-    "forms": "0.3.0"
+    "forms": "0.3.0",
+    "mocha": "1.16.2"
   },
   "engines": {
     "node": "0.10.21"
+  },
+  "scripts": {
+    "test": "mocha --recursive --reporter spec tests"
   },
   "private": true
 }

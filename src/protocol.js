@@ -83,7 +83,7 @@ module.exports = function(io) {
       log.debug('New accept request by user %s: ', user.email, data);
 
       Game.findOne({_id: data.game_id, state: 'waiting'}, function(err, game) {
-        if (err) {
+        if (err || !game) {
           return log.warn('Unable to find waiting game by id %s', data.game_id);
         }
 
@@ -93,7 +93,26 @@ module.exports = function(io) {
 
         game.challengee = user._id;
         game.state = 'live';
-        game.board = Array(game.config.size * game.config.size + 1).join(' ');
+        game.started = new Date();
+
+        // decide who has black, thus starts
+        if (game.config.color == 'black') {
+          game.black = game.challenger;
+        } else if (game.config.color == 'white') {
+          game.black = game.challengee;
+        } else {
+          game.black = Math.random() < .5 ? game.challenger : game.challengee;
+        }
+
+        // describes the current state of the game
+        game.runtime = {
+          board: Array(game.config.size * game.config.size + 1).join(' '),
+          score: {
+            challenger: 0,
+            challengee: 0
+          },
+          turn: game.black
+        };
 
         game.save(function(err) {
           if (err) {
@@ -112,11 +131,11 @@ module.exports = function(io) {
 
       Game
         .findById(data.game_id)
-        .populate('challenger', 'alias')
-        .populate('challengee', 'alias')
+        .populate('challenger')
+        .populate('challengee')
         .exec(function(err, game) {
           if (err || !game) {
-            return log.warn('Failed to get game: ', err);
+            return log.warn('Failed to get game %s: ', data.game_id, err);
           }
 
           socket.join(game.id);
@@ -142,26 +161,24 @@ module.exports = function(io) {
 
       Game
         .findById(data.gameId)
-        .populate('challenger', 'alias')
-        .populate('challengee', 'alias')
+        .populate('challenger')
+        .populate('challengee')
         .exec(function(err, game) {
           if (err || !game) {
-            return log.warn('Unable to find game by id %s', data.gameId);
+            return log.warn('Unable to find game by id %s: ', data.gameId, err);
           }
 
           if (game.state !== 'live') {
             return log.warn('Moves are only allowed for games that are live');
           }
 
-          /*
-          if (game.playing_id !== user.id) {
-            return log.warn('User is not allowed to make a move.');
+          if (game.runtime.turn !== user._id) {
+            return log.warn('User is not allowed to make a move, not his turn.');
           }
-          */
 
           var move = new Move({
-            game: game.id,
-            user: user.id,
+            game: game._id,
+            user: user._id,
             type: data.type
           });
 
@@ -169,13 +186,15 @@ module.exports = function(io) {
             move.column = data.column;
             move.row = data.row;
 
-            var board = logic.move(game.board, user.id == game.challenger.id ? 'B' : 'W', move.column, move.row);
+            var board = logic.move(game.board,
+              user._id === game.black ? 'B' : 'W', move.column, move.row);
 
             if (!board) {
               return log.warn('Illegal move.');
             }
 
             move.board = board;
+
             game.board = board;
           }
 

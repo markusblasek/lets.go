@@ -124,11 +124,10 @@ exports.login = function(req, res) {
 
 exports.logout = function(req, res) {
     req.logout();
-    res.send('');
+    res.redirect('/');
 };
 
 exports.get = function(req, res) {
-  // TODO: We should not expose hash and salt this way, we also might hide __v.
   res.send(req.user);
 };
 
