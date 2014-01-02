@@ -78,6 +78,23 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
     }
   }).
 
+  controller('UserDetailCtrl', function($scope, $window, UserDetail, ChangeUserDetail) {
+        //controller('UserDetailCtrl', function($scope, UserDetail, ChangeUserDetail) {
+        UserDetail.query(function(userDet) {
+            $scope.userDetails = userDet;
+            $scope.name= '';
+            $scope.alias='';
+            //$scope.email='';
+        });
+
+        $scope.changeUserDetail = function(){
+            //TODO ggf. Ändern des AnzeigeNamens oben in der Menüleiste...f5 hilft bis dahin
+            //ChangeUserDetail.changeUserDetail($scope.email, $scope.alias, $scope.name);
+            ChangeUserDetail.changeUserDetail($scope.alias, $scope.name);
+            $window.location = "#/userDetail/.";
+        }
+  }).
+
   controller('MessagesCtrl', function($scope, $http, $location) {
     $scope.users = ['ich', 'du'];
   }).

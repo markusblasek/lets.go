@@ -72,6 +72,8 @@ app.post('/user/login', routes.user.login);
 app.post('/user/logout', routes.user.isAuthed, routes.user.logout);
 app.get('/user', routes.user.isAuthed, routes.user.get);
 app.get('/user/:id', routes.user.isAuthed, routes.user.get);
+app.get('/userDetail', routes.user.isAuthed, routes.user.getUser);
+app.post('/userDetail', routes.user.isAuthed, routes.user.changeUserDetail);
 app.get('/user/auth/google', routes.user.authGoogle, home);
 app.get('/user/auth/google/return', routes.user.authGoogle, home);
 app.get('/user/auth/facebook', routes.user.authFacebook, function(){});

@@ -1,0 +1,39 @@
+
+html(lang="en")
+    head
+
+
+    body
+      h1 User data
+      form(name='form', ng-submit='changeUserDetail()', novalidate)
+          table.ui.basic.table
+            tbody
+              tr
+                td Name:
+                td
+                  div.field
+                    div.ui.left.labeled.icon.input
+                      input(type='text', placeholder='{{userDetails[0].name}}', ng-model='name')
+              tr
+                td Display Name:
+                td
+                  div.ui.left.labeled.icon.input
+                    input(placeholder='{{userDetails[0].alias}}', type='text', name='alias', ng-model='alias', required)
+                    div.ui.corner.label
+                      i.asterisk.icon
+              tr
+                td E-mail:
+                td
+                    div.field
+                        //(ng-class='{error: form.email.$dirty && form.email.$invalid}')
+                    div.ui.left.labeled.icon.input
+                        {{userDetails[0].email}}
+                        //input(placeholder='{{userDetails[0].email}}',  type='email', name='email', ng-model='email', required)
+                        //div.ui.corner.label
+                            i.asterisk.icon
+              tr
+                td
+                td
+                td
+                  button.ui.blue.submit.button(type='submit') Change
+

@@ -36,6 +36,10 @@ config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvide
       templateUrl: '/static/partials/user/register.jade',
       controller: 'RegisterCtrl'
     }).
+    when('/userDetail', {
+      templateUrl: '/static/partials/user/userDetail.jade',
+      controller: 'UserDetailCtrl'
+    }).
     when('/messages', {
       templateUrl: '/static/partials/messages/index.jade',
       controller: 'MessagesCtrl'
