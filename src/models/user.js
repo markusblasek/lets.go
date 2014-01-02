@@ -7,6 +7,13 @@ var User = new mongoose.Schema({
   name: String
 });
 
+User.options.toJSON = {
+  transform: function(user) {
+    delete user.hash;
+    delete user.salt;
+  }
+};
+
 User.plugin(passportLocalMongoose, {
     usernameField: 'email',
     saltField: 'salt',
