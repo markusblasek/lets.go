@@ -24,10 +24,11 @@ div.ui.inverted.small.borderless.main.menu(style='margin: 0;')
             i.users.icon
             | Online
             div.ui.small.teal.label {{online}}
-        div.ui.dropdown.item.simple
-            i.icon.user
-            b(ng-bind='user.alias')
-            div.menu.left
-                div.ui.label.item ID: {{user._id}}
+        a.item(href='#userDetail')
+            div.ui.dropdown.item.simple
+                i.icon.user
+                b(ng-bind='user.alias')
+                div.menu.left
+                    div.ui.label.item ID: {{user._id}}
         a.item(href='#', ng-click='logout()')
             div.ui.teal.button logout

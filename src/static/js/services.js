@@ -147,4 +147,21 @@ angular.module('letsGo.services', []).
 
   service('Game', function($resource) {
     return $resource('/games/:id', {id: '@id'});
+  }).
+
+  service('UserDetail', function($resource) {
+    return $resource('/userDetail');//ruft in server.js auf???
+  }).
+
+  service('ChangeUserDetail', function($resource, $http) {
+    return{
+        //changeUserDetail: function(email, alias, name) {
+        changeUserDetail: function(alias, name) {
+            return $http.post('/userDetail', {
+                //email: email,
+                alias: alias,
+                name: name
+            })
+        }
+    }
   });

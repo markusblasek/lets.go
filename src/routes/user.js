@@ -41,3 +41,42 @@ exports.get = function(req, res) {
   // TODO: We should not expose hash and salt this way, we also might hide __v.
   res.send(req.user);
 };
+
+exports.getUser = function(req, res){
+    User
+        .findOne({_id: req.user._id})
+        .exec(function(err, user) {
+            if (err) {
+                return res.send(400, err);
+            }
+            var userArray = [
+                {
+                    email: user.email,
+                    alias: user.alias,
+                    name: user.name
+                }
+            ]
+            res.send(userArray);
+        });
+};
+
+exports.changeUserDetail = function(req, res){
+    User.findOne({_id: req.user._id}, function(err, doc){
+        if(err){
+            console.log("error in exports.changeUserDetail")
+        }else{
+            if(req.body.name!=''){
+                doc.name = req.body.name;
+            }
+            if(req.body.alias != ''){
+                doc.alias = req.body.alias;
+            }
+            /*
+            if(req.body.email != '' && req.body.email != undefined){
+                doc.email = req.body.email;
+            }
+            */
+            doc.save();
+        }
+    })
+};

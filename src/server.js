@@ -197,6 +197,8 @@ app.post('/user', routes.user.register);
 app.post('/user/login', routes.user.login);
 app.post('/user/logout', auth, routes.user.logout);
 app.get('/user', auth, routes.user.get);
+app.get('/userDetail', auth, routes.user.getUser);
+app.post('/userDetail', auth, routes.user.changeUserDetail);
 
 app.post('/games', auth, routes.games.create);
 app.get('/games', auth, routes.games.list);
