@@ -172,31 +172,49 @@ module.exports = function(io) {
             return log.warn('Moves are only allowed for games that are live');
           }
 
-          if (game.runtime.turn !== user._id) {
+          if (game.runtime.turn.toString() !== user.id) {
             return log.warn('User is not allowed to make a move, not his turn.');
           }
 
           var move = new Move({
             game: game._id,
             user: user._id,
-            type: data.type
+            type: data.type,
+            board: game.runtime.board
           });
 
           if (data.type === 'play') {
             move.column = data.column;
             move.row = data.row;
 
-            var board = logic.move(game.board,
-              user._id === game.black ? 'B' : 'W', move.column, move.row);
+            var board = logic.move(game.runtime.board,
+              user.id === game.black.toString() ? 'B' : 'W',
+              move.column, move.row);
 
             if (!board) {
               return log.warn('Illegal move.');
             }
 
-            move.board = board;
+            var prisoners = logic.prisoners(game.runtime.board, board);
 
-            game.board = board;
+            if (!prisoners) {
+              return log.warn('Unable to count prisoners');
+            }
+
+            var challengerBlack = game.challenger._id.toString() == game.black.toString();
+
+            move.board = board;
+            game.runtime.board = board;
+            game.runtime.score.challenger += prisoners[challengerBlack ? 'B' : 'W'] || 0;
+            game.runtime.score.challengee += prisoners[challengerBlack ? 'W' : 'B'] || 0;
           }
+
+          if (data.type === 'surrender') {
+            // TODO: Finish game through surrender
+          }
+
+          game.runtime.turn = (user.id === game.challenger.id) ?
+            game.challengee._id : game.challenger._id;
 
           move.save(function(err) {
             if (err) {

@@ -58,6 +58,33 @@ var move = function(board, turn, col, row) {
   return board;
 };
 
+/**
+ * Compare two boards and count the number of prisoners made.
+ * @param {String} from - A board string.
+ * @param {String} to - A board string.
+ * @returns {Object} A mapping from color to made prisoners.
+ */
+var prisoners = function(from, to) {
+  if (from.length != to.length) {
+    return null;
+  }
+
+  var b = 0, w = 0;
+
+  for (var i = 0; i < from.length; ++i) {
+    if (from[i] === 'B') b -= 1;
+    if (from[i] === 'W') w -= 1;
+    if (to[i] === 'B') b += 1;
+    if (to[i] === 'W') w += 1;
+  }
+
+  if ((b === 1 && w > 0) || (w === 1 && b > 0)) {
+    return null;
+  }
+
+  return (b === 1) ? {B: -w} : {W: -b};
+};
+
 // return 1d indexes of all group members
 var group = function(board, n, x, y, checked) {
   var index = y * n + x;
@@ -115,5 +142,6 @@ var replace = function(board, index, value) {
 };
 
 module.exports = {
-  move: move
+  move: move,
+  prisoners: prisoners
 };

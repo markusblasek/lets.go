@@ -43,6 +43,7 @@
     "node": "0.10.21"
   },
   "scripts": {
+    "start": "node src/server.js",
     "test": "mocha --recursive --reporter spec tests"
   },
   "private": true

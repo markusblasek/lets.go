@@ -84,14 +84,19 @@ angular.module('letsGo.services', []).
       }
     };
 
-    var moveAction = function(gameId, column, row) {
+    var moveAction = function(gameId, type, column, row) {
       if (connected) {
-        socket.emit('move', {
+        var data = {
           gameId: gameId,
-          type: 'play',
-          column: column,
-          row: row
-        });
+          type: type
+        };
+
+        if (type === 'play') {
+          data.column = column;
+          data.row = row;
+        }
+
+        socket.emit('move', data);
       }
     };
 

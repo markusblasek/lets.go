@@ -146,11 +146,18 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
     $scope.game = {};
     $scope.board = [];
 
-    $scope.move = function(column, row) {
-      console.log('move ', $scope.board, column, row);
+    $scope.play = function(column, row) {
       if ($scope.board[row][column].cell === ' ') {
-        socket.move(gameId, column, row);
+        socket.move(gameId, 'play', column, row);
       }
+    };
+
+    $scope.pass = function() {
+      socket.move(gameId, 'pass');
+    };
+
+    $scope.surrender = function() {
+      socket.move(gameId, 'surrender');
     };
 
     $scope.$on('gameState', function(event, game) {
@@ -158,13 +165,13 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
         $scope.game = game;
 
         $scope.board = [];
-        for (var i = 0; i < game.board.length; ++i) {
+        for (var i = 0; i < game.runtime.board.length; ++i) {
           if (i % game.config.size == 0) {
             $scope.board.push([]);
           }
 
           $scope.board[parseInt(i/game.config.size)].push({
-            cell: game.board[i]
+            cell: game.runtime.board[i]
           });
         }
 

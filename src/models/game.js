@@ -2,6 +2,8 @@ var mongoose = require('mongoose');
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
+var User = require('./user');
+
 var gameSchema = new mongoose.Schema({
   state: {
     type: String,
@@ -27,6 +29,8 @@ var gameSchema = new mongoose.Schema({
   black: {type: ObjectId},
   challenger: {type: ObjectId, ref: 'User', required: true},
   challengee: {type: ObjectId, ref: 'User'},
+
+  // used while live
   runtime: {
     board: {type: String},
     score: {
@@ -35,6 +39,13 @@ var gameSchema = new mongoose.Schema({
     },
     turn: {type: ObjectId}
   },
+
+  // used while over
+  result: {
+    winner: {type: ObjectId, ref: 'User'},
+    reason: {type: String}
+  },
+
   started: {type: Date},
   created: {type: Date, default: Date.now}
 });

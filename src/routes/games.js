@@ -20,7 +20,7 @@ exports.create = function(req, res) {
 exports.list = function(req, res) {
   Game
     .find()
-    .populate('challenger', 'alias')
+    .populate('challenger')
     .exec(function(err, games) {
       if (err) {
         return res.send(400, err);
@@ -32,8 +32,8 @@ exports.list = function(req, res) {
 exports.get = function(req, res) {
   Game.
     findOne({_id: req.params.id}).
-    populate('challenger', 'alias').
-    populate('challengee', 'alias').
+    populate('challenger').
+    populate('challengee').
     exec(function(err, game) {
       if (err) {
         res.send(400, err);
