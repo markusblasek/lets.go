@@ -1,40 +1,20 @@
-div.ui.segment(ng-if='my')
-  a.ui.right.floated.mini.labeled.icon.button(href='#/games/create')
-    i.add.icon
-    | Create
-  h1.ui.medium.dividing.header Challenges
+a.ui.right.floated.mini.labeled.icon.button(href='#/games/create')
+  i.add.icon
+  | Create
+h1.ui.medium.dividing.header Challenges
 
-  table.ui.basic.table
-    tbody
-      tr(ng-repeat='game in open')
-        td(ng-bind='game.config.size + "x" + game.config.size')
-        td
-          img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
-          span(ng-bind='game.challenger.alias')
-        td(ng-bind='game.config.name')
-        td(ng-if='game.challenger._id == user._id')
-          a.ui.right.floated.red.mini.button(ng-click='remove(game._id)') Remove
-        td(ng-if='game.challenger._id != user._id')
-          a.ui.right.floated.green.mini.button(ng-click='accept(game._id)') Play!
-
-div.ui.segment(ng-if='open')
-  a.ui.right.floated.mini.labeled.icon.button(href='#/games/create')
-    i.add.icon
-    | Create
-  h1.ui.medium.dividing.header Challenges
-
-  table.ui.basic.table
-    tbody
-      tr(ng-repeat='game in open')
-        td(ng-bind='game.config.size + "x" + game.config.size')
-        td
-          img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
-          span(ng-bind='game.challenger.alias')
-        td(ng-bind='game.config.name')
-        td(ng-if='game.challenger._id == user._id')
-          a.ui.right.floated.red.mini.button(ng-click='remove(game._id)') Remove
-        td(ng-if='game.challenger._id != user._id')
-          a.ui.right.floated.green.mini.button(ng-click='accept(game._id)') Play!
+table.ui.basic.table
+  tbody
+    tr(ng-repeat='game in open')
+      td(ng-bind='game.config.size + "x" + game.config.size')
+      td
+        img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
+        span(ng-bind='game.challenger.alias')
+      td(ng-bind='game.config.name')
+      td(ng-if='game.challenger._id == user._id')
+        a.ui.right.floated.red.mini.button(ng-click='remove(game._id)') Remove
+      td(ng-if='game.challenger._id != user._id')
+        a.ui.right.floated.green.mini.button(ng-click='accept(game._id)') Play!
 
 div.ui.segment(ng-if='running')
   h1.ui.medium.dividing.header Already Running
