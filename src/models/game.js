@@ -83,7 +83,7 @@ var score = function(player) {
 };
 
 gameSchema.virtual('next').get(function() {
-  if (!this.turn) return null;
+  if (!this.turn || !this.challenger || !this.challengee) return null;
   return this.turn.equals(this.challenger._id) ?
     this.challengee._id : this.challenger._id;
 });
