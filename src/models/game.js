@@ -67,7 +67,8 @@ var score = function(player) {
     var score = this.prisoners[player];
     var user = {_id: this.populated(player) || this[player]};
 
-    if (this.state === 'over' || this.state === 'counting') {
+    if ((this.state === 'over' || this.state === 'counting') &&
+        this.territory && this.dead) {
       // territory
       var counts = _.countBy(this.territory, _.identity);
       score += counts[this.color(user)] || 0;
