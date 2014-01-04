@@ -1,16 +1,28 @@
 var crypto = require('crypto');
 
 var passport = require('passport');
-var passportGoogle = require('passport-google');
+//var passportGoogle = require('passport-google');
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var passportFacebook = require('passport-facebook');
 
 var User = require('../models/user');
 var log = require('../log');
 var config = require('../config');
 
-// don't abuse it plz
+// LOCALHOST
 var FACEBOOK_APP_ID = '723348891027933';
 var FACEBOOK_APP_SECRET = 'b82698180e06348651c4cf1a8285f54b';
+var GOOGLE_CLIENT_ID = '179733906984-b3cg0psdbp97ou2th4689o7ia4qt34lg.apps.googleusercontent.com';
+var GOOGLE_CLIENT_SECRET = 'S8IkqL0X3uWnSFOMxFQw2VMe';
+
+// REAKTOR42.de
+/*
+var FACEBOOK_APP_ID = '259268590897864';
+var FACEBOOK_APP_SECRET = '5e833bb4b8d90406a0a7dfc73622504b';
+var GOOGLE_CLIENT_ID = '179733906984-0774u6lq7mu0fof6am7gbk7bms1dl2io.apps.googleusercontent.com';
+var GOOGLE_CLIENT_SECRET = 'BGryGckhim__F2B8dh_uFCHt';
+*/
+
 
 // setup
 
@@ -21,11 +33,12 @@ exports.setup = function(app) {
   passport.deserializeUser(User.deserializeUser());
 
   // add google strategy
-  passport.use(new passportGoogle.Strategy({
-    returnURL: config.address + '/user/auth/google/return',
-    realm: config.address
+  passport.use(new GoogleStrategy({
+    clientID: GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    callbackURL: config.address + '/user/auth/google/callback'
   },
-  function(identifier, profile, done) {
+  function(accessToken, refreshToken, profile, done) {
     User.findOne({email: profile.emails[0].value}, function(err, user) {
       if (user) {
         log.info('Google user logged in: %s', user.email);
@@ -36,8 +49,8 @@ exports.setup = function(app) {
           name: profile.displayName,
           email: profile.emails[0].value
         });
-        if (profile.photos && profile.photos[0]) {
-          user.photo = profile.photos[0].value;
+        if (profile._json['picture']) {
+          user.photo = profile._json['picture'];
         }
         user.save(function(err) {
           if (err) {
@@ -90,7 +103,13 @@ exports.isAuthed = function(req, res, next) {
 };
 
 exports.authGoogle = passport.authenticate('google', {
+  scope: ['https://www.googleapis.com/auth/userinfo.email',
+          'https://www.googleapis.com/auth/userinfo.profile'],
   failureRedirect: '/user/login'
+});
+
+exports.authGoogleCb = passport.authenticate('google', {
+    failureRedirect: '/user/login'
 });
 
 exports.authFacebook = passport.authenticate('facebook', {scope: ['email']});
