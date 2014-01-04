@@ -60,8 +60,12 @@ var gameSchema = new mongoose.Schema({
 
 var score = function(player) {
   return function() {
+    if (!this[player]) {
+      return 0;
+    }
+
     var score = this.prisoners[player];
-    var user = this[player];
+    var user = {_id: this.populated(player) || this[player]};
 
     if (this.state === 'over' || this.state === 'counting') {
       // territory
