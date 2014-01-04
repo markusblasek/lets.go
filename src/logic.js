@@ -1,3 +1,4 @@
+var _ = require('underscore');
 
 /**
  * Create a new board by making a move.
@@ -11,9 +12,8 @@
  * @returns {String} Either a new board or null in case the move isn't legit.
  */
 var move = function(board, turn, col, row) {
-  var n = Math.sqrt(board.length);
-
   // quadratic boards only
+  var n = Math.sqrt(board.length);
   if (n % 1 !== 0) {
     return null;
   }
@@ -23,10 +23,8 @@ var move = function(board, turn, col, row) {
     return null;
   }
 
-  var index = n*row + col;
-  var opponent = (turn === 'W') ? 'B' : 'W';
-
   // check whether the place is already taken
+  var index = n*row + col;
   if (board[index] !== ' ') {
     return null;
   }
@@ -35,23 +33,24 @@ var move = function(board, turn, col, row) {
   board = replace(board, index, turn);
 
   // remove all stones that are dead now
-  var neighbors = neighborhood(n, index);
-  for (var i = 0; i < neighbors.length; ++i) {
-    var neighbor = neighbors[i];
-    if (board[neighbor] === opponent) {
-      var grp = group(board, n, neighbor % n, Math.floor(neighbor / n));
-      if (liberties(board, n, grp) === 0) {
-        for (var j = 0; j < grp.length; ++j) {
-          board = replace(board, grp[j], ' ');
-        }
-      }
-    }
-  }
-
-  var indices = group(board, n, col, row);
+  board = _
+    .chain(neighborhood(n, index))
+    .filter(function(neighbor) {
+      return board[neighbor] !== turn && board[neighbor] !== ' ';
+    })
+    .map(function(neighbor) {
+      return group(board, n, neighbor % n, Math.floor(neighbor / n));
+    })
+    .filter(function(grp) {
+      return liberties(board, n, grp) === 0;
+    })
+    .flatten()
+    .reduce(function(board, stone) {
+      return replace(board, stone, ' ');
+    }, board).value();
 
   // ensure that it's not a suicide move
-  if (liberties(board, n, indices) === 0) {
+  if (liberties(board, n, group(board, n, col, row)) === 0) {
     return null;
   }
 
@@ -73,20 +72,16 @@ var prisoners = function(from, to) {
     return null;
   }
 
-  var b = 0, w = 0;
+  var minus = _(from).countBy(_.identity);
+  var plus = _(to).countBy(_.identity);
+  var black = (plus.B || 0) - (minus.B || 0);
+  var white = (plus.W || 0) - (minus.W || 0);
 
-  for (var i = 0; i < from.length; ++i) {
-    if (from[i] === 'B') b -= 1;
-    if (from[i] === 'W') w -= 1;
-    if (to[i] === 'B') b += 1;
-    if (to[i] === 'W') w += 1;
-  }
-
-  if (!(b === 1 && w <= 0) && !(w === 1 && b <= 0)) {
+  if (!(black === 1 && white <= 0) && !(white === 1 && black <= 0)) {
     return null;
   }
 
-  return (b === 1) ? {B: -w} : {W: -b};
+  return (black === 1) ? {B: -white} : {W: -black};
 };
 
 
@@ -103,23 +98,19 @@ var prisoners = function(from, to) {
  */
 var dead = function(board, alreadyDead, column, row) {
   var n = Math.sqrt(board.length);
-
-  // quadratic boards only
   if (n % 1 !== 0 || board.length !== alreadyDead.length) {
     return null;
   }
 
-  if (board[n*row + column] === ' ') {
+  if (board[n * row + column] === ' ') {
     return null;
   }
 
-  var grp = group(board, n, column, row);
-  var value = (alreadyDead[n * row + column] === 'X') ? ' ' : 'X';
-  for (var i = 0; i < grp.length; ++i) {
-    alreadyDead = replace(alreadyDead, grp[i], value);
-  }
+  var value = alreadyDead[n * row + column] === 'X' ? ' ' : 'X';
 
-  return alreadyDead;
+  return _(group(board, n, column, row)).reduce(function(dead, index) {
+    return replace(dead, index, value);
+  }, alreadyDead);
 };
 
 
@@ -134,50 +125,37 @@ var dead = function(board, alreadyDead, column, row) {
  */
 var territory = function(board, dead) {
   var n = Math.sqrt(board.length);
-
-  // quadratic boards only
   if (n % 1 !== 0 || board.length !== dead.length) {
     return null;
   }
 
-  var territory = new Array(board.length + 1).join(' ');
-
   // remove dead stones
-  for (var i = 0; i < dead.length; ++i) {
-    if (dead[i] === 'X') {
-      board = replace(board, i, ' ');
-    }
-  }
+  board = _(dead).reduce(function(board, dead, index) {
+    return dead === 'X' ? replace(board, index, ' ') : board;
+  }, board);
 
   // get all territory groups
   var checked = [];
-  for (var i = 0; i < board.length; ++i) {
-    if (checked.indexOf(i) >= 0 || board[i] !== ' ') {
-      continue;
-    }
+  return _(board).reduce(function(territory, stone, index) {
+    if (!_(checked).contains(index) && board[index] === ' ') {
+      var grp = group(board, n, index % n, Math.floor(index / n));
+      var colors = _
+        .chain(grp)
+        .map(_.partial(neighborhood, n))
+        .flatten()
+        .map(function(neighbor) {
+          return board[neighbor];
+        })
+        .countBy(_.identity).value();
 
-    var grp = group(board, n, i % n, Math.floor(i / n));
-    var white = false, black = false;
-
-    // see if they are aligned to one color only
-    for (var j = 0; j < grp.length && !(white && black); ++j) {
-      var neighbors = neighborhood(n, grp[j]);
-      for (var k = 0; k < neighbors.length; ++k) {
-        white = white || board[neighbors[k]] === 'W';
-        black = black || board[neighbors[k]] === 'B';
+      if ((colors.B && !colors.W) || (!colors.B && colors.W)) {
+        _(grp).each(function(stone) {
+          territory = replace(territory, stone, colors.B ? 'B' : 'W');
+        });
       }
     }
-
-    if ((white && black) || (!white && !black)) {
-      continue;
-    }
-
-    for (var j = 0; j < grp.length; ++j) {
-      territory = replace(territory, grp[j], white ? 'W' : 'B');
-    }
-  }
-
-  return territory;
+    return territory;
+  }, new Array(board.length + 1).join(' '));
 };
 
 
@@ -185,16 +163,13 @@ var territory = function(board, dead) {
 var group = function(board, n, x, y, checked) {
   var index = y * n + x;
 
-  checked = checked || [];
-  checked.push(index);
+  (checked = checked || []).push(index);
 
-  var candidates = neighborhood(n, index);
-  for (var i = 0; i < candidates.length; ++i) {
-    var c = candidates[i];
-    if (checked.indexOf(c) === -1 && board[c] === board[index]) {
-      group(board, n, c % n, Math.floor(c / n), checked);
+  _(neighborhood(n, index)).each(function(neighbor) {
+    if (!_(checked).contains(neighbor) && board[neighbor] === board[index]) {
+      group(board, n, neighbor % n, Math.floor(neighbor / n), checked);
     }
-  }
+  });
 
   return checked;
 };
@@ -204,16 +179,12 @@ var liberties = function(board, n, indices) {
   var checked = [];
   var count = 0;
 
-  for (var i = 0; i < indices.length; ++i) {
-    var candidates = neighborhood(n, indices[i]);
-    for (var j = 0; j < candidates.length; ++j) {
-      var c = candidates[j];
-      if (checked.indexOf(c) === -1 && board[c] === ' ') {
-        count += 1;
-        checked.push(c);
-      }
+  _.chain(indices).map(_.partial(neighborhood, n)).flatten().each(function(n) {
+    if (!_(checked).contains(n) && board[n] === ' ') {
+      count += 1;
+      checked.push(n);
     }
-  }
+  });
 
   return count;
 };
