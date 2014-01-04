@@ -2,10 +2,10 @@ var Game = require('../models/game');
 
 exports.create = function(req, res) {
   var game = new Game({
-    name: req.body.name,
     challenger: req.user._id,
     config: {
-      size: req.body.size
+      size: req.body.size,
+      name: req.body.name
     }
   });
 
@@ -21,6 +21,7 @@ exports.list = function(req, res) {
   Game
     .find()
     .populate('challenger')
+    .populate('challengee')
     .exec(function(err, games) {
       if (err) {
         return res.send(400, err);

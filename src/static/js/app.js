@@ -56,5 +56,5 @@ config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvide
       templateUrl: '/static/partials/games/view.jade',
       controller: 'GamesViewCtrl'
     }).
-    otherwise({redirectTo: '/'});
+    otherwise({redirectTo: '/games'});
 }]);

@@ -1,3 +1,5 @@
+var crypto = require('crypto');
+
 var passport = require('passport');
 var passportGoogle = require('passport-google');
 var passportFacebook = require('passport-facebook');
@@ -34,6 +36,9 @@ exports.setup = function(app) {
           name: profile.displayName,
           email: profile.emails[0].value
         });
+        if (profile.photos && profile.photos[0]) {
+          user.photo = profile.photos[0].value;
+        }
         user.save(function(err) {
           if (err) {
             return log.error('Failed to create new google user: ', profile);
@@ -49,7 +54,8 @@ exports.setup = function(app) {
   passport.use(new passportFacebook.Strategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: config.address + '/user/auth/facebook/callback'
+    callbackURL: config.address + '/user/auth/facebook/callback',
+    profileFields: ['name', 'displayName', 'emails', 'photos']
   },
   function(accessToken, refreshToken, profile, done) {
     User.findOne({email: profile.emails[0].value}, function(err, user) {
@@ -62,6 +68,9 @@ exports.setup = function(app) {
           name: profile.displayName,
           email: profile.emails[0].value
         });
+        if (profile.photos && profile.photos[0]) {
+          user.photo = profile.photos[0].value;
+        }
         user.save(function(err) {
           if (err) {
             return log.error('Failed to create new facebook user: ', profile);
@@ -96,7 +105,10 @@ exports.register = function(req, res) {
   var user = new User({
     email: req.body.email,
     alias: req.body.alias,
-    name: req.body.name
+    name: req.body.name,
+    photo: 'http://robohash.org/' +
+           crypto.createHash('md5').update(req.body.email).digest('hex') +
+           '.png?size=50x50&bgset=bg2'
   });
 
   User.register(user, req.body.password, function(err) {

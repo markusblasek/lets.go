@@ -117,16 +117,19 @@
 }
 /* bla */
 
-body {
-    margin: 0;
-    font-size: 15px;
-    font-family: "Open Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
-    background: #FCFCFC url('/static/img/bg.jpg') repeat;
+body,
+html {
+  margin: 0;
+  padding: 0;
+  font-size: 15px;
+  font-family: "Open Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  /*background: #FCFCFC url('/static/img/bg.jpg') repeat;*/
 }
 
-#container {
-    padding: 70px 100px 0 100px;
+.container {
     width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
 #logo {

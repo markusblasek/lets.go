@@ -1,3 +1,4 @@
+h1.ui.dividing.medium.header Log In
 div.ui.two.column.middle.aligned.relaxed.grid.basic.segment
   div.column
     form(name='form', ng-submit='login()', novalidate)
@@ -22,17 +23,15 @@ div.ui.two.column.middle.aligned.relaxed.grid.basic.segment
               i.asterisk.icon
         button.ui.blue.submit.button(type='submit', ng-disabled='form.$invalid', ng-class='{disabled: form.$invalid}') Login
   div.ui.vertical.divider Or
-  div.left.aligned.column
+  div.center.aligned.column
     a.huge.green.ui.labeled.icon.button(href='#/user/register')
       i.signup.icon
       | Signup
-    a(href='/user/auth/facebook')
-      div.ui.facebook.button
+    div &nbsp;
+    div.ui.vertical.labeled.icon.buttons
+      a.ui.facebook.button(href='/user/auth/facebook')
         i.facebook.icon
-        |Sign in with Facebook
-    a(href='/user/auth/google')
-      div.ui.google.plus.button
+        | Sign in with Facebook
+      a.ui.google.plus.button(href='/user/auth/google')
         i.google.plus.icon
-        |Sign In with Google
-
-
+        | Sign in with Google

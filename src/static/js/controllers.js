@@ -99,15 +99,20 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
     $scope.users = ['ich', 'du'];
   }).
 
-  controller('GamesListCtrl', function($scope, $location, Game, socket) {
+  controller('GamesListCtrl', function($scope, $location, $timeout, Game, socket) {
 
-    $scope.games = [];
+    $scope.open = [];
+    $scope.running = [];
 
-    var update = function() {
+    (function tick() {
       Game.query(function(games) {
-        $scope.games = games;
+        var states = _.groupBy(games, 'state');
+        $scope.open = states.waiting || [];
+        $scope.running = (states.live || []).concat(states.counting || []);
+
+        $timeout(tick, 10 * 1000);
       });
-    };
+    })();
 
     $scope.remove = function(id) {
       Game.delete({id: id}, update);
@@ -120,8 +125,6 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
     $scope.view = function(id) {
       $location.url('/games/' + id);
     };
-
-    update();
   }).
 
   controller('GamesCreateCtrl', function($scope, $location, Game) {

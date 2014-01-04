@@ -11,10 +11,10 @@ html(lang='en', ng-app='letsGo')
     include partials/menu
 
     div#toggleChat.ui.black.inverted.fixed.left.attached.button(ng-if='user', style='position: relative; margin-top: 50px; float: right;', onclick="$('.sidebar').sidebar('toggle');")
-        i.icon.chat.layout.large
+      i.icon.chat.layout.large
 
-    div#container.ui.grid.aligned.middle
-        div.column(ng-view)
+    div.ui.page.grid
+      div.column(ng-view)
 
     script(src='/static/lib/jQuery/jquery-1.10.2.min.js')
     script(src='/static/lib/semantic/javascript/semantic.min.js')
@@ -24,6 +24,7 @@ html(lang='en', ng-app='letsGo')
     script(src='/static/lib/angular/angular-route.min.js')
     script(src='/static/lib/angular/angular-sanitize.min.js')
     script(src='/static/lib/angular/angular-resource.min.js')
+    script(src='/static/lib/underscore/underscore.min.js')
 
     script(src='/static/js/app.js')
     script(src='/static/js/services.js')

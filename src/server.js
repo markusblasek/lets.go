@@ -112,7 +112,7 @@ io.configure(function() {
                 }
 
                 User.findOne({ email: data.session.passport.user }, function(err, user) {
-                    if (err) {
+                    if (err || !user) {
                         return callback('Unable to retrieve user object: ' + err, false);
                     }
 

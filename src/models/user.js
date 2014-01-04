@@ -4,7 +4,8 @@ var passportLocalMongoose = require('passport-local-mongoose');
 var userSchema = new mongoose.Schema({
   email: {type: String, unique: true, required: true, index: true},
   alias: {type: String, required: true},
-  name: String
+  name: String,
+  photo: String
 });
 
 userSchema.set('toJSON', {
