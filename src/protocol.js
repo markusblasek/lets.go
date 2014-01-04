@@ -1,4 +1,5 @@
 var jsonschema = require('jsonschema');
+var _ = require('underscore');
 
 var log = require('./log'),
   logic = require('./logic'),
@@ -19,6 +20,15 @@ var messageSchema = {
   }
 };
 
+var acceptSchema = {
+  type: 'object',
+  properties: {
+    gameId: {type: 'string', required: true}
+  }
+};
+
+var joinSchema = acceptSchema;
+
 var moveSchema = {
   type: 'object',
   properties: {
@@ -28,6 +38,19 @@ var moveSchema = {
     column: {type: 'integer', minimum: 0}
   }
 };
+
+var resumeSchema = acceptSchema;
+
+var deadSchema = {
+  type: 'object',
+  properties: {
+    gameId: {type: 'string', required: true},
+    row: {type: 'integer', minimum: 0, required: true},
+    column: {type: 'integer', minimum: 0, required: true}
+  }
+};
+
+var doneSchema = acceptSchema;
 
 var videoChatSchema = {
     type: 'object',
@@ -52,16 +75,63 @@ module.exports = function(io) {
       online: Object.keys(users).length
     });
 
+
+    // helper method to add a game callback, it checks the schema, retrieves
+    // the game, checks the user rights and saves/distributes the game
+    var addGameHandler = function(event, schema, state, cb) {
+      addHandler(event, schema, function(data) {
+        Game
+          .findById(data.gameId)
+          .populate('challenger')
+          .populate('challengee')
+          .exec(function(err, game) {
+            if (err || !game) {
+              return log.warn('Unable to find game by id %s: ', data.gameId, err);
+            }
+
+            if (state !== '*' && game.state !== state) {
+              return log.warn('Game is not in expected state %s', state);
+            }
+
+            if (game.state !== 'waiting' &&
+                game.challenger.id !== user.id &&
+                game.challengee.id !== user.id) {
+              return log.warn('User is not participating in the game');
+            }
+
+            cb(game, data, function(save) {
+              if (save !== false) {
+                game.save(function(err) {
+                  if (err) {
+                    return log.warn('Failed to save new game state: ', err);
+                  }
+                  io.sockets.in(game.id).emit('game', game);
+                });
+              }
+            });
+          });
+      });
+    };
+
+    // helper method to add an schema validated event handler
+    var addHandler = function(event, schema, cb) {
+      socket.on(event, function(data) {
+        log.debug('New message of type %s by user %s: ', event, user.email, data);
+
+        if (typeof schema !== 'function') {
+          var validation = jsonschema.validate(data, schema);
+          if (validation.errors.length > 0) {
+            return log.warn('Supplied data is invalid: ', validation.errors);
+          }
+        }
+
+        (typeof schema === 'function' ? schema : cb)(data);
+      });
+    };
+
+
     // messaging
-    socket.on('message', function(data) {
-      log.debug('New message by user %s: ', user.email, data);
-
-      var validation = jsonschema.validate(data, messageSchema);
-
-      if (validation.errors.length > 0) {
-        return log.warn('Message data is invalid: ', validation.errors);
-      }
-
+    addHandler('message', messageSchema, function(data) {
       data.user = user.alias;
 
       if (data.target.type === 'user') {
@@ -79,181 +149,184 @@ module.exports = function(io) {
     });
 
     // accepting a game
-    socket.on('accept', function(data) {
-      log.debug('New accept request by user %s: ', user.email, data);
+    addGameHandler('accept', acceptSchema, 'waiting', function(game, data, done) {
+      if (game.challenger === user._id) {
+        return log.warn('Unable to accept own game!');
+      }
 
-      Game.findOne({_id: data.game_id, state: 'waiting'}, function(err, game) {
-        if (err || !game) {
-          return log.warn('Unable to find waiting game by id %s', data.game_id);
-        }
+      game.challengee = user._id;
+      game.state = 'live';
+      game.started = new Date();
 
-        if (game.challenger == user._id) {
-          return log.warn('Unable to accept own game!');
-        }
+      // decide who has black, thus starts
+      if (game.config.color == 'black') {
+        game.black = game.challenger;
+      } else if (game.config.color == 'white') {
+        game.black = game.challengee;
+      } else {
+        game.black = Math.random() < .5 ? game.challenger : game.challengee;
+      }
 
-        game.challengee = user._id;
-        game.state = 'live';
-        game.started = new Date();
+      game.board = new Array(game.config.size * game.config.size + 1).join(' ');
+      game.prisoners.challenger = 0;
+      game.prisoners.challengee = 0;
+      game.turn = game.black;
 
-        // decide who has black, thus starts
-        if (game.config.color == 'black') {
-          game.black = game.challenger;
-        } else if (game.config.color == 'white') {
-          game.black = game.challengee;
-        } else {
-          game.black = Math.random() < .5 ? game.challenger : game.challengee;
-        }
-
-        // describes the current state of the game
-        game.runtime = {
-          board: Array(game.config.size * game.config.size + 1).join(' '),
-          score: {
-            challenger: 0,
-            challengee: 0
-          },
-          turn: game.black
-        };
-
-        game.save(function(err) {
-          if (err) {
-            return log.warn('Failed to save new game state: ', err);
-          }
-
-          socket.emit('start', game);
-          users[game.challenger].emit('start', game);
-        });
-      })
+      done();
     });
 
     // joining a game
-    socket.on('join', function(data) {
-      log.debug('New join request by user %s: ', user.email, data);
+    addGameHandler('join', joinSchema, '*', function(game) {
+      // TODO: Private games? Currently everbody can look at the game.
+      socket.join(game.id);
+      socket.emit('game', game);
 
-      Game
-        .findById(data.game_id)
-        .populate('challenger')
-        .populate('challengee')
-        .exec(function(err, game) {
-          if (err || !game) {
-            return log.warn('Failed to get game %s: ', data.game_id, err);
-          }
-
-          socket.join(game.id);
-          socket.emit('game', game);
-
-          io.sockets.in(game.id).emit('message', {
-            target: {type: 'game', id: game.id},
-            user: 'System',
-            text: 'User ' + user.alias + ' joined.'
-          });
-        });
+      // TODO: proper messaging
+      io.sockets.in(game.id).emit('message', {
+        target: {type: 'game', id: game.id},
+        user: 'System',
+        text: 'User ' + user.alias + ' joined.'
+      });
     });
 
-    // making moves in a game
-    socket.on('move', function(data) {
-      log.debug('New move by user %s: ', user.email, data);
-
-      var validation = jsonschema.validate(data, moveSchema);
-
-      if (validation.errors.length > 0) {
-        return log.warn('Invalid data supplied in move command', data, validation.errors);
+    // making a move: play, pass or surrender
+    addGameHandler('move', moveSchema, 'live', function(game, data, done) {
+      if (game.turn.toString() !== user.id) {
+        return log.warn('User is not allowed to make a move, not his turn.');
       }
 
-      Game
-        .findById(data.gameId)
-        .populate('challenger')
-        .populate('challengee')
-        .exec(function(err, game) {
-          if (err || !game) {
-            return log.warn('Unable to find game by id %s: ', data.gameId, err);
+      game.turn = game.next;
+
+      var saveMove = function() {
+        move.save(function(err) {
+          if (err) {
+            return log.warn('Unable to save move', move, err);
           }
 
-          if (game.state !== 'live') {
-            return log.warn('Moves are only allowed for games that are live');
-          }
-
-          if (game.runtime.turn.toString() !== user.id) {
-            return log.warn('User is not allowed to make a move, not his turn.');
-          }
-
-          var move = new Move({
-            game: game._id,
-            user: user._id,
-            type: data.type,
-            board: game.runtime.board
-          });
-
-          if (data.type === 'play') {
-            move.column = data.column;
-            move.row = data.row;
-
-            var board = logic.move(game.runtime.board,
-              user.id === game.black.toString() ? 'B' : 'W',
-              move.column, move.row);
-
-            if (!board) {
-              return log.warn('Illegal move.');
-            }
-
-            var prisoners = logic.prisoners(game.runtime.board, board);
-
-            if (!prisoners) {
-              return log.warn('Unable to count prisoners');
-            }
-
-            var challengerBlack = game.challenger._id.toString() == game.black.toString();
-
-            move.board = board;
-            game.runtime.board = board;
-            game.runtime.score.challenger += prisoners[challengerBlack ? 'B' : 'W'] || 0;
-            game.runtime.score.challengee += prisoners[challengerBlack ? 'W' : 'B'] || 0;
-          }
-
-          if (data.type === 'surrender') {
-            // TODO: Finish game through surrender
-          }
-
-          game.runtime.turn = (user.id === game.challenger.id) ?
-            game.challengee._id : game.challenger._id;
-
-          move.save(function(err) {
-            if (err) {
-              return log.warn('Unable to save move', move, err);
-            }
-
-            game.save(function(err) {
-              if (err) {
-                return log.warn('Unable to save game', game, err);
-              }
-
-              io.sockets.in(game.id).emit('game', game);
-            });
-          });
+          done();
         });
-    });
+      };
 
-    // exchange messages between two clients to initialise the video chat
-    socket.on('videochat', function (data){
-        log.debug('New video chat message by user %s: ', user.email, data);
-        var validation = jsonschema.validate(data, videoChatSchema);
-        if (validation.errors.length > 0) {
-            return log.warn('Video chat message data is invalid: ', validation.errors);
-        };
-        var target = users[data.idcallee];
-        if (!target) {
-            return log.warn('User does not exist or is offline.');
-        }
-        // set the id of the caller, so the callee does know who is calling
-        data.idcaller = user.id;
-        target.emit('videochat', data);
-    });
-    socket.on('disconnect', function() {
-     log.info('User %s disconnected.', user.email);
-      delete users[user.id];
-
-      io.sockets.emit('status', {
-        online: Object.keys(users).length
+      var move = new Move({
+        game: game._id,
+        user: user._id,
+        type: data.type,
+        board: game.board
       });
+
+      // normal move
+      if (data.type === 'play') {
+        move.column = data.column;
+        move.row = data.row;
+
+        var board = logic.move(game.board, game.color(user), move.column,
+          move.row);
+        if (!board) {
+          return log.warn('Illegal move.');
+        }
+
+        var prisoners = logic.prisoners(game.board, board);
+        if (!prisoners) {
+          return log.warn('Unable to count prisoners');
+        }
+
+        move.board = board;
+        game.board = board;
+        game.prisoners.challenger += prisoners[game.color(game.challenger)] || 0;
+        game.prisoners.challengee += prisoners[game.color(game.challengee)] || 0;
+
+        saveMove();
+      }
+      // pass: check if passed two times in a row and start counting
+      else if (data.type === 'pass') {
+        Move
+          .find({game: game._id})
+          .sort('-created')
+          .limit(1)
+          .exec(function(err, moves) {
+            if (err) {
+              return log.warn('Unable to retrieve moves for game', game, err);
+            }
+
+            if (moves && moves.length === 1 && moves[0].type === 'pass') {
+              game.state = 'counting';
+              game.dead = new Array(game.config.size * game.config.size + 1).join(' ');
+              game.territory = logic.territory(game.board, game.dead);
+              if (game.territory === null) {
+                return log.warn('Unable to compute territory');
+              }
+            }
+
+            saveMove();
+          })
+      }
+      // surrender
+      else if (data.type === 'surrender') {
+        game.state = 'over';
+        // TODO: Result!
+
+        saveMove();
+      }
+    });
+
+    // counting: let's continue playing
+    addGameHandler('resume', resumeSchema, 'counting', function(game, data, done) {
+      game.state = 'live';
+      done();
+    });
+
+    // counting: mark stone/group as dead
+    addGameHandler('dead', deadSchema, 'counting', function(game, data, done) {
+      if (game.board[data.row * game.config.size * data.column] === ' ') {
+        return log.warn('The marked position must be occupied');
+      }
+
+      game.dead = logic.dead(game.board, game.dead, data.column, data.row);
+      if (game.dead === null) {
+        return log.warn('Unable to compute death map');
+      }
+
+      game.territory = logic.territory(game.board, game.dead);
+      if (game.territory === null) {
+        return log.warn('Unable to compute territory');
+      }
+
+      done();
+    });
+
+    // counting: player is done
+    addGameHandler('done', doneSchema, 'counting', function(game, data, done) {
+      game.accepted.addToSet(user._id);
+      if (game.accepted.length === 2) {
+        game.state = 'over';
+        if (game.score.challenger > game.score.challengee) {
+          game.winner = game.challenger._id;
+        } else if (game.score.challenger < game.score.challengee) {
+          game.winner = game.challengee._id;
+        } else {
+          game.winner = null;
+        }
+      }
+
+      done();
+    });
+
+    // video chat yeah yeah
+    addHandler('videochat', videoChatSchema, function(data) {
+      var target = users[data.idcallee];
+      if (!target) {
+        return log.warn('User does not exist or is offline.');
+      }
+      // set the id of the caller, so the callee does know who is calling
+      data.idcaller = user.id;
+      target.emit('videochat', data);
+    });
+
+    // a user disconnected
+    addHandler('disconnect', function() {
+      log.info('User %s disconnected.', user.email);
+      delete users[user.id];
+      io.sockets.emit('status', {online: Object.keys(users).length});
     });
   });
 }

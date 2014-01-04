@@ -168,12 +168,26 @@ body {
     height: 20px;
     border-radius: 11px;
 }
-.board .stone.white {
+.board .stone.dead {
+    opacity: .5;
+}
+.board .stone.countwhite:not(.dead),
+.board .stone.countblack:not(.dead) {
+    opacity: .3;
+    width: 10px;
+    height: 10px;
+    margin-left: -5px;
+    margin-top: -5px;
+    border-radius: 6px;
+}
+.board .stone.white,
+.board .stone.countwhite:not(.dead) {
     background: #fff;
     border: 1px solid #333;
 }
 
-.board .stone.black {
+.board .stone.black,
+.board .stone.countblack:not(.dead) {
     background: #111;
     border: 1px solid #333;
 }

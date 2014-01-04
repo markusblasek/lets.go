@@ -37,7 +37,8 @@
     "passport-facebook": "1.0.2",
     "passport-google": "0.3.0",
     "forms": "0.3.0",
-    "mocha": "1.16.2"
+    "mocha": "1.16.2",
+    "underscore": "1.5.2"
   },
   "engines": {
     "node": "0.10.21"

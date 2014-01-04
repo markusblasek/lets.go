@@ -1,34 +1,34 @@
 - var messages = 5;
 
 div.ui.inverted.small.borderless.main.menu(style='margin: 0;')
-    a.item(href='/')
-        img#logo.ui.image(src='/static/img/ic_logo.png')
-    a.item
-        i.mail.icon
-        | MESSAGES
-        if(messages > 0)
-            div.ui.small.teal.label #{messages}
-    a.item
-        i.user.icon
-        | CHAT
-    a.item(href='#/games')
-        i.gamepad.icon
-        | GAMES
-    div.right.menu.borderless(ng-if='!user')
-        a.ui.item(href='#/user/login')
-            div.ui.button login
-        a.ui.item(href='#/user/register')
-            div.ui.teal.button sign up
-    div.right.menu.borderless(ng-if='user')
-        div.ui.item
-            i.users.icon
-            | Online
-            div.ui.small.teal.label {{online}}
-        a.item(href='#userDetail')
-            div.ui.dropdown.item.simple
-                i.icon.user
-                b(ng-bind='user.alias')
-                div.menu.left
-                    div.ui.label.item ID: {{user._id}}
-        a.item(href='#', ng-click='logout()')
-            div.ui.teal.button logout
+  a.item(href='/')
+    img#logo.ui.image(src='/static/img/ic_logo.png')
+  a.item
+    i.mail.icon
+    | MESSAGES
+    if(messages > 0)
+      div.ui.small.teal.label #{messages}
+  a.item
+    i.user.icon
+    | CHAT
+  a.item(href='#/games')
+    i.gamepad.icon
+    | GAMES
+  div.right.menu.borderless(ng-if='!user')
+    a.ui.item(href='#/user/login')
+      div.ui.button login
+    a.ui.item(href='#/user/register')
+      div.ui.teal.button sign up
+  div.right.menu.borderless(ng-if='user')
+    div.ui.item
+      i.users.icon
+      | Online
+      div.ui.small.teal.label {{online}}
+    div.ui.dropdown.item.simple
+      i.icon.user
+      b(ng-bind='user.alias')
+      div.menu.left
+        div.ui.label.item ID: {{user._id}}
+        a.ui.label.item(href='#/userDetail') Account
+    a.item(href='#', ng-click='logout()')
+      div.ui.teal.button logout

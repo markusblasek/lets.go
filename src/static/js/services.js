@@ -63,15 +63,15 @@ angular.module('letsGo.services', []).
       $rootScope.$broadcast('message', data);
     };
 
-    var acceptAction = function(game_id) {
+    var acceptAction = function(gameId) {
       if (connected) {
-        socket.emit('accept', {game_id: game_id});
+        socket.emit('accept', {gameId: gameId});
       }
     };
 
-    var joinAction = function(game_id) {
+    var joinAction = function(gameId) {
       if (connected) {
-        socket.emit('join', {game_id: game_id});
+        socket.emit('join', {gameId: gameId});
       }
     };
 
@@ -97,6 +97,28 @@ angular.module('letsGo.services', []).
         }
 
         socket.emit('move', data);
+      }
+    };
+
+    var resumeAction = function(gameId) {
+      if (connected) {
+        socket.emit('resume', {gameId: gameId});
+      }
+    };
+
+    var deadAction = function(gameId, column, row) {
+      if (connected) {
+        socket.emit('dead', {
+          gameId: gameId,
+          column: column,
+          row: row
+        });
+      }
+    };
+
+    var doneAction = function(gameId) {
+      if (connected) {
+        socket.emit('done', {gameId: gameId});
       }
     };
 
@@ -135,6 +157,9 @@ angular.module('letsGo.services', []).
       join: joinAction,
       message: messageAction,
       move: moveAction,
+      resume: resumeAction,
+      dead: deadAction,
+      done: doneAction,
 
       //temporary solution
       emit: function(event, data){

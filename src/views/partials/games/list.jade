@@ -20,5 +20,5 @@ table.ui.basic.table
       td(ng-if='game.challenger._id != user._id && game.state == "waiting"')
         a.ui.red.button(ng-click='accept(game._id)') Play
 
-      td(ng-if='game.state == "live"')
+      td(ng-if='game.state === "live" || game.state === "counting"')
         a.ui.red.button(ng-click='view(game._id)') View
