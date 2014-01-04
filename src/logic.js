@@ -1,5 +1,7 @@
+
 /**
  * Create a new board by making a move.
+ *
  * @param {String} board - A string of n*n characters, with each character
  *                         being one of ' ', 'B' or 'W' describing the
  *                         board.
@@ -58,8 +60,10 @@ var move = function(board, turn, col, row) {
   return board;
 };
 
+
 /**
  * Compare two boards and count the number of prisoners made.
+ *
  * @param {String} from - A board string.
  * @param {String} to - A board string.
  * @returns {Object} A mapping from color to made prisoners.
@@ -78,12 +82,104 @@ var prisoners = function(from, to) {
     if (to[i] === 'W') w += 1;
   }
 
-  if ((b === 1 && w > 0) || (w === 1 && b > 0)) {
+  if (!(b === 1 && w <= 0) && !(w === 1 && b <= 0)) {
     return null;
   }
 
   return (b === 1) ? {B: -w} : {W: -b};
 };
+
+
+/**
+ * Create a "death map" derived from a board and a list of already dead stones
+ * If the stone is already dead, the stone/group is reborn. The death map
+ * denotes dead stones with a 'X'.
+ *
+ * @param {String} board - A board.
+ * @param {String} alreadyDead - Current death map corresponding to the board.
+ * @param {Number} column - Column of the dead stone.
+ * @param {Number} row - Row of the dead stone.
+ * @returns {String} A new death map.
+ */
+var dead = function(board, alreadyDead, column, row) {
+  var n = Math.sqrt(board.length);
+
+  // quadratic boards only
+  if (n % 1 !== 0 || board.length !== alreadyDead.length) {
+    return null;
+  }
+
+  if (board[n*row + column] === ' ') {
+    return null;
+  }
+
+  var grp = group(board, n, column, row);
+  var value = (alreadyDead[n * row + column] === 'X') ? ' ' : 'X';
+  for (var i = 0; i < grp.length; ++i) {
+    alreadyDead = replace(alreadyDead, grp[i], value);
+  }
+
+  return alreadyDead;
+};
+
+
+/**
+ * Create a "territory map" by looking at a board and the corresponding
+ * "death map". The territory map is made of 'W', 'B' and ' ' characters,
+ * where W and B denote the belonging.
+ *
+ * @param {String} board - The board.
+ * @param {String} dead - The corresponding death map.
+ * @returns {String} A territory map.
+ */
+var territory = function(board, dead) {
+  var n = Math.sqrt(board.length);
+
+  // quadratic boards only
+  if (n % 1 !== 0 || board.length !== dead.length) {
+    return null;
+  }
+
+  var territory = new Array(board.length + 1).join(' ');
+
+  // remove dead stones
+  for (var i = 0; i < dead.length; ++i) {
+    if (dead[i] === 'X') {
+      board = replace(board, i, ' ');
+    }
+  }
+
+  // get all territory groups
+  var checked = [];
+  for (var i = 0; i < board.length; ++i) {
+    if (checked.indexOf(i) >= 0 || board[i] !== ' ') {
+      continue;
+    }
+
+    var grp = group(board, n, i % n, Math.floor(i / n));
+    var white = false, black = false;
+
+    // see if they are aligned to one color only
+    for (var j = 0; j < grp.length && !(white && black); ++j) {
+      var neighbors = neighborhood(n, grp[j]);
+      for (var k = 0; k < neighbors.length; ++k) {
+        white = white || board[neighbors[k]] === 'W';
+        black = black || board[neighbors[k]] === 'B';
+      }
+    }
+
+    if ((white && black) || (!white && !black)) {
+      continue;
+    }
+
+    for (var j = 0; j < grp.length; ++j) {
+      territory = replace(territory, grp[j], white ? 'W' : 'B');
+    }
+  }
+
+  return territory;
+};
+
 
 // return 1d indexes of all group members
 var group = function(board, n, x, y, checked) {
@@ -141,7 +237,10 @@ var replace = function(board, index, value) {
   return board.substr(0, index) + value + board.substr(index + 1);
 };
 
+
 module.exports = {
   move: move,
-  prisoners: prisoners
+  prisoners: prisoners,
+  dead: dead,
+  territory: territory
 };
