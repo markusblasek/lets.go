@@ -51,16 +51,10 @@ angular.module('letsGo.services', []).
       $rootScope.$broadcast('online', data.online);
     };
 
-    var startHandler = function(data) {
-      $rootScope.$broadcast('gameStarted', data);
-    };
-
-    var gameHandler = function(data) {
-      $rootScope.$broadcast('gameState', data);
-    };
-
-    var messageHandler = function(data) {
-      $rootScope.$broadcast('message', data);
+    var createHandler = function(name) {
+      return function(data) {
+        $rootScope.$broadcast(name, data);
+      }
     };
 
     var acceptAction = function(gameId) {
@@ -128,9 +122,10 @@ angular.module('letsGo.services', []).
           socket = io.connect('/');
 
           socket.on('status', statusHandler);
-          socket.on('start', startHandler);
-          socket.on('game', gameHandler);
-          socket.on('message', messageHandler);
+          socket.on('start',createHandler('gameStarted'));
+          socket.on('game', createHandler('gameState'));
+          socket.on('message', createHandler('message'));
+          socket.on('list', createHandler('gameList'));
 
         } else if (!connected) {
           // due to https://github.com/LearnBoost/socket.io-client/issues/251

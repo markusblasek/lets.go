@@ -1,7 +1,8 @@
+
+
 var Game = require('../models/game');
 
 exports.create = function(req, res) {
-  console.log('reg ', req.body)
   var game = new Game({
     challenger: req.user._id,
     config: {
@@ -14,9 +15,16 @@ exports.create = function(req, res) {
 
   game.save(function(err, game) {
     if (err) {
-      return res.send(400, err);
+      return res.send(500, err);
     }
     res.send(game);
+
+    game.populate('challenger', function(err, game) {
+      if (err || !game) {
+        return log.error('Unable to populate challenger of game ', game);
+      }
+      req.io.sockets.emit('list');
+    });
   });
 };
 
@@ -26,8 +34,8 @@ exports.list = function(req, res) {
     .populate('challenger')
     .populate('challengee')
     .exec(function(err, games) {
-      if (err) {
-        return res.send(400, err);
+      if (err || !games) {
+        return res.send(404, err);
       }
       res.send(games);
     });
@@ -39,8 +47,8 @@ exports.get = function(req, res) {
     populate('challenger').
     populate('challengee').
     exec(function(err, game) {
-      if (err) {
-        res.send(400, err);
+      if (err || !game) {
+        res.send(404, err);
       }
       res.send(game);
     });
@@ -53,7 +61,7 @@ exports.remove = function(req, res) {
     state: 'waiting'
   }, function(err) {
     if (err) {
-      res.send(400, err);
+      res.send(500, err);
     }
     res.send('');
   });

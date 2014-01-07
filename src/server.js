@@ -55,6 +55,12 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
+// TODO: not sure if there is a better way to pass the io instance to the handler
+app.use(function(req, res, next) {
+  req.io = io;
+  next();
+});
+
 routes.user.setup(app);
 
 // routes below

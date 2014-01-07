@@ -78,7 +78,7 @@ module.exports = function(io) {
 
     // helper method to add a game callback, it checks the schema, retrieves
     // the game, checks the user rights and saves/distributes the game
-    var addGameHandler = function(event, schema, state, cb) {
+    var addGameHandler = function(event, schema, state, cb, saved) {
       addHandler(event, schema, function(data) {
         Game
           .findById(data.gameId)
@@ -107,6 +107,10 @@ module.exports = function(io) {
                     return log.warn('Failed to save new game state: ', err);
                   }
                   io.sockets.in(game.id).emit('game', game);
+
+                  if (typeof saved === 'function') {
+                    saved(game);
+                  }
                 });
               }
             });
@@ -176,6 +180,8 @@ module.exports = function(io) {
       game.turn = game.black;
 
       done();
+    }, function() {
+      io.sockets.emit('list');
     });
 
     // joining a game
@@ -269,6 +275,10 @@ module.exports = function(io) {
 
         saveMove();
       }
+    }, function(game) {
+      if (game.state === 'over') {
+        io.sockets.emit('list');
+      }
     });
 
     // counting: let's continue playing
@@ -311,6 +321,10 @@ module.exports = function(io) {
       }
 
       done();
+    }, function(game) {
+      if (game.state === 'over') {
+        io.sockets.emit('list');
+      }
     });
 
     // video chat yeah yeah
