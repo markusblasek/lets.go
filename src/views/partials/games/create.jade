@@ -17,4 +17,9 @@ form(name='form', ng-submit='create()', novalidate)
           div.item.active(data-value='9', ng-click='game.size = 9') 9x9
           div.item(data-value='13', ng-click='game.size = 13') 13x13
           div.item(data-value='19', ng-click='game.size = 19') 19x19
+    div.field(ng-class='{error: form.private.$dirty && form.private.$invalid}')
+      label Private Game
+      div.ui.checkbox
+        input#private-game(name='private', type='checkbox', ng-model='game.private')
+        label(for='private-game') Block spectators from watching the game
     button.ui.blue.submit.button(type='submit', ng-disabled='form.$invalid', ng-class='{disabled: form.$invalid}') Create

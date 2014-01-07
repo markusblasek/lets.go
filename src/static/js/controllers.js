@@ -139,6 +139,7 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
         $location.url('/games');
       }, function(err) {
         $scope.error = 'Failed ' + err;
+        $scope.loading = false;
       });
     };
   }).

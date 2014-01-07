@@ -28,7 +28,8 @@ var gameSchema = new mongoose.Schema({
       enum: ['black', 'white', 'random'],
       default: 'random',
       required: true
-    }
+    },
+    private: {type: Boolean, default: false, required: true}
   },
 
   // challenger is the creator, challengee might be assigned later

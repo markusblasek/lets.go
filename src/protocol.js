@@ -95,8 +95,9 @@ module.exports = function(io) {
 
             if (game.state !== 'waiting' &&
                 game.challenger.id !== user.id &&
-                game.challengee.id !== user.id) {
-              return log.warn('User is not participating in the game');
+                game.challengee.id !== user.id &&
+                !(event === 'join' && !game.config.private)) {
+              return log.warn('User is not participating in the game and game is private');
             }
 
             cb(game, data, function(save) {
@@ -143,7 +144,9 @@ module.exports = function(io) {
 
         target.emit('message', data);
       } else if (data.target.type === 'game') {
-        // TODO: ensure that user joined the channel ...
+        if (io.sockets.clients(data.target.id).indexOf(socket) === -1) {
+          return log.warn('User is not allowed to message to that game.');
+        }
         io.sockets.in(data.target.id).emit('message', data);
       }
     });
@@ -177,7 +180,6 @@ module.exports = function(io) {
 
     // joining a game
     addGameHandler('join', joinSchema, '*', function(game) {
-      // TODO: Private games? Currently everbody can look at the game.
       socket.join(game.id);
       socket.emit('game', game);
 

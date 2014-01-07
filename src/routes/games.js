@@ -1,11 +1,13 @@
 var Game = require('../models/game');
 
 exports.create = function(req, res) {
+  console.log('reg ', req.body)
   var game = new Game({
     challenger: req.user._id,
     config: {
       size: req.body.size,
-      name: req.body.name
+      name: req.body.name,
+      private: !!req.body.private
     }
   });
 
