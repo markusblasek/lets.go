@@ -6,6 +6,7 @@ exports.create = function(req, res) {
     challenger: req.user._id,
     config: {
       size: req.body.size,
+      color: req.body.color,
       name: req.body.name,
       private: !!req.body.private
     }

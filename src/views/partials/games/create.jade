@@ -17,6 +17,16 @@ form(name='form', ng-submit='create()', novalidate)
           div.item.active(data-value='9', ng-click='game.size = 9') 9x9
           div.item(data-value='13', ng-click='game.size = 13') 13x13
           div.item(data-value='19', ng-click='game.size = 19') 19x19
+    div.field(ng-class='{error: form.color.$dirty && form.color.$invalid}')
+      label Your Color
+      div.ui.selection.dropdown
+        input(name='color', type='hidden', value='random')
+        div.text Random
+        i.dropdown.icon
+        div.menu.transition.hidden
+          div.item.active(data-value='random', ng-click='game.color = "random"') Random
+          div.item(data-value='black', ng-click='game.color = "black"') Black
+          div.item(data-value='white', ng-click='game.color = "white"') White
     div.field(ng-class='{error: form.private.$dirty && form.private.$invalid}')
       label Private Game
       div.ui.checkbox

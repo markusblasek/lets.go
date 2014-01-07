@@ -128,7 +128,11 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
   }).
 
   controller('GamesCreateCtrl', function($scope, $location, Game) {
-    $scope.game = {size: 9};
+    $scope.game = {
+      size: 9,
+      color: 'random',
+      private: false
+    };
     $scope.loading = false;
 
     $scope.create = function() {
