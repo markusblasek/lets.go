@@ -18,13 +18,7 @@ exports.create = function(req, res) {
       return res.send(500, err);
     }
     res.send(game);
-
-    game.populate('challenger', function(err, game) {
-      if (err || !game) {
-        return log.error('Unable to populate challenger of game ', game);
-      }
-      req.io.sockets.emit('list');
-    });
+    req.io.sockets.emit('list');
   });
 };
 
