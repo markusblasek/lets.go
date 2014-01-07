@@ -134,6 +134,7 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
     $scope.game = {
       size: 9,
       color: 'random',
+      komi: 6.5,
       private: false
     };
     $scope.loading = false;

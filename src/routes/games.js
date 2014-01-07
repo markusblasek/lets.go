@@ -8,6 +8,7 @@ exports.create = function(req, res) {
     config: {
       size: req.body.size,
       color: req.body.color,
+      komi: req.body.komi,
       name: req.body.name,
       private: !!req.body.private
     }

@@ -29,6 +29,7 @@ var gameSchema = new mongoose.Schema({
       default: 'random',
       required: true
     },
+    komi: {type: Number, min: 0, default: 6.5},
     private: {type: Boolean, default: false, required: true}
   },
 
@@ -67,6 +68,10 @@ var score = function(player) {
 
     var score = this.prisoners[player];
     var user = {_id: this.populated(player) || this[player]};
+
+    if (this.color(user) === 'W') {
+      score += this.config.komi;
+    }
 
     if ((this.state === 'over' || this.state === 'counting') &&
         this.territory && this.dead) {
