@@ -95,8 +95,25 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
         }
   }).
 
-  controller('MessagesCtrl', function($scope, $http, $location) {
-    $scope.users = ['ich', 'du'];
+  controller('MessagesCtrl', function($scope, $window, Message, MessageUser, MessageData) {
+        MessageUser.query(function(userData){
+            $scope.users = userData;
+        });
+
+        MessageData.query(function(myMessages){
+            $scope.messages = myMessages;
+        })
+
+        $scope.sendMessage = function(){
+            console.log("Message should be send to: "+$scope.name + " content: "+$scope.content+" myID: "+$scope.user._id);
+            Message.sendMessage($scope.user._id, $scope.user.alias, $scope.name, $scope.subject, $scope.content);
+            $window.location = "#/messages/.";
+        }
+
+        $scope.removeMessage = function(messID){
+            Message.removeMessage(messID);
+            $window.location = "#/messages/.";
+        }
   }).
 
   controller('GamesListCtrl', function($scope, $location, $timeout, Game, socket) {

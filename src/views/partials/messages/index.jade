@@ -1,7 +1,59 @@
-div.ui.secondary.vertical.pointing.menu
-  div.item
-    i.users.icon
-    | Users
-    div.menu(ng-repeat='user in users')
-      a.item
-        | {{ user }}
+div.ui.two.column.middle.aligned.relaxed.grid.basic.segment
+    div.column
+        div.ui.vertical.menu
+            div.item(ng-init='curName="Please select someone."', ng-click='curName="something"')
+                i.users.icon
+                | Users
+                hr
+            div(ng-repeat='userObj in users')
+                a.item(ng-if="user._id != userObj._id", ng-click='curName="userObj.alias"'){{userObj.alias}}
+                    //a.item(ng-if="user._id != userObj._id", href='#/games/create'){{userObj.alias}}
+    div.column
+        form(name='form', ng-submit='sendMessage()')
+            table.ui.basic
+                tbody
+                    tr
+                        td
+                            b To:
+                        td {{curName}}
+                    tr
+                        td
+                            b Subject:
+                        td
+                            input(type:'text', ng-model='subject')
+                    tr
+                        td(colspan=2)
+                            <textarea ng-model='content', cols='50', rows='10'>
+                            </textarea>
+                    tr
+                        td
+                        td
+                        td
+                            button.ui.blue.submit.button(type='submit') Send message
+div.ui.buttons
+  div.ui.button(ng-click='switchMess=1') My messages
+  div.or
+  div.ui.button(ng-click='switchMess=2') Send messages
+
+div(ng-if='switchMess == 1', ng-repeat='mess in messages')
+    div.ui.fitted.divider(ng-if='mess.acceptorID == user._id')
+    table.ui.three.column.table.segment(ng-if='mess.acceptorID == user._id')
+        tr
+            td From: {{mess.senderID}}
+            td Subject: {{mess.subject}}
+            td
+                a.ui.right.floated.red.mini.button(ng-click='removeMessage(mess._id)') Remove
+        tr
+            td.three.column {{mess.content}}
+
+
+div(ng-if='switchMess==2', ng-repeat='mess in messages')
+    div.ui.fitted.divider(ng-if='mess.senderID == user._id')
+    table.ui.three.column.table.segment(ng-if='mess.senderID == user._id')
+        tr
+            td To: {{mess.acceptorID}}
+            td Subject: {{mess.subject}}
+            td
+              a.ui.right.floated.red.mini.button(ng-click='removeMessage(mess._id)') Remove
+        tr
+            td.three.column {{mess.content}}

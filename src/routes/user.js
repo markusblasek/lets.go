@@ -200,3 +200,22 @@ exports.changeUserDetail = function(req, res){
         }
     })
 };
+
+exports.getUserList = function(req, res) {
+    var users = new Array(User);
+    User
+        .find({})
+        .exec(function(err, data) {
+            for(var i=0; i<data.length; i++){
+                users[i] = new User();
+                users[i]._id = data[i]._id;
+                users[i].name = data[i].name;
+                users[i].alias = data[i].alias;
+                users[i].email = data[i].email;
+                users[i].photo = data[i].photo;
+            }
+            res.send(users);
+        });
+
+};
+
