@@ -41,13 +41,26 @@ exports.setup = function(app) {
   function(accessToken, refreshToken, profile, done) {
     User.findOne({email: profile.emails[0].value}, function(err, user) {
       if (user) {
+        //check, if user changed some of his profile settings and update them if necessary
+        if(user.alias != profile.name.givenName)
+          user.alias = profile.name.givenName;
+        if(user.name != profile.displayName)
+          user.name = profile.displayName;
+        if(user.googleId != profile.id)
+          user.googleId = profile.id;
+        if(profile._json['picture'])
+          if(user.photos != profile._json['picture'])
+              user.photos = profile._json['picture']
+        user.save();
         log.info('Google user logged in: %s', user.email);
         done(null, user);
       } else {
         user = new User({
           alias: profile.name.givenName,
           name: profile.displayName,
-          email: profile.emails[0].value
+          email: profile.emails[0].value,
+          googleId: profile.id,
+          facebookId: ''
         });
         if (profile._json['picture']) {
           user.photo = profile._json['picture'];
@@ -73,13 +86,25 @@ exports.setup = function(app) {
   function(accessToken, refreshToken, profile, done) {
     User.findOne({email: profile.emails[0].value}, function(err, user) {
       if (user) {
+        //check, if user changed some of his profile settings and update them if necessary
+        if(user.alias != profile.name.givenName)
+          user.alias = profile.name.givenName;
+        if(user.name != profile.displayName)
+          user.name = profile.displayName;
+        if(user.facebookId != profile.id)
+          user.facebookId = profile.id;
+        if(profile.photos && profile.photos[0])
+          if(user.photos != profile.photos[0].value)
+            user.photos = profile.photos[0].value;
         log.info('Facebook user logged in: %s', user.email);
         done(null, user);
       } else {
         user = new User({
           alias: profile.name.givenName,
           name: profile.displayName,
-          email: profile.emails[0].value
+          email: profile.emails[0].value,
+          googleId: '',
+          facebookId: profile.id
         });
         if (profile.photos && profile.photos[0]) {
           user.photo = profile.photos[0].value;
@@ -127,7 +152,8 @@ exports.register = function(req, res) {
     name: req.body.name,
     photo: 'http://robohash.org/' +
            crypto.createHash('md5').update(req.body.email).digest('hex') +
-           '.png?size=50x50&bgset=bg2'
+           '.png?size=50x50&bgset=bg2',
+    socialId: ''
   });
 
   User.register(user, req.body.password, function(err) {
@@ -173,7 +199,9 @@ exports.getUser = function(req, res){
                 {
                     email: user.email,
                     alias: user.alias,
-                    name: user.name
+                    name: user.name,
+                    photo: user.photo,
+                    socialId: user.socialId
                 }
             ]
             res.send(userArray);
@@ -213,6 +241,7 @@ exports.getUserList = function(req, res) {
                 users[i].alias = data[i].alias;
                 users[i].email = data[i].email;
                 users[i].photo = data[i].photo;
+                users[i].socialId = data[i].socialId;
             }
             res.send(users);
         });
