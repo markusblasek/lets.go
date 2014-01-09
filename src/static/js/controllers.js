@@ -152,7 +152,7 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
     };
   }).
 
-  controller('GamesViewCtrl', function($scope, $http, $location, $routeParams, socket, Game) {
+  controller('GamesViewCtrl', function($scope, $http, $location, $routeParams, socket) {
     var gameId = $routeParams.gameId;
 
     var move = function(type, column, row) {
@@ -219,8 +219,6 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
 
           $scope.board[parseInt(i/game.config.size)].push(cell);
         }
-
-        console.log('new board', $scope.board);
       });
     });
 
