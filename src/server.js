@@ -85,6 +85,11 @@ app.get('/user/auth/google/callback', routes.user.authGoogleCb, home);
 app.get('/user/auth/facebook', routes.user.authFacebook, function(){});
 app.get('/user/auth/facebook/callback', routes.user.authFacebookCb, home);
 
+app.post('/sendMessage', routes.message.sendMessage);
+app.get('/messageUser', routes.user.getUserList);
+app.get('/messageData', routes.message.getMessages);
+app.post('/removeMessage', routes.message.removeMessage);
+
 app.post('/games', routes.user.isAuthed, routes.games.create);
 app.get('/games', routes.user.isAuthed, routes.games.list);
 app.get('/games/:id', routes.user.isAuthed, routes.games.get);

@@ -189,4 +189,35 @@ angular.module('letsGo.services', []).
             })
         }
     }
-  });
+    }).
+    service('MessageUser', function($resource){
+        return $resource('/messageUser');
+    }).
+    service('MessageData', function($resource){
+        return $resource('/messageData');
+    }).
+    service('Message', function($resource, $http){
+        return{
+            /*getUser: function(req, res){
+             console.log("????")
+             return $http.get('/message');
+             },*/
+
+            sendMessage: function(senderID, senderAlias, acceptorID, subject, content){
+                return $http.post('/sendMessage',{
+                    senderID: senderID,
+                    senderAlias: senderAlias,
+                    acceptorID:acceptorID,
+                    subject:subject,
+                    content:content
+                })
+            },
+
+            removeMessage: function(messID){
+                return $http.post('/removeMessage',{
+                    messID:messID
+                })
+            }
+        }
+
+    });
