@@ -153,7 +153,8 @@ exports.register = function(req, res) {
     photo: 'http://robohash.org/' +
            crypto.createHash('md5').update(req.body.email).digest('hex') +
            '.png?size=50x50&bgset=bg2',
-    socialId: ''
+    googleId: '',
+    facebookId: ''
   });
 
   User.register(user, req.body.password, function(err) {
@@ -201,7 +202,8 @@ exports.getUser = function(req, res){
                     alias: user.alias,
                     name: user.name,
                     photo: user.photo,
-                    socialId: user.socialId
+                    googleId: user.googleId,
+                    facebookId: user.facebookId
                 }
             ]
             res.send(userArray);
@@ -241,7 +243,8 @@ exports.getUserList = function(req, res) {
                 users[i].alias = data[i].alias;
                 users[i].email = data[i].email;
                 users[i].photo = data[i].photo;
-                users[i].socialId = data[i].socialId;
+                users[i].googleId = data[i].googleId;
+                users[i].facebookId = data[i].facebookId;
             }
             res.send(users);
         });
