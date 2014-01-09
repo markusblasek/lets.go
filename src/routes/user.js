@@ -1,8 +1,8 @@
 var crypto = require('crypto');
 
 var passport = require('passport');
-//var passportGoogle = require('passport-google');
-var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var passportLocal = require('passport-local');
+var passportGoogleOauth = require('passport-google-oauth');
 var passportFacebook = require('passport-facebook');
 
 var User = require('../models/user');
@@ -27,54 +27,79 @@ var GOOGLE_CLIENT_SECRET = 'BGryGckhim__F2B8dh_uFCHt';
 // setup
 
 exports.setup = function(app) {
-  // add local strategy
-  passport.use(User.createStrategy());
   passport.serializeUser(User.serializeUser());
   passport.deserializeUser(User.deserializeUser());
 
+  var strategyHandler = function(update) {
+    return function(accessToken, refreshToken, profile, done) {
+      var identifier = {
+        service: {
+          name: profile.provider,
+          id: profile.id
+        }
+      };
+
+      User.findOne(identifier, function(err, user) {
+        if (!user) {
+          user = new User(identifier);
+        }
+
+        user.alias = profile.name.givenName;
+        user.name = profile.displayName;
+        user.email = profile.emails[0].value;
+        if (profile.photos && profile.photos[0]) {
+          user.photo = profile.photos[0].value;
+        }
+
+        if (update) {
+          update(user, profile);
+        }
+
+        user.save(function(err) {
+          if (err) {
+            log.error('Unable to save user ', user, ' with profile ', profile);
+          }
+          done(err, err ? null : user);
+        });
+      });
+    };
+  };
+
+  // add local strategy
+  passport.use(new passportLocal.Strategy({
+    usernameField: 'email',
+    passwordField: 'password'
+  }, function(username, password, done) {
+    var identifier = {
+      service: {
+        name: 'local',
+        id: username
+      }
+    };
+
+    User.findOne(identifier, function (err, user) {
+      if (err) {
+        return done(err);
+      }
+      if (!user) {
+        return done(null, false);
+      }
+      user.authenticate(password, function(err, correct, asd) {
+        done(null, user === correct ? user : false);
+      })
+    });
+  }));
+
   // add google strategy
-  passport.use(new GoogleStrategy({
+  passport.use(new passportGoogleOauth.OAuth2Strategy({
     clientID: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
     callbackURL: config.address + '/user/auth/google/callback'
-  },
-  function(accessToken, refreshToken, profile, done) {
-    User.findOne({email: profile.emails[0].value}, function(err, user) {
-      if (user) {
-        //check, if user changed some of his profile settings and update them if necessary
-        if(user.alias != profile.name.givenName)
-          user.alias = profile.name.givenName;
-        if(user.name != profile.displayName)
-          user.name = profile.displayName;
-        if(user.googleId != profile.id)
-          user.googleId = profile.id;
-        if(profile._json['picture'])
-          if(user.photos != profile._json['picture'])
-              user.photos = profile._json['picture']
-        user.save();
-        log.info('Google user logged in: %s', user.email);
-        done(null, user);
-      } else {
-        user = new User({
-          alias: profile.name.givenName,
-          name: profile.displayName,
-          email: profile.emails[0].value,
-          googleId: profile.id,
-          facebookId: ''
-        });
-        if (profile._json['picture']) {
-          user.photo = profile._json['picture'];
-        }
-        user.save(function(err) {
-          if (err) {
-            return log.error('Failed to create new google user: ', profile);
-          }
-          log.info('New google user created and logged in: %s', user.email);
-          done(null, user);
-        });
-      }
-    });
-  }));
+  }, strategyHandler(function(user, profile) {
+    if (profile._json['picture']) {
+      user.photo = profile._json['picture'];
+    }
+  })));
 
   // add facebook strategy
   passport.use(new passportFacebook.Strategy({
@@ -82,43 +107,7 @@ exports.setup = function(app) {
     clientSecret: FACEBOOK_APP_SECRET,
     callbackURL: config.address + '/user/auth/facebook/callback',
     profileFields: ['name', 'displayName', 'emails', 'photos']
-  },
-  function(accessToken, refreshToken, profile, done) {
-    User.findOne({email: profile.emails[0].value}, function(err, user) {
-      if (user) {
-        //check, if user changed some of his profile settings and update them if necessary
-        if(user.alias != profile.name.givenName)
-          user.alias = profile.name.givenName;
-        if(user.name != profile.displayName)
-          user.name = profile.displayName;
-        if(user.facebookId != profile.id)
-          user.facebookId = profile.id;
-        if(profile.photos && profile.photos[0])
-          if(user.photos != profile.photos[0].value)
-            user.photos = profile.photos[0].value;
-        log.info('Facebook user logged in: %s', user.email);
-        done(null, user);
-      } else {
-        user = new User({
-          alias: profile.name.givenName,
-          name: profile.displayName,
-          email: profile.emails[0].value,
-          googleId: '',
-          facebookId: profile.id
-        });
-        if (profile.photos && profile.photos[0]) {
-          user.photo = profile.photos[0].value;
-        }
-        user.save(function(err) {
-          if (err) {
-            return log.error('Failed to create new facebook user: ', profile);
-          }
-          log.info('New facebook user created and logged in: %s', user.email);
-          done(null, user);
-        });
-      }
-    });
-  }));
+  }, strategyHandler()));
 };
 
 // middleware functions
@@ -147,21 +136,19 @@ exports.authFacebookCb = passport.authenticate('facebook', {
 
 exports.register = function(req, res) {
   var user = new User({
+    service: {
+      name: 'local',
+      id: req.body.email
+    },
     email: req.body.email,
     alias: req.body.alias,
-    name: req.body.name,
-    photo: 'http://robohash.org/' +
-           crypto.createHash('md5').update(req.body.email).digest('hex') +
-           '.png?size=50x50&bgset=bg2',
-    googleId: '',
-    facebookId: ''
+    name: req.body.name
   });
 
   User.register(user, req.body.password, function(err) {
     if (err) {
       return res.send(400, err.message);
     }
-
     passport.authenticate('local')(req, res, function () {
       res.send(user);
     });
@@ -201,9 +188,7 @@ exports.getUser = function(req, res){
                     email: user.email,
                     alias: user.alias,
                     name: user.name,
-                    photo: user.photo,
-                    googleId: user.googleId,
-                    facebookId: user.facebookId
+                    photo: user.photo
                 }
             ]
             res.send(userArray);
@@ -243,8 +228,6 @@ exports.getUserList = function(req, res) {
                 users[i].alias = data[i].alias;
                 users[i].email = data[i].email;
                 users[i].photo = data[i].photo;
-                users[i].googleId = data[i].googleId;
-                users[i].facebookId = data[i].facebookId;
             }
             res.send(users);
         });
