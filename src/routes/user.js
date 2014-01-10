@@ -130,7 +130,7 @@ exports.register = function(req, res) {
 
   User.register(user, req.body.password, function(err) {
     if (err) {
-      return res.send(400, err.message);
+      return res.send(400, err);
     }
     passport.authenticate('local')(req, res, function () {
       res.send(user);
@@ -140,8 +140,11 @@ exports.register = function(req, res) {
 
 exports.login = function(req, res) {
   passport.authenticate('local', function(err, user, info) {
+    if (err) {
+      return res.send(400, err);
+    }
     if (!user) {
-      res.send(400, 'Incorrect credentials');
+      res.send(400, info || 'Incorrect credentials.');
     } else {
       req.logIn(user, function(err) {
         res.send(user);

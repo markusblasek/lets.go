@@ -35,22 +35,12 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
   }).
 
   controller('UserLoginCtrl', function($scope, $http, $location, user) {
-    $scope.email = '';
-    $scope.password = '';
+    $scope.user = {};
 
     $scope.login = function() {
-      $scope.loading = true;
-      $scope.error = null;
-
-      user.login($scope.email, $scope.password)
-        .then(function(user){
-          $location.url('/');
-        }, function(error){
-          $scope.error = error;
-        })
-        .finally(function() {
-          $scope.loading = false;
-        });
+      return user.login($scope.user.email, $scope.user.password).then(function(user) {
+        $location.url('/');
+      });
     };
   }).
 
@@ -58,44 +48,19 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
     $scope.user = {};
 
     $scope.register = function() {
-      $scope.loading = true;
-      $scope.error = null;
-
-      user.register($scope.user)
-        .then(function(user) {
-          $location.url('/');
-        }, function(error) {
-          $scope.error = error;
-        })
-        .finally(function() {
-          $scope.loading = false;
-        });
+      return user.register($scope.user).then(function(user) {
+        $location.url('/');
+      });
     }
   }).
 
-  controller('UserEditCtrl', function($scope, user) {
+  controller('UserEditCtrl', function($scope, user, formHelper) {
     $scope.user = angular.copy(user.user());
 
-    $scope.edit = function(form) {
-      $scope.loading = true;
-      $scope.error = null;
-
-      _.each(form, function(field, name) {
-        field.$validation = null;
+    $scope.edit = function() {
+      return user.edit($scope.user).then(function(user) {
+        $scope.user = angular.copy(user);
       });
-
-      user.edit($scope.user)
-        .then(function(user) {
-          $scope.user = user;
-        }, function(error) {
-          $scope.error = error;
-          _.each(error.data.errors || {}, function(error, field) {
-            form[field].$validation = error.message;
-          });
-        })
-        .finally(function() {
-          $scope.loading = false;
-        });
     };
   }).
 

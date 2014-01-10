@@ -185,4 +185,38 @@ angular.module('letsGo.services', []).
 
   service('Message', function($resource) {
     return $resource('/messages/:id', {id: '@_id'});
+  })
+
+  .service('formHelper', function($resource) {
+    return {
+      submit: function(postAction) {
+        return function(form) {
+          form = form || {};
+          console.log('form ', form);
+
+          form.lgLoading = true;
+          form.lgFailure = false;
+          form.lgSuccess = false;
+
+          _.each(form, function(field) {
+            field.lgError = undefined;
+          });
+
+          var promise = postAction(form);
+
+          promise
+            .catch(function(error) {
+              // TODO: set global form error
+              _.each(error.data.errors || {}, function(error, field) {
+                if (form[field]) {
+                  form[field].lgError = error.message;
+                }
+              });
+            })
+            .finally(function() {
+              form.lgLoading = false;
+            });
+        }
+      }
+    };
   });

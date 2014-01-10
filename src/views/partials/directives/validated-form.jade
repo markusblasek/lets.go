@@ -1,0 +1,10 @@
+form(name='form', ng-submit='action()', novalidate)
+  div.ui.form.segment(ng-class='{loading: form.lgLoading, error: form.lgError}')
+    div.ui.error.message(ng-show='form.lgError')
+      div.header Something went wrong, sorry!
+      p(ng-bind='form.lgError')
+    div(ng-transclude)
+    button.ui.blue.submit.button(type='submit',
+                                 ng-disabled='form.$invalid || form.$pristine',
+                                 ng-class='{disabled: form.$invalid || form.$pristine}',
+                                 ng-bind='button')

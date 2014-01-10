@@ -1,8 +1,8 @@
 'use strict';
 
-angular.module('letsGo.directives', []).
+angular.module('letsGo.directives', [])
 
-  directive('lgMessageBox', function($rootScope, $http, socket) {
+  .directive('lgMessageBox', function($rootScope, $http, socket) {
     return {
       restrict: 'E',
       scope: {
@@ -41,4 +41,73 @@ angular.module('letsGo.directives', []).
         });
       }
     };
+  })
+
+  .directive('lgValidatedForm', function() {
+    return {
+      restrict: 'E',
+      transclude: true,
+      replace: true,
+      scope: {
+        button: '@lgButton',
+        submit: '&lgSubmit'
+      },
+      templateUrl: '/static/partials/directives/validated-form.jade',
+      controller: function($scope) {
+        this.scope = $scope;
+        $scope.action = function() {
+          $scope.form.lgLoading = true;
+          $scope.form.lgError = false;
+          $scope.form.lgSuccess = false;
+
+          _.each($scope.form, function(field) {
+            delete field.lgError;
+          });
+
+          var promise = $scope.submit();
+          promise
+            .then(function() {
+              $scope.form.$setPristine();
+            }, function(error) {
+              if (typeof error.data === 'string') {
+                $scope.form.lgError = error.data;
+              }
+
+              if (typeof error.data === 'object') {
+                if (typeof error.data.message === 'string') {
+                  $scope.form.lgError = error.data.message;
+                }
+                _.each(error.data.errors || {}, function(error, field) {
+                  if ($scope.form[field]) {
+                    $scope.form[field].lgError = error.message;
+                    //$scope.form.$setValidity()
+                  }
+                });
+              }
+
+              // TODO: set global form error
+            })
+            .finally(function() {
+              $scope.form.lgLoading = false;
+            });
+        }
+      }
+    }
+  })
+
+  .directive('lgValidatedField', function() {
+    return {
+      restrict: 'E',
+      transclude: true,
+      replace: true,
+      scope: {
+        field: '@lgField',
+        label: '@lgLabel'
+      },
+      require: '^lgValidatedForm',
+      templateUrl: '/static/partials/directives/validated-field.jade',
+      link: function(scope, element, attrs, formController) {
+        scope.form = formController.scope.form;
+      }
+    }
   });

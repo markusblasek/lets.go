@@ -1,0 +1,5 @@
+div.field(ng-class='{error: form[field].$dirty && (form[field].$invalid || form[field].lgError)}')
+  label(ng-if='label', ng-bind='label')
+  div(ng-transclude)
+  div.ui.red.pointing.above.ui.label(ng-show='form[field].lgError',
+                                     ng-bind='form[field].lgError')
