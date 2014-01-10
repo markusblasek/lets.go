@@ -60,7 +60,7 @@ angular.module('letsGo.controllers', [])
   })
 
   .controller('UserEditCtrl', function($scope, userManager) {
-    $scope.user = angular.copy(userManager.user());
+    $scope.user = angular.copy(userManager.user);
 
     $scope.edit = function() {
       return userManager.edit($scope.user).then(function(user) {
