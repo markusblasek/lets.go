@@ -3,13 +3,11 @@ var Game = require('../models/game');
 exports.create = function(req, res) {
   var game = new Game({
     challenger: req.user._id,
-    config: {
-      size: req.body.size,
-      color: req.body.color,
-      komi: req.body.komi,
-      name: req.body.name,
-      private: !!req.body.private
-    }
+    size: req.body.size,
+    color: req.body.color,
+    komi: req.body.komi,
+    name: req.body.name,
+    private: !!req.body.private
   });
 
   game.save(function(err, game) {

@@ -15,23 +15,21 @@ var gameSchema = new mongoose.Schema({
   },
 
   // defined by the creator
-  config: {
-    name: {type: String},
-    size: {
-      type: Number,
-      min: 9,
-      max: 19,
-      required: true
-    },
-    color: {
-      type: String,
-      enum: ['black', 'white', 'random'],
-      default: 'random',
-      required: true
-    },
-    komi: {type: Number, min: 0, default: 6.5},
-    private: {type: Boolean, default: false, required: true}
+  name: {type: String},
+  size: {
+    type: Number,
+    min: 9,
+    max: 19,
+    required: true
   },
+  color: {
+    type: String,
+    enum: ['black', 'white', 'random'],
+    default: 'random',
+    required: true
+  },
+  komi: {type: Number, min: 0, default: 6.5},
+  private: {type: Boolean, default: false, required: true},
 
   // challenger is the creator, challengee might be assigned later
   challenger: {type: ObjectId, ref: 'User', index: true, required: true},
@@ -69,19 +67,19 @@ var score = function(player) {
     var score = this.prisoners[player];
     var user = {_id: this.populated(player) || this[player]};
 
-    if (this.color(user) === 'W') {
-      score += this.config.komi;
+    if (this.hasColor(user) === 'W') {
+      score += this.komi;
     }
 
     if ((this.state === 'over' || this.state === 'counting') &&
         this.territory && this.dead) {
       // territory
       var counts = _.countBy(this.territory, _.identity);
-      score += counts[this.color(user)] || 0;
+      score += counts[this.hasColor(user)] || 0;
 
       // dead stones
       _.each(_.zip(this.board, this.dead), function(pair) {
-        score += (pair[0] !== this.color(user) && pair[1] === 'X') ? 1 : 0;
+        score += (pair[0] !== this.hasColor(user) && pair[1] === 'X') ? 1 : 0;
       }, this);
     }
 
@@ -98,7 +96,7 @@ gameSchema.virtual('next').get(function() {
 gameSchema.virtual('score.challenger').get(score('challenger'));
 gameSchema.virtual('score.challengee').get(score('challengee'));
 
-gameSchema.methods.color = function(user) {
+gameSchema.methods.hasColor = function(user) {
   if (!this.black) return null;
   return this.black.equals(user._id) ? 'B' : 'W';
 };

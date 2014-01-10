@@ -4,7 +4,7 @@ angular.module('letsGo.controllers', [])
 
   // ==== Main Controller ====
 
-  .controller('AppCtrl', function($scope, $route, $http, $location, userManager) {
+  .controller('AppCtrl', function($scope, $route, $location, userManager) {
     $scope.$route = $route;
 
     $scope.$on('$routeChangeStart', NProgress.start);
@@ -39,7 +39,7 @@ angular.module('letsGo.controllers', [])
 
   // ==== User Controllers ====
 
-  .controller('UserLoginCtrl', function($scope, $http, $location, userManager) {
+  .controller('UserLoginCtrl', function($scope, $location, userManager) {
     $scope.user = {};
 
     $scope.login = function() {
@@ -142,7 +142,7 @@ angular.module('letsGo.controllers', [])
     };
 
     $scope.create = function() {
-      return Game.$save($scope.game, function(game) {
+      return Game.save($scope.game, function(game) {
         $location.path('/games');
       }).$promise;
     };
@@ -162,7 +162,7 @@ angular.module('letsGo.controllers', [])
     $scope.board = [];
 
     $scope.cell = function(column, row) {
-      var index = $scope.game.config.size *row + column;
+      var index = $scope.game.size *row + column;
 
       if ($scope.game.state === 'live' && $scope.game.board[index] === ' ') {
         move('play', column, row);
@@ -199,7 +199,7 @@ angular.module('letsGo.controllers', [])
 
         $scope.board = [];
         for (var i = 0; i < game.board.length; ++i) {
-          if (i % game.config.size == 0) {
+          if (i % game.size == 0) {
             $scope.board.push([]);
           }
 
@@ -213,7 +213,7 @@ angular.module('letsGo.controllers', [])
             cell.countBlack = game.territory[i] === 'B';
           }
 
-          $scope.board[parseInt(i/game.config.size)].push(cell);
+          $scope.board[parseInt(i/game.size)].push(cell);
         }
       });
     });

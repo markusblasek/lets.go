@@ -6,5 +6,5 @@ form(name='form', ng-submit='action()', novalidate)
     div(ng-transclude)
     button.ui.blue.submit.button(type='submit',
                                  ng-disabled='form.$invalid || form.$pristine',
-                                 ng-class='{disabled: form.$invalid || form.$pristine}',
+                                 ng-class='{disabled: form.$invalid}',
                                  ng-bind='button')

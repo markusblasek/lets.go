@@ -96,7 +96,7 @@ module.exports = function(io) {
             if (game.state !== 'waiting' &&
                 game.challenger.id !== user.id &&
                 game.challengee.id !== user.id &&
-                !(event === 'join' && !game.config.private)) {
+                !(event === 'join' && !game.private)) {
               return log.warn('User is not participating in the game and game is private');
             }
 
@@ -166,15 +166,15 @@ module.exports = function(io) {
       game.started = new Date();
 
       // decide who has black, thus starts
-      if (game.config.color == 'black') {
+      if (game.color == 'black') {
         game.black = game.challenger;
-      } else if (game.config.color == 'white') {
+      } else if (game.color == 'white') {
         game.black = game.challengee;
       } else {
         game.black = Math.random() < .5 ? game.challenger : game.challengee;
       }
 
-      game.board = new Array(game.config.size * game.config.size + 1).join(' ');
+      game.board = new Array(game.size * game.size + 1).join(' ');
       game.prisoners.challenger = 0;
       game.prisoners.challengee = 0;
       game.turn = game.black;
@@ -227,7 +227,7 @@ module.exports = function(io) {
         move.column = data.column;
         move.row = data.row;
 
-        var board = logic.move(game.board, game.color(user), move.column,
+        var board = logic.move(game.board, game.hasColor(user), move.column,
           move.row);
         if (!board) {
           return log.warn('Illegal move.');
@@ -240,8 +240,8 @@ module.exports = function(io) {
 
         move.board = board;
         game.board = board;
-        game.prisoners.challenger += prisoners[game.color(game.challenger)] || 0;
-        game.prisoners.challengee += prisoners[game.color(game.challengee)] || 0;
+        game.prisoners.challenger += prisoners[game.hasColor(game.challenger)] || 0;
+        game.prisoners.challengee += prisoners[game.hasColor(game.challengee)] || 0;
 
         saveMove();
       }
@@ -258,7 +258,7 @@ module.exports = function(io) {
 
             if (moves && moves.length === 1 && moves[0].type === 'pass') {
               game.state = 'counting';
-              game.dead = new Array(game.config.size * game.config.size + 1).join(' ');
+              game.dead = new Array(game.size * game.size + 1).join(' ');
               game.territory = logic.territory(game.board, game.dead);
               if (game.territory === null) {
                 return log.warn('Unable to compute territory');
@@ -289,7 +289,7 @@ module.exports = function(io) {
 
     // counting: mark stone/group as dead
     addGameHandler('dead', deadSchema, 'counting', function(game, data, done) {
-      if (game.board[data.row * game.config.size * data.column] === ' ') {
+      if (game.board[data.row * game.size * data.column] === ' ') {
         return log.warn('The marked position must be occupied');
       }
 

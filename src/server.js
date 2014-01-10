@@ -6,6 +6,11 @@ var cookie = require('cookie');
 var connect = require('connect');
 var passport = require('passport');
 
+mongoose.Error.messages.general.required = '{PATH} is mandatory.';
+mongoose.Error.messages.Number.min = '{PATH} has to be equal to or larger than {MIN}';
+mongoose.Error.messages.Number.max = '{PATH} has to be equal to or smaller than {MAX}';
+mongoose.Error.messages.String.enum = '"{VALUE}" is not valid for {PATH}';
+
 var config = require('./config');
 var log = require('./log');
 var routes = require('./routes');
@@ -15,10 +20,6 @@ var User = require('./models/user');
 // establish mongodb connection
 mongoose.connection.on('error', log.error.bind(log, 'connection error:'));
 mongoose.connect('mongodb://' + config.mongodb.host + ':' + config.mongodb.port + '/test');
-mongoose.Error.messages.general.required = '{PATH} is mandatory.';
-mongoose.Error.messages.Number.min = '{PATH} has to be equal to or larger than {MIN}';
-mongoose.Error.messages.Number.max = '{PATH} has to be equal to or smaller than {MAX}';
-mongoose.Error.messages.String.enum = '"{VALUE}" is not valid for {PATH}';
 
 // create app, http server and websocket server instances
 var app = express(),

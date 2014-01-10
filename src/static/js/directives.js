@@ -65,11 +65,8 @@ angular.module('letsGo.directives', [])
             delete field.lgError;
           });
 
-          var promise = $scope.submit();
-          promise
-            .then(function() {
-              $scope.form.$setPristine();
-            }, function(error) {
+          $scope.submit()
+            .catch(function(error) {
               if (typeof error.data === 'string') {
                 $scope.form.lgError = error.data;
               }
@@ -106,6 +103,7 @@ angular.module('letsGo.directives', [])
       templateUrl: '/static/partials/directives/validated-field.jade',
       link: function(scope, element, attrs, formController) {
         scope.form = formController.scope.form;
+        element.find('.ui.dropdown').dropdown();
       }
     }
   });
