@@ -23,7 +23,7 @@ userSchema.set('toJSON', {transform: transform});
 userSchema.set('toObject', {transform: transform});
 
 userSchema.plugin(passportLocalMongoose, {
-    usernameField: 'identifier',
+    usernameField: '_id',
     saltField: 'salt',
     hashField: 'hash'
 });

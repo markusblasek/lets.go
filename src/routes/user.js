@@ -187,8 +187,9 @@ exports.edit = function(req, res){
     user.name = req.body.name;
     user.email = req.body.email;
 
-    // TODO: Update identifier if local, but i think that would break the hash
-    
+    if (user.identifier.indexOf('local-') === 0) {
+      user.identifier = 'local-' + user.email;
+    }
 
     user.save(function(err, user) {
       err ? res.send(500, err) : res.send(user);

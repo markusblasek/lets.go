@@ -121,7 +121,7 @@ io.configure(function() {
           return callback('You need to be logged in.', false);
         }
 
-        User.findOne({identifier: data.session.passport.user}, function(err, user) {
+        User.findOne({_id: data.session.passport.user}, function(err, user) {
           if (err || !user) {
             return callback('Unable to retrieve user object: ' + err, false);
           }
