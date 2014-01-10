@@ -1,11 +1,12 @@
 var crypto = require('crypto');
 
 var mongoose = require('mongoose');
+var mongooseUniqueValidator = require('mongoose-unique-validator');
 var passportLocalMongoose = require('passport-local-mongoose');
 
 var userSchema = new mongoose.Schema({
   identifier: {type: String, required: true, unique: true, index: true},
-  email: {type: String, unique: true, required: true, index: true},
+  email: {type: String, required: true, unique: true, index: true},
   alias: {type: String, required: true},
   name: String,
   photo: String
@@ -22,6 +23,9 @@ var transform = function(doc, ret, options) {
 userSchema.set('toJSON', {transform: transform});
 userSchema.set('toObject', {transform: transform});
 
+userSchema.plugin(mongooseUniqueValidator, {
+  message: 'That {PATH} is already taken, sorry.'
+});
 userSchema.plugin(passportLocalMongoose, {
     usernameField: '_id',
     saltField: 'salt',

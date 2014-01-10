@@ -23,6 +23,7 @@
   "dependencies": {
     "express": "3.4.7",
     "mongoose": "3.8.3",
+    "mongoose-unique-validator": "0.3.0",
     "jade": "1.0.2",
     "less-middleware": "0.1.14",
     "socket.io": "0.9.16",

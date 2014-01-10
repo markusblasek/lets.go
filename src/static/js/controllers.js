@@ -76,15 +76,22 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
   controller('UserEditCtrl', function($scope, user) {
     $scope.user = angular.copy(user.user());
 
-    $scope.edit = function() {
+    $scope.edit = function(form) {
       $scope.loading = true;
       $scope.error = null;
+
+      _.each(form, function(field, name) {
+        field.$validation = null;
+      });
 
       user.edit($scope.user)
         .then(function(user) {
           $scope.user = user;
         }, function(error) {
           $scope.error = error;
+          _.each(error.data.errors || {}, function(error, field) {
+            form[field].$validation = error.message;
+          });
         })
         .finally(function() {
           $scope.loading = false;

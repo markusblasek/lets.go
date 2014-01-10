@@ -1,16 +1,17 @@
-form(name='form', ng-submit='edit()', novalidate)
+form(name='form', ng-submit='edit(form)', novalidate)
   div.ui.form.segment(ng-class='{loading: loading, warning: error}')
     div.ui.warning.message(ng-if='error')
       div.header Something went wrong, sorry!
       ul.list
         li(ng-bind='error')
-    div.field(ng-class='{error: form.email.$dirty && form.email.$invalid}')
+    div.field(ng-class='{error: form.email.$dirty && (form.email.$invalid || form.email.$validation)}')
       label E-Mail
       div.ui.left.labeled.icon.input
         input(placeholder='E-Mail', type='email', name='email', ng-model='user.email', required)
         i.user.icon
         div.ui.corner.label
           i.asterisk.icon
+      div.ui.red.pointing.above.ui.label(ng-if='form.email.$validation', ng-bind='form.email.$validation')
     div.field(ng-class='{error: form.alias.$dirty && form.alias.$invalid}')
       label Display Name
       div.ui.left.labeled.icon.input
