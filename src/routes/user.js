@@ -155,18 +155,18 @@ exports.logout = function(req, res) {
     res.redirect('/');
 };
 
+exports.me = function(req, res) {
+  res.send(req.user);
+};
+
 exports.get = function(req, res) {
-  if (!req.params.id) {
-    return res.send(req.user);
-  } else {
-    User.findById(req.params.id, function(err, user) {
-      if (err) {
-        log.warn('Failed to fetch user by id %s', req.params.id, err);
-        return res.send(500, err.message);
-      }
-      return res.send(user || 404);
-    });
-  }
+  User.findById(req.params.id, function(err, user) {
+    if (err) {
+      log.warn('Failed to fetch user by id %s', req.params.id, err);
+      return res.send(500, err.message);
+    }
+    return res.send(user || 404);
+  });
 };
 
 exports.edit = function(req, res){
@@ -188,6 +188,7 @@ exports.edit = function(req, res){
     user.email = req.body.email;
 
     // TODO: Update identifier if local, but i think that would break the hash
+    
 
     user.save(function(err, user) {
       err ? res.send(500, err) : res.send(user);

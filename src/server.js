@@ -76,7 +76,8 @@ app.get('/static/partials/*', routes.partials);
 app.post('/user', routes.user.register);
 app.post('/user/login', routes.user.login);
 app.post('/user/logout', routes.user.isAuthed, routes.user.logout);
-app.get('/user', routes.user.isAuthed, routes.user.get);
+app.get('/user/me', routes.user.isAuthed, routes.user.me);
+app.get('/user', routes.user.isAuthed, routes.user.list);
 app.get('/user/:id', routes.user.isAuthed, routes.user.get);
 app.post('/user/:id', routes.user.isAuthed, routes.user.edit);
 app.get('/user/auth/google', routes.user.authGoogle, home);
@@ -84,10 +85,9 @@ app.get('/user/auth/google/callback', routes.user.authGoogleCb, home);
 app.get('/user/auth/facebook', routes.user.authFacebook, function(){});
 app.get('/user/auth/facebook/callback', routes.user.authFacebookCb, home);
 
-app.post('/sendMessage', routes.message.sendMessage);
-app.get('/messageUser', routes.user.list);
-app.get('/messageData', routes.message.getMessages);
-app.post('/removeMessage', routes.message.removeMessage);
+app.post('/messages', routes.user.isAuthed, routes.messages.create);
+app.get('/messages', routes.user.isAuthed, routes.messages.list);
+app.delete('/messages/:id', routes.user.isAuthed, routes.messages.remove);
 
 app.post('/games', routes.user.isAuthed, routes.games.create);
 app.get('/games', routes.user.isAuthed, routes.games.list);

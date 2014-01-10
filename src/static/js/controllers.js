@@ -74,7 +74,7 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
   }).
 
   controller('UserEditCtrl', function($scope, user) {
-    $scope.user = user.user();
+    $scope.user = angular.copy(user.user());
 
     $scope.edit = function() {
       $scope.loading = true;
@@ -92,25 +92,35 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
     };
   }).
 
-  controller('MessagesCtrl', function($scope, $window, Message, MessageUser, MessageData) {
-        MessageUser.query(function(userData){
-            $scope.users = userData;
-        });
+  controller('MessagesCtrl', function($scope, $window, User, Message) {
+    $scope.users = [];
+    $scope.messages = [];
 
-        MessageData.query(function(myMessages){
-            $scope.messages = myMessages;
-        })
+    User.query(function(users) {
+      $scope.users = users;
+    });
 
-        $scope.sendMessage = function(){
-            console.log("Message should be send to: "+$scope.name + " content: "+$scope.content+" myID: "+$scope.user._id);
-            Message.sendMessage($scope.user._id, $scope.user.alias, $scope.name, $scope.subject, $scope.content);
-            $window.location = "#/messages/.";
-        }
+    var update = function() {
+      Message.query(function(messages) {
+        $scope.messages = messages;
+      });
+    };
 
-        $scope.removeMessage = function(messID){
-            Message.removeMessage(messID);
-            $window.location = "#/messages/.";
-        }
+    update();
+
+    $scope.sendMessage = function() {
+      Message.save({
+        senderID: $scope.user._id,
+        senderAlias: $scope.user.alias,
+        acceptorID: $scope.name,
+        subject: $scope.subject,
+        content: $scope.content
+      }, update);
+    };
+
+    $scope.removeMessage = function(id) {
+      Message.remove({id: id}, update);
+    };
   }).
 
   controller('GamesListCtrl', function($scope, $location, $timeout, Game, socket) {

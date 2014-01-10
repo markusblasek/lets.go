@@ -1,6 +1,6 @@
 exports.user = require('./user');
 exports.games = require('./games');
-exports.message = require('./message');
+exports.messages = require('./messages');
 
 exports.index = function(req, res) {
     res.render('index');

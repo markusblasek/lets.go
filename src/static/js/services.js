@@ -23,7 +23,7 @@ angular.module('letsGo.services', []).
       },
       check: function() {
         if (user) return false;
-        $http.get('/user').success(setUser);
+        $http.get('/user/me').success(setUser);
       },
       login: function(email, password) {
         return User.login({
@@ -183,34 +183,6 @@ angular.module('letsGo.services', []).
     return $resource('/games/:id', {id: '@_id'});
   }).
 
-  service('MessageUser', function($resource){
-      return $resource('/messageUser');
-  }).
-  service('MessageData', function($resource){
-      return $resource('/messageData');
-  }).
-  service('Message', function($resource, $http){
-      return{
-          /*getUser: function(req, res){
-           console.log("????")
-           return $http.get('/message');
-           },*/
-
-          sendMessage: function(senderID, senderAlias, acceptorID, subject, content){
-              return $http.post('/sendMessage',{
-                  senderID: senderID,
-                  senderAlias: senderAlias,
-                  acceptorID:acceptorID,
-                  subject:subject,
-                  content:content
-              })
-          },
-
-          removeMessage: function(messID){
-              return $http.post('/removeMessage',{
-                  messID:messID
-              })
-          }
-      }
-
+  service('Message', function($resource) {
+    return $resource('/messages/:id', {id: '@_id'});
   });
