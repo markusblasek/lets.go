@@ -15,15 +15,15 @@ angular.module('letsGo.controllers', [])
       $('.ui.dropdown').dropdown();
     });
 
-    //user.check();
-
     $scope.user = null;
     $scope.online = 0;
     $scope.logout = userManager.logout;
     $scope.running_games = [];
 
-    $scope.$on('userChanged', function(event, user) {
-      $scope.user = user;
+    $scope.$watch(function() {
+      return userManager.user;
+    }, function(newUser) {
+      $scope.user = newUser;
     });
 
     $scope.$on('online', function(event, online) {

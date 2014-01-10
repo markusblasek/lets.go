@@ -22,19 +22,8 @@ angular.module('letsGo', [
   });
 
   // prepend each route lookup with a proper user check
-  var check = function($q, $timeout, $location, User) {
-    var deferred = $q.defer();
-
-    User.me(function(user) {
-      if (user._id === undefined) {
-        deferred.reject();
-        $location.path('/user/login');
-      } else {
-        deferred.resolve();
-      }
-    });
-
-    return deferred.promise;
+  var check = function(userManager) {
+    return userManager.check();
   };
 
   $routeProvider

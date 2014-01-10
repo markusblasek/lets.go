@@ -4,24 +4,34 @@ angular.module('letsGo.services', [])
 
   // ==== Managers ====
 
-  .service('userManager', function($rootScope, $http, socketManager, User) {
-    var user = null;
-
+  .service('userManager', function($q, $location, socketManager, User) {
     var setUser = function(aUser) {
-      if (!user && aUser) {
+      if (!service.user && aUser) {
         socketManager.connect();
       }
-      if (!aUser && user) {
+      if (!aUser && service.user) {
         socketManager.disconnect();
       }
-      user = aUser;
-      $rootScope.$broadcast('userChanged', user);
+      service.user = aUser;
       return aUser;
     };
 
-    return {
-      user: function() {
-        return user;
+    var service = {
+      user: null,
+      check: function() {
+        var deferred = $q.defer();
+
+        User.me(function(user) {
+          if (!user || user._id === undefined) {
+            deferred.reject();
+            $location.path('/user/login');
+          } else {
+            setUser(user);
+            deferred.resolve();
+          }
+        });
+
+        return deferred.promise;
       },
       login: function(email, password) {
         return User.login({
@@ -40,7 +50,9 @@ angular.module('letsGo.services', [])
       edit: function(user) {
         return User.save(user).$promise.then(setUser);
       }
-    }
+    };
+
+    return service;
   })
 
   .service('socketManager', function($rootScope) {
