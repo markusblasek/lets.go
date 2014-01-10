@@ -1,5 +1,3 @@
-
-
 var Game = require('../models/game');
 
 exports.create = function(req, res) {

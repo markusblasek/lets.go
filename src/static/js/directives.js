@@ -59,6 +59,7 @@ angular.module('letsGo.directives', [])
           $scope.form.lgLoading = true;
           $scope.form.lgError = false;
           $scope.form.lgSuccess = false;
+          // TODO: Flash success messages?
 
           _.each($scope.form, function(field) {
             delete field.lgError;
@@ -80,12 +81,9 @@ angular.module('letsGo.directives', [])
                 _.each(error.data.errors || {}, function(error, field) {
                   if ($scope.form[field]) {
                     $scope.form[field].lgError = error.message;
-                    //$scope.form.$setValidity()
                   }
                 });
               }
-
-              // TODO: set global form error
             })
             .finally(function() {
               $scope.form.lgLoading = false;

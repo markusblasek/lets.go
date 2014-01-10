@@ -2,6 +2,8 @@
 
 angular.module('letsGo.services', []).
 
+  // ==== Managers ====
+
   service('user', function($rootScope, $http, socket, User) {
     var user = null;
 
@@ -170,53 +172,21 @@ angular.module('letsGo.services', []).
         }
       }
     };
-  }).
+  })
 
-  service('User', function($resource) {
+  // ==== REST Resources ===
+
+  .service('User', function($resource) {
     return $resource('/user/:id', {id: '@_id'}, {
       login: {method: 'POST', url: '/user/login'},
       logout: {method: 'POST', url: '/user/logout'}
     });
-  }).
-
-  service('Game', function($resource) {
-    return $resource('/games/:id', {id: '@_id'});
-  }).
-
-  service('Message', function($resource) {
-    return $resource('/messages/:id', {id: '@_id'});
   })
 
-  .service('formHelper', function($resource) {
-    return {
-      submit: function(postAction) {
-        return function(form) {
-          form = form || {};
-          console.log('form ', form);
+  .service('Game', function($resource) {
+    return $resource('/games/:id', {id: '@_id'});
+  })
 
-          form.lgLoading = true;
-          form.lgFailure = false;
-          form.lgSuccess = false;
-
-          _.each(form, function(field) {
-            field.lgError = undefined;
-          });
-
-          var promise = postAction(form);
-
-          promise
-            .catch(function(error) {
-              // TODO: set global form error
-              _.each(error.data.errors || {}, function(error, field) {
-                if (form[field]) {
-                  form[field].lgError = error.message;
-                }
-              });
-            })
-            .finally(function() {
-              form.lgLoading = false;
-            });
-        }
-      }
-    };
+  .service('Message', function($resource) {
+    return $resource('/messages/:id', {id: '@_id'});
   });
