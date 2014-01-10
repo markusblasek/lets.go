@@ -2,7 +2,7 @@
 
 angular.module('letsGo.directives', [])
 
-  .directive('lgMessageBox', function($rootScope, $http, socket) {
+  .directive('lgMessageBox', function($rootScope, $http, socketManager) {
     return {
       restrict: 'E',
       scope: {
@@ -34,7 +34,7 @@ angular.module('letsGo.directives', [])
             var $this = $(this);
             var text = $this.val();
             if (text && text != '') {
-              socket.message(attrs.lgTargetType, attrs.lgTargetId, text);
+              socketManager.message(attrs.lgTargetType, attrs.lgTargetId, text);
               $this.val('');
             }
           }

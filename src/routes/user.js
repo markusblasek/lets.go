@@ -159,7 +159,7 @@ exports.logout = function(req, res) {
 };
 
 exports.me = function(req, res) {
-  res.send(req.user);
+  res.send(req.user || '');
 };
 
 exports.get = function(req, res) {

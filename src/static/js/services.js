@@ -1,18 +1,18 @@
 'use strict';
 
-angular.module('letsGo.services', []).
+angular.module('letsGo.services', [])
 
   // ==== Managers ====
 
-  service('user', function($rootScope, $http, socket, User) {
+  .service('userManager', function($rootScope, $http, socketManager, User) {
     var user = null;
 
     var setUser = function(aUser) {
       if (!user && aUser) {
-        socket.connect();
+        socketManager.connect();
       }
       if (!aUser && user) {
-        socket.disconnect();
+        socketManager.disconnect();
       }
       user = aUser;
       $rootScope.$broadcast('userChanged', user);
@@ -22,10 +22,6 @@ angular.module('letsGo.services', []).
     return {
       user: function() {
         return user;
-      },
-      check: function() {
-        if (user) return false;
-        $http.get('/user/me').success(setUser);
       },
       login: function(email, password) {
         return User.login({
@@ -45,9 +41,9 @@ angular.module('letsGo.services', []).
         return User.save(user).$promise.then(setUser);
       }
     }
-  }).
+  })
 
-  service('socket', function($rootScope) {
+  .service('socketManager', function($rootScope) {
     var socket = null;
     var connected = false;
 
@@ -174,10 +170,11 @@ angular.module('letsGo.services', []).
     };
   })
 
-  // ==== REST Resources ===
+  // ==== REST Resources ====
 
   .service('User', function($resource) {
     return $resource('/user/:id', {id: '@_id'}, {
+      me: {method: 'GET', url: '/user/me'},
       login: {method: 'POST', url: '/user/login'},
       logout: {method: 'POST', url: '/user/logout'}
     });

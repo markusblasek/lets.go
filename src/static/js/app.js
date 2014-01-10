@@ -7,54 +7,69 @@ angular.module('letsGo', [
   'letsGo.services',
   'letsGo.controllers',
   'letsGo.directives'
-]).
-config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvider) {
+])
+.config(function($routeProvider, $httpProvider) {
   // add an interceptor for AJAX errors
   $httpProvider.responseInterceptors.push(function($q, $location) {
     return function(promise) {
-      return promise.then(
-        // Success: just return the response
-        function(response){
-          return response;
-        },
-        // Error: check the error status to get only the 401
-        function(response) {
-          if (response.status === 401)
-            $location.url('/user/login');
-          return $q.reject(response);
+      return promise.then(null, function(response) {
+        if (response.status === 401) {
+          $location.path('/user/login');
         }
-      );
-    }
+        return $q.reject(response);
+      });
+    };
   });
 
-  $routeProvider.
-    when('/user/login', {
+  // prepend each route lookup with a proper user check
+  var check = function($q, $timeout, $location, User) {
+    var deferred = $q.defer();
+
+    User.me(function(user) {
+      if (user._id === undefined) {
+        deferred.reject();
+        $location.path('/user/login');
+      } else {
+        deferred.resolve();
+      }
+    });
+
+    return deferred.promise;
+  };
+
+  $routeProvider
+    .when('/user/login', {
       templateUrl: '/static/partials/user/login.jade',
       controller: 'UserLoginCtrl'
-    }).
-    when('/user/register', {
+    })
+    .when('/user/register', {
       templateUrl: '/static/partials/user/register.jade',
       controller: 'UserRegisterCtrl'
-    }).
-    when('/user/edit', {
+    })
+    .when('/user/edit', {
       templateUrl: '/static/partials/user/edit.jade',
-      controller: 'UserEditCtrl'
-    }).
-    when('/messages', {
+      controller: 'UserEditCtrl',
+      resolve: {loggedIn: check}
+    })
+    .when('/messages', {
       templateUrl: '/static/partials/messages/index.jade',
-      controller: 'MessagesCtrl'
-    }).
-    when('/games', {
+      controller: 'MessagesCtrl',
+      resolve: {loggedIn: check}
+    })
+    .when('/games', {
       templateUrl: '/static/partials/games/list.jade',
-      controller: 'GamesListCtrl'
-    }).
-    when('/games/create', {
+      controller: 'GamesListCtrl',
+      resolve: {loggedIn: check}
+    })
+    .when('/games/create', {
       templateUrl: '/static/partials/games/create.jade',
-      controller: 'GamesCreateCtrl'
-    }).
-    when('/games/:gameId', {
+      controller: 'GamesCreateCtrl',
+      resolve: {loggedIn: check}
+    })
+    .when('/games/:gameId', {
       templateUrl: '/static/partials/games/view.jade',
-      controller: 'GamesViewCtrl'
-    }).
-    otherwise({redirectTo: '/games'});
-}]);
+      controller: 'GamesViewCtrl',
+      resolve: {loggedIn: check}
+    })
+    .otherwise({redirectTo: '/games'});
+});

@@ -79,8 +79,8 @@ app.get('/static/partials/*', routes.partials);
 
 app.post('/user', routes.user.register);
 app.post('/user/login', routes.user.login);
+app.get('/user/me', routes.user.me);
 app.post('/user/logout', routes.user.isAuthed, routes.user.logout);
-app.get('/user/me', routes.user.isAuthed, routes.user.me);
 app.get('/user', routes.user.isAuthed, routes.user.list);
 app.get('/user/:id', routes.user.isAuthed, routes.user.get);
 app.post('/user/:id', routes.user.isAuthed, routes.user.edit);
