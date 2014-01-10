@@ -32,27 +32,19 @@ exports.setup = function(app) {
 
   var strategyHandler = function(update) {
     return function(accessToken, refreshToken, profile, done) {
-      var identifier = {
-        service: {
-          name: profile.provider,
-          id: profile.id
-        }
-      };
-
+      var identifier = {identifier: profile.provider + '-' + profile.id};
       User.findOne(identifier, function(err, user) {
         if (!user) {
           user = new User(identifier);
-        }
-
-        user.alias = profile.name.givenName;
-        user.name = profile.displayName;
-        user.email = profile.emails[0].value;
-        if (profile.photos && profile.photos[0]) {
-          user.photo = profile.photos[0].value;
-        }
-
-        if (update) {
-          update(user, profile);
+          user.alias = profile.name.givenName;
+          user.name = profile.displayName;
+          user.email = profile.emails[0].value;
+          if (profile.photos && profile.photos[0]) {
+            user.photo = profile.photos[0].value;
+          }
+          if (update) {
+            update(user, profile);
+          }
         }
 
         user.save(function(err) {
@@ -70,13 +62,7 @@ exports.setup = function(app) {
     usernameField: 'email',
     passwordField: 'password'
   }, function(username, password, done) {
-    var identifier = {
-      service: {
-        name: 'local',
-        id: username
-      }
-    };
-
+    var identifier = {identifier: 'local' + '-' + username};
     User.findOne(identifier, function (err, user) {
       if (err) {
         return done(err);
@@ -136,10 +122,7 @@ exports.authFacebookCb = passport.authenticate('facebook', {
 
 exports.register = function(req, res) {
   var user = new User({
-    service: {
-      name: 'local',
-      id: req.body.email
-    },
+    identifier: 'local-' + req.body.email,
     email: req.body.email,
     alias: req.body.alias,
     name: req.body.name
@@ -173,64 +156,50 @@ exports.logout = function(req, res) {
 };
 
 exports.get = function(req, res) {
-  res.send(req.user);
+  if (!req.params.id) {
+    return res.send(req.user);
+  } else {
+    User.findById(req.params.id, function(err, user) {
+      if (err) {
+        log.warn('Failed to fetch user by id %s', req.params.id, err);
+        return res.send(500, err.message);
+      }
+      return res.send(user || 404);
+    });
+  }
 };
 
-exports.getUser = function(req, res){
-    User
-        .findOne({_id: req.user._id})
-        .exec(function(err, user) {
-            if (err) {
-                return res.send(400, err);
-            }
-            var userArray = [
-                {
-                    email: user.email,
-                    alias: user.alias,
-                    name: user.name,
-                    photo: user.photo
-                }
-            ]
-            res.send(userArray);
-        });
+exports.edit = function(req, res){
+  if (req.user.id !== req.body._id) {
+    log.warn('Users may edit only their own account');
+    return res.send(403);
+  }
+
+  User.findById(req.body._id, function(err, user) {
+    if (err) {
+      return res.send(500, err);
+    }
+    if (!user) {
+      return res.send(404);
+    }
+
+    user.alias = req.body.alias;
+    user.name = req.body.name;
+    user.email = req.body.email;
+
+    // TODO: Update identifier if local, but i think that would break the hash
+
+    user.save(function(err, user) {
+      err ? res.send(500, err) : res.send(user);
+    });
+  });
 };
 
-exports.changeUserDetail = function(req, res){
-    User.findOne({_id: req.user._id}, function(err, doc){
-        if(err){
-            console.log("error in exports.changeUserDetail")
-        }else{
-            if(req.body.name!=''){
-                doc.name = req.body.name;
-            }
-            if(req.body.alias != ''){
-                doc.alias = req.body.alias;
-            }
-            /*
-            if(req.body.email != '' && req.body.email != undefined){
-                doc.email = req.body.email;
-            }
-            */
-            doc.save();
-        }
-    })
+exports.list = function(req, res) {
+  User.find({}, function(err, users) {
+    if (err) {
+      res.send(500, err);
+    }
+    res.send(users || []);
+  });
 };
-
-exports.getUserList = function(req, res) {
-    var users = new Array(User);
-    User
-        .find({})
-        .exec(function(err, data) {
-            for(var i=0; i<data.length; i++){
-                users[i] = new User();
-                users[i]._id = data[i]._id;
-                users[i].name = data[i].name;
-                users[i].alias = data[i].alias;
-                users[i].email = data[i].email;
-                users[i].photo = data[i].photo;
-            }
-            res.send(users);
-        });
-
-};
-

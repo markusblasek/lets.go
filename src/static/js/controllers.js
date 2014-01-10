@@ -34,7 +34,7 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
     });
   }).
 
-  controller('LoginCtrl', function($scope, $http, $location, user) {
+  controller('UserLoginCtrl', function($scope, $http, $location, user) {
     $scope.email = '';
     $scope.password = '';
 
@@ -42,57 +42,54 @@ angular.module('letsGo.controllers', ['letsGo.directives']).
       $scope.loading = true;
       $scope.error = null;
 
-      return user.login($scope.email, $scope.password).
-        success(function(user){
+      user.login($scope.email, $scope.password)
+        .then(function(user){
           $location.url('/');
-        }).
-        error(function(error){
+        }, function(error){
           $scope.error = error;
-        }).
-        finally(function() {
+        })
+        .finally(function() {
           $scope.loading = false;
         });
     };
   }).
 
-  controller('RegisterCtrl', function($scope, $http, $location, user) {
-    $scope.email = '';
-    $scope.alias = '';
-    $scope.name = '';
-    $scope.password = '';
+  controller('UserRegisterCtrl', function($scope, $location, user) {
+    $scope.user = {};
 
     $scope.register = function() {
       $scope.loading = true;
       $scope.error = null;
 
-      user.register($scope.email, $scope.alias, $scope.name, $scope.password).
-        success(function(user) {
+      user.register($scope.user)
+        .then(function(user) {
           $location.url('/');
-        }).
-        error(function(error) {
+        }, function(error) {
           $scope.error = error;
-        }).
-        finally(function() {
+        })
+        .finally(function() {
           $scope.loading = false;
         });
     }
   }).
 
-  controller('UserDetailCtrl', function($scope, $window, UserDetail, ChangeUserDetail) {
-        //controller('UserDetailCtrl', function($scope, UserDetail, ChangeUserDetail) {
-        UserDetail.query(function(userDet) {
-            $scope.userDetails = userDet;
-            $scope.name= '';
-            $scope.alias='';
-            //$scope.email='';
-        });
+  controller('UserEditCtrl', function($scope, user) {
+    $scope.user = user.user();
 
-        $scope.changeUserDetail = function(){
-            //TODO ggf. Ändern des AnzeigeNamens oben in der Menüleiste...f5 hilft bis dahin
-            //ChangeUserDetail.changeUserDetail($scope.email, $scope.alias, $scope.name);
-            ChangeUserDetail.changeUserDetail($scope.alias, $scope.name);
-            $window.location = "#/userDetail/.";
-        }
+    $scope.edit = function() {
+      $scope.loading = true;
+      $scope.error = null;
+
+      user.edit($scope.user)
+        .then(function(user) {
+          $scope.user = user;
+        }, function(error) {
+          $scope.error = error;
+        })
+        .finally(function() {
+          $scope.loading = false;
+        });
+    };
   }).
 
   controller('MessagesCtrl', function($scope, $window, Message, MessageUser, MessageData) {

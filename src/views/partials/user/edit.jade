@@ -1,4 +1,4 @@
-form#registerform(name='form', ng-submit='register()', novalidate)
+form(name='form', ng-submit='edit()', novalidate)
   div.ui.form.segment(ng-class='{loading: loading, warning: error}')
     div.ui.warning.message(ng-if='error')
       div.header Something went wrong, sorry!
@@ -21,11 +21,4 @@ form#registerform(name='form', ng-submit='register()', novalidate)
     div.field
       label Real Name
       input(placeholder='John Doe (Optional)', type='text', ng-model='user.name')
-    div.field(ng-class='{error: form.password.$dirty && form.password.$invalid}')
-      label Password
-      div.ui.left.labeled.icon.input
-        input(placeholder='Password', type='password', name='password', ng-model='user.password', required)
-        i.lock.icon
-        div.ui.corner.label
-          i.asterisk.icon
-    button.ui.blue.submit.button(type='submit', ng-disabled='form.$invalid', ng-class='{disabled: form.$invalid}') Register
+    button.ui.blue.submit.button(type='submit', ng-disabled='form.$invalid', ng-class='{disabled: form.$invalid}') Edit

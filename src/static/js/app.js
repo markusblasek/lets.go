@@ -30,15 +30,15 @@ config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvide
   $routeProvider.
     when('/user/login', {
       templateUrl: '/static/partials/user/login.jade',
-      controller: 'LoginCtrl'
+      controller: 'UserLoginCtrl'
     }).
     when('/user/register', {
       templateUrl: '/static/partials/user/register.jade',
-      controller: 'RegisterCtrl'
+      controller: 'UserRegisterCtrl'
     }).
-    when('/userDetail', {
-      templateUrl: '/static/partials/user/userDetail.jade',
-      controller: 'UserDetailCtrl'
+    when('/user/edit', {
+      templateUrl: '/static/partials/user/edit.jade',
+      controller: 'UserEditCtrl'
     }).
     when('/messages', {
       templateUrl: '/static/partials/messages/index.jade',

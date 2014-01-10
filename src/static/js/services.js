@@ -2,43 +2,45 @@
 
 angular.module('letsGo.services', []).
 
-  service('user', function($rootScope, $http, socket) {
+  service('user', function($rootScope, $http, socket, User) {
     var user = null;
 
     var setUser = function(aUser) {
+      if (!user && aUser) {
+        socket.connect();
+      }
+      if (!aUser && user) {
+        socket.disconnect();
+      }
       user = aUser;
       $rootScope.$broadcast('userChanged', user);
-      socket.connect();
-    }
+      return aUser;
+    };
 
     return {
+      user: function() {
+        return user;
+      },
       check: function() {
         if (user) return false;
         $http.get('/user').success(setUser);
       },
       login: function(email, password) {
-        return $http.post('/user/login', {
+        return User.login({
           email: email,
           password: password
-        })
-        .success(setUser);
+        }).$promise.then(setUser);
       },
       logout: function() {
-        return $http.post('/user/logout')
-          .success(function() {
-            user = null;
-            socket.disconnect();
-
-            $rootScope.$broadcast('userChanged', user);
-          });
+        return User.logout().$promise.then(function() {
+          setUser(null);
+        });
       },
-      register: function(email, alias, name, password) {
-        return $http.post('/user', {
-          email: email,
-          alias: alias,
-          name: name,
-          password: password
-        }).success(setUser);
+      register: function(user) {
+        return User.save(user).$promise.then(setUser);
+      },
+      edit: function(user) {
+        return User.save(user).$promise.then(setUser);
       }
     }
   }).
@@ -170,54 +172,45 @@ angular.module('letsGo.services', []).
     };
   }).
 
-  service('Game', function($resource) {
-    return $resource('/games/:id', {id: '@id'});
-  }).
-
-  service('UserDetail', function($resource) {
-    return $resource('/userDetail');//ruft in server.js auf???
-  }).
-
-  service('ChangeUserDetail', function($resource, $http) {
-    return{
-        //changeUserDetail: function(email, alias, name) {
-        changeUserDetail: function(alias, name) {
-            return $http.post('/userDetail', {
-                //email: email,
-                alias: alias,
-                name: name
-            })
-        }
-    }
-    }).
-    service('MessageUser', function($resource){
-        return $resource('/messageUser');
-    }).
-    service('MessageData', function($resource){
-        return $resource('/messageData');
-    }).
-    service('Message', function($resource, $http){
-        return{
-            /*getUser: function(req, res){
-             console.log("????")
-             return $http.get('/message');
-             },*/
-
-            sendMessage: function(senderID, senderAlias, acceptorID, subject, content){
-                return $http.post('/sendMessage',{
-                    senderID: senderID,
-                    senderAlias: senderAlias,
-                    acceptorID:acceptorID,
-                    subject:subject,
-                    content:content
-                })
-            },
-
-            removeMessage: function(messID){
-                return $http.post('/removeMessage',{
-                    messID:messID
-                })
-            }
-        }
-
+  service('User', function($resource) {
+    return $resource('/user/:id', {id: '@_id'}, {
+      login: {method: 'POST', url: '/user/login'},
+      logout: {method: 'POST', url: '/user/logout'}
     });
+  }).
+
+  service('Game', function($resource) {
+    return $resource('/games/:id', {id: '@_id'});
+  }).
+
+  service('MessageUser', function($resource){
+      return $resource('/messageUser');
+  }).
+  service('MessageData', function($resource){
+      return $resource('/messageData');
+  }).
+  service('Message', function($resource, $http){
+      return{
+          /*getUser: function(req, res){
+           console.log("????")
+           return $http.get('/message');
+           },*/
+
+          sendMessage: function(senderID, senderAlias, acceptorID, subject, content){
+              return $http.post('/sendMessage',{
+                  senderID: senderID,
+                  senderAlias: senderAlias,
+                  acceptorID:acceptorID,
+                  subject:subject,
+                  content:content
+              })
+          },
+
+          removeMessage: function(messID){
+              return $http.post('/removeMessage',{
+                  messID:messID
+              })
+          }
+      }
+
+  });
