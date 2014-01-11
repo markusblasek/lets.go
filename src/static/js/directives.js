@@ -72,14 +72,16 @@ angular.module('letsGo.directives', [])
               }
 
               if (typeof error.data === 'object') {
-                if (typeof error.data.message === 'string') {
-                  $scope.form.lgError = error.data.message;
-                }
+                var fields = false;
                 _.each(error.data.errors || {}, function(error, field) {
                   if ($scope.form[field]) {
                     $scope.form[field].lgError = error.message;
+                    fields = true;
                   }
                 });
+                if (typeof error.data.message === 'string' && !fields) {
+                  $scope.form.lgError = error.data.message;
+                }
               }
             })
             .finally(function() {

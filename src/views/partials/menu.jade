@@ -1,29 +1,31 @@
-div.ui.inverted.borderless.main.menu
-  div.container
-    a.item(href='#/')
-      img#logo.ui.image(src='/static/img/ic_logo.png')
-    a.item(ng-if='user')
+#menu.ui.page.grid(ng-if='user')
+  .ui.secondary.pointing.menu
+    a.logo.item(href='#/')
+      | &nbsp;
+      #logo
+    a.item
       i.users.icon
       | CHAT
       div.ui.small.teal.label(ng-bind='online')
-    a.item(href='#messages',ng-if='user')
+    a.item(href='#/messages')
       i.mail.icon
       | MESSAGES
-      //if(messages > 0)
-        div.ui.small.teal.label #{messages}
-    a.item(href='#/games', ng-if='user')
+    a.item(href='#/games')
       i.gamepad.icon
       | GAMES
-    div.right.menu.borderless(ng-if='!user')
-      div.item
-        a.ui.blue.button(href='#/user/login') login
-      div.item
-        a.ui.teal.button(href='#/user/register') sign up
-    div.right.menu.borderless(ng-if='user')
-      div.ui.dropdown.item.simple
-        i.icon.user
+    .right.menu.borderless
+      div.ui.dropdown.item.simple.fitted
         img.ui.avatar.image(ng-src='{{user.photo}}', ng-if='user.photo')
         b(ng-bind='user.alias')
         div.menu.left
           a.item(href='#/user/edit') Edit
           a.item(href='#', ng-click='logout()') Logout
+
+#menu-unknown(ng-if='!user')
+  .ui.one.column.page.grid
+    .column
+      a.ui.right.floated.small.button(href='#/user/login') Sign in
+      a.ui.right.floated.small.green.button(href='#/user/register', style='margin-right: 8px;') Sign up
+      #logo
+        a(href='#/') let's go
+  .ui.divider

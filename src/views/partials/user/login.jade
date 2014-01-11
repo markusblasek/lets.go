@@ -1,29 +1,37 @@
-h1.ui.dividing.medium.header Log In
-div.ui.two.column.middle.aligned.relaxed.grid.basic.segment
-  div.column
-    lg-validated-form(lg-button='Login', lg-submit='login()')
-      lg-validated-field(lg-field='email', lg-label='E-Mail')
-        div.ui.left.labeled.icon.input
-          input(placeholder='E-Mail', type='email', name='email', ng-model='user.email', required)
-          i.user.icon
-          div.ui.corner.label
-            i.asterisk.icon
-      lg-validated-field(lg-field='password', lg-label='Password')
-        div.ui.left.labeled.icon.input
-          input(placeholder='Password', type='password', name='password', ng-model='user.password', required)
-          i.lock.icon
-          div.ui.corner.label
-            i.asterisk.icon
-  div.ui.vertical.divider Or
-  div.center.aligned.column
-    a.huge.green.ui.labeled.icon.button(href='#/user/register')
-      i.signup.icon
-      | Signup
-    div &nbsp;
-    div.ui.vertical.labeled.icon.buttons
-      a.ui.facebook.button(href='/user/auth/facebook')
-        i.facebook.icon
-        | Sign in with Facebook
-      a.ui.google.plus.button(href='/user/auth/google')
-        i.google.plus.icon
-        | Sign in with Google
+#user-login
+  .ui.two.column.middle.aligned.stackable.grid
+    .column
+      .ui.attached.blue.message
+        .ui.header Sign In
+        p To use this fucking awesome service right now!
+      lg-validated-form(lg-button='Login', lg-submit='login()')
+        lg-validated-field(lg-field='email', lg-label='E-Mail')
+          .ui.left.labeled.icon.input
+            input(placeholder='E-Mail', type='email', name='email', ng-model='user.email', required)
+            i.user.icon
+            .ui.corner.label
+              i.asterisk.icon
+        lg-validated-field(lg-field='password', lg-label='Password')
+          .ui.left.labeled.icon.input
+            input(placeholder='Password', type='password', name='password', ng-model='user.password', required)
+            i.lock.icon
+            .ui.corner.label
+              i.asterisk.icon
+    .center.aligned.column
+      p.
+        You don't have an account? That's too bad, but no worries, we got you covered.
+        Just use our dead simple registration form to
+        <a href="#/user/register">create an account</a>
+        right now and start playing Go with other enthusiasts in now time!
+      .ui.horizontal.section.divider Or
+      p.
+        Use an external service to sign in. If you don't have already an account, we create one
+        for you with updated information with just one click.
+      .ui.small.buttons
+        a.ui.facebook.button(href='/user/auth/facebook')
+          i.facebook.icon
+          | Facebook
+        .or
+        a.ui.google.plus.button(href='/user/auth/google')
+          i.google.plus.icon
+          | Google

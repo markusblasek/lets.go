@@ -1,15 +1,18 @@
-lg-validated-form(lg-button='Edit', lg-submit='edit()')
-  lg-validated-field(lg-field='email', lg-label='E-Mail')
-    div.ui.left.labeled.icon.input
-      input(placeholder='E-Mail', type='email', name='email', ng-model='user.email', required)
-      i.user.icon
-      div.ui.corner.label
-        i.asterisk.icon
-  lg-validated-field(lg-field='alias', lg-label='Display Name')
-    div.ui.left.labeled.icon.input
-      input(placeholder='GameLord1337', type='text', name='alias', ng-model='user.alias', required)
-      i.user.icon
-      div.ui.corner.label
-        i.asterisk.icon
-  lg-validated-field(lg-field='name', lg-label='Real Name')
-    input(placeholder='John Doe (Optional)', type='text', name='name', ng-model='user.name')
+#user-edit
+  .ui.attached.blue.message
+    .ui.header Profile Settings
+  lg-validated-form(lg-button='Edit', lg-submit='edit()')
+    lg-validated-field(lg-field='email', lg-label='E-Mail')
+      .ui.left.labeled.icon.input
+        input(placeholder='E-Mail', type='email', name='email', ng-model='user.email', required)
+        i.user.icon
+        .ui.corner.label
+          i.asterisk.icon
+    lg-validated-field(lg-field='alias', lg-label='Display Name')
+      .ui.left.labeled.icon.input
+        input(placeholder='GameLord1337', type='text', name='alias', ng-model='user.alias', required)
+        i.user.icon
+        .ui.corner.label
+          i.asterisk.icon
+    lg-validated-field(lg-field='name', lg-label='Real Name')
+      input(placeholder='John Doe (Optional)', type='text', name='name', ng-model='user.name')

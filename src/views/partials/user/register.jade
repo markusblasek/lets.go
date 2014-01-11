@@ -1,21 +1,43 @@
-lg-validated-form(lg-button='Register', lg-submit='register()')
-  lg-validated-field(lg-field='email', lg-label='E-Mail')
-    div.ui.left.labeled.icon.input
-      input(placeholder='E-Mail', type='email', name='email', ng-model='user.email', required)
-      i.user.icon
-      div.ui.corner.label
-        i.asterisk.icon
-  lg-validated-field(lg-field='alias', lg-label='Display Name')
-    div.ui.left.labeled.icon.input
-      input(placeholder='GameLord1337', type='text', name='alias', ng-model='user.alias', required)
-      i.user.icon
-      div.ui.corner.label
-        i.asterisk.icon
-  lg-validated-field(lg-field='name', lg-label='Real Name')
-    input(placeholder='John Doe (Optional)', type='text', name='name', ng-model='user.name')
-  lg-validated-field(lg-field='password', lg-label='Password')
-    div.ui.left.labeled.icon.input
-      input(placeholder='Password', type='password', name='password', ng-model='user.password', required)
-      i.lock.icon
-      div.ui.corner.label
-        i.asterisk.icon
+#user-register
+  .ui.two.column.middle.aligned.stackable.grid
+    .column
+      .ui.attached.green.message
+        .ui.header Create an Account
+        p Just one small step before your new Go gaming experience
+      lg-validated-form(lg-button='Register', lg-submit='register()')
+        lg-validated-field(lg-field='email', lg-label='E-Mail')
+          .ui.left.labeled.icon.input
+            input(placeholder='E-Mail', type='email', name='email', ng-model='user.email', required)
+            i.user.icon
+            .ui.corner.label
+              i.asterisk.icon
+        lg-validated-field(lg-field='alias', lg-label='Display Name')
+          .ui.left.labeled.icon.input
+            input(placeholder='GameLord1337', type='text', name='alias', ng-model='user.alias', required)
+            i.user.icon
+            .ui.corner.label
+              i.asterisk.icon
+        lg-validated-field(lg-field='name', lg-label='Real Name')
+          input(placeholder='John Doe (Optional)', type='text', name='name', ng-model='user.name')
+        lg-validated-field(lg-field='password', lg-label='Password')
+          .ui.left.labeled.icon.input
+            input(placeholder='Password', type='password', name='password', ng-model='user.password', required)
+            i.lock.icon
+            .ui.corner.label
+              i.asterisk.icon
+    .center.aligned.column
+      p.
+        You already have an account? No problem, just
+        <a href="#/user/login">sign in here</a>.
+      .ui.horizontal.section.divider Or
+      p.
+        Use an external service to create an account with already prefilled information in no time.
+        Just one simple click is enough, we do the rest for you.
+      .ui.small.buttons
+        a.ui.facebook.button(href='/user/auth/facebook')
+          i.facebook.icon
+          | Facebook
+        .or
+        a.ui.google.plus.button(href='/user/auth/google')
+          i.google.plus.icon
+          | Google

@@ -1,0 +1,143 @@
+
+/* gen styles */
+
+
+// ==== General Structure ====
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  font-size: 15px;
+  font-family: "Open Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  width: 100%;
+  height: 100%;
+}
+
+#logo {
+  margin-top: -6px;
+  width: 123px;
+  height: 45px;
+  background: url('/static/img/logo.png');
+  a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-indent: -9999px;
+    outline: 0;
+  }
+}
+
+#menu-unknown {
+  padding-top: .9rem;
+}
+
+#menu {
+  border-bottom: 3px solid rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  > .menu {
+    border-bottom: 0;
+  }
+  #logo {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    margin-top: 5px;
+    margin-left: 18px;
+  }
+  .logo.item {
+    width: 160px;
+  }
+  .item:not(.fitted) {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+}
+
+// ==== Specific Structures ====
+
+// landing page for unknown users
+#landing {
+  .eyecatcher {
+    font-size: 400%;
+  }
+  .subtitle {
+    font-size: 130%;
+  }
+}
+
+// login and register page
+#user-login,
+#user-register {
+  max-width: 1024px;
+  margin: 0 auto;
+  margin-top: 80px;
+}
+
+// user edit page
+#user-edit {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.board .row {
+    clear: left;
+}
+
+.board .cell {
+    float: left;
+    border-top: 1px solid #111;
+    border-left: 1px solid #111;
+    width: 20px;
+    height: 20px;
+}
+.board .cell:first-child {
+    margin-left: 10px;
+}
+.board .cell:last-child {
+    width: 0px;
+}
+.board .row:first-child {
+    margin-top: 10px;
+}
+.board .row:last-child .cell {
+    height: 0px;
+}
+
+.board .stone {
+    margin-left: -10px;
+    margin-top: -10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 11px;
+}
+.board .stone.dead {
+    opacity: .5;
+}
+.board .stone.countwhite:not(.dead),
+.board .stone.countblack:not(.dead) {
+    opacity: .3;
+    width: 10px;
+    height: 10px;
+    margin-left: -5px;
+    margin-top: -5px;
+    border-radius: 6px;
+}
+.board .stone.white,
+.board .stone.countwhite:not(.dead) {
+    background: #fff;
+    border: 1px solid #333;
+}
+
+.board .stone.black,
+.board .stone.countblack:not(.dead) {
+    background: #111;
+    border: 1px solid #333;
+}
+
+// ==== General Styling ====
+
+a {
+  color: #4faeff;
+  outline: 0;
+}

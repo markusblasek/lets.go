@@ -24,7 +24,8 @@ angular.module('letsGo.services', [])
         User.me(function(user) {
           if (!user || user._id === undefined) {
             deferred.reject();
-            $location.path('/user/login');
+            //$location.path('/user/login');
+            setUser(null);
           } else {
             setUser(user);
             deferred.resolve();

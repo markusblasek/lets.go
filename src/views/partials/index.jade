@@ -1,0 +1,67 @@
+// index page for users
+.ui.one.column.page.grid(ng-if='user')
+  .column
+    | Dunno where shall be
+
+// landing page for unknown users
+.ui.stackable.page.grid#landing(ng-if='!user')
+  .middle.aligned.row
+    .ten.wide.column
+      .ui.eyecatcher.header Play Go in a real-life fashion, online.
+      p.subtitle.
+        <em>Let's go</em> is the so far most natural way of playing Go online
+        with thousand other enthusiasts. But don't take our word for it, just
+        try it out yourself!
+      .ui.center.aligned.basic.segment
+        img(src='/static/img/goban.jpg')
+    .six.wide.column
+      lg-validated-form(lg-button='Create an account', lg-submit='register()')
+        lg-validated-field(lg-field='email')
+          .ui.left.labeled.icon.input
+            input(placeholder='Your E-Mail', type='email', name='email', ng-model='newUser.email', required)
+            i.user.icon
+        lg-validated-field(lg-field='alias')
+          .ui.left.labeled.icon.input
+            input(placeholder='Pick a username', type='text', name='alias', ng-model='newUser.alias', required)
+            i.user.icon
+        lg-validated-field(lg-field='password')
+          .ui.left.labeled.icon.input
+            input(placeholder='Choose a password', type='password', name='password', ng-model='newUser.password', required)
+            i.lock.icon
+      .ui.center.aligned.basic.segment
+        | Or just use an external service to create and properly update an account for you with only one click:
+        p
+          .ui.small.buttons
+            a.ui.facebook.button(href='/user/auth/facebook')
+              i.facebook.icon
+              | Facebook
+            .or
+            a.ui.google.plus.button(href='/user/auth/google')
+              i.google.plus.icon
+              | Google
+  .ui.section.divider
+  .center.aligned.one.column.row
+    .column
+      .ui.huge.header
+        | Why you'll love let's go.
+        .sub.header The most natural Go gaming platform ever!
+  .center.aligned.three.column.row
+    .column
+      i.huge.circular.inverted.red.gamepad.icon
+      .ui.header Thousand Players around the globe.
+      p.
+        Play Go online with thousand other players around the globe. The border between real and virtual
+        gaming blurs, thanks to the integration of new multimedia techniques.
+    .column
+      i.huge.circular.inverted.green.chat.icon
+      .ui.header Real time text, audio and video communication.
+      p.
+        Real time collaboration, be it text, audio or video, is a key factor in this platform. It's a basic feature of human interaction and
+        thus we have to make sure that you get exactly that, not less!
+    .column
+      i.huge.circular.inverted.blue.github.icon
+      .ui.header Open-source software made with <i class="heart icon"></i>
+      p.
+        Let's go is a quality service and product we are proud of. It's made
+        with love and no ill intent. Therefore the whole source-code is available
+        online through <a href="https://github.com/markusblasek/lets.go">Github</a>.

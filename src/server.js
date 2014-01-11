@@ -53,12 +53,14 @@ app.use(function(req, res, next) {
   req.io = io;
   next();
 });
-app.use(app.router);
 app.use(require('less-middleware')({
   src: path.join(__dirname, 'static'),
+  dest: path.join(__dirname, 'static'),
+  prefix: '/static',
   compress: true
 }));
 app.use('/static', express.static(path.join(__dirname, 'static')));
+app.use(app.router);
 
 // development only
 if ('development' == app.get('env')) {

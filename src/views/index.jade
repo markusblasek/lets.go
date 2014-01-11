@@ -6,15 +6,10 @@ html(lang='en', ng-app='letsGo')
     link(href='/static/lib/semantic/css/semantic.min.css', rel='stylesheet', type='text/css')
     link(href='/static/lib/nprogress/css/nprogress.css', rel='stylesheet', type='text/css')
     link(href='/static/css/main.css', rel='stylesheet', type='text/css')
-  body(ng-controller='AppCtrl')
-    include partials/sidebarChat
+  body(ng-controller='AppCtrl', ng-cloak)
     include partials/menu
 
-    div#toggleChat.ui.black.inverted.fixed.left.attached.button(ng-if='user', style='position: relative; margin-top: 50px; float: right;', onclick="$('.sidebar').sidebar('toggle');")
-      i.icon.chat.layout.large
-
-    div.ui.page.grid
-      div.column(ng-view)
+    div(ng-view)
 
     script(src='/static/lib/jQuery/jquery-1.10.2.min.js')
     script(src='/static/lib/semantic/javascript/semantic.min.js')

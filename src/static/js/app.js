@@ -27,6 +27,10 @@ angular.module('letsGo', [
   };
 
   $routeProvider
+    .when('/', {
+      templateUrl: '/static/partials/index.jade',
+      controller: 'IndexCtrl'
+    })
     .when('/user/login', {
       templateUrl: '/static/partials/user/login.jade',
       controller: 'UserLoginCtrl'
@@ -60,5 +64,5 @@ angular.module('letsGo', [
       controller: 'GamesViewCtrl',
       resolve: {loggedIn: check}
     })
-    .otherwise({redirectTo: '/games'});
+    .otherwise({redirectTo: '/'});
 });

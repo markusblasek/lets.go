@@ -1,34 +1,37 @@
-a.ui.right.floated.mini.labeled.icon.button(href='#/games/create')
-  i.add.icon
-  | Create
-h1.ui.medium.dividing.header Challenges
+.ui.page.grid
+  .one.column.row
+    .column
+      a.ui.right.floated.mini.labeled.icon.button(href='#/games/create')
+        i.add.icon
+        | Create
+      h1.ui.medium.dividing.header Challenges
 
-table.ui.basic.table
-  tbody
-    tr(ng-repeat='game in open')
-      td(ng-bind='game.size + "x" + game.size')
-      td
-        img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
-        span(ng-bind='game.challenger.alias')
-      td(ng-bind='game.name')
-      td(ng-if='game.challenger._id == user._id')
-        a.ui.right.floated.red.mini.button(ng-click='remove(game._id)') Remove
-      td(ng-if='game.challenger._id != user._id')
-        a.ui.right.floated.green.mini.button(ng-click='accept(game._id)') Play!
+      table.ui.basic.table
+        tbody
+          tr(ng-repeat='game in open')
+            td(ng-bind='game.size + "x" + game.size')
+            td
+              img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
+              span(ng-bind='game.challenger.alias')
+            td(ng-bind='game.name')
+            td(ng-if='game.challenger._id == user._id')
+              a.ui.right.floated.red.mini.button(ng-click='remove(game._id)') Remove
+            td(ng-if='game.challenger._id != user._id')
+              a.ui.right.floated.green.mini.button(ng-click='accept(game._id)') Play!
 
-div.ui.segment(ng-if='running')
-  h1.ui.medium.dividing.header Already Running
+      div.ui.segment(ng-if='running')
+        h1.ui.medium.dividing.header Already Running
 
-  table.ui.basic.table
-    tbody
-      tr(ng-repeat='game in running')
-        td(ng-bind='game.size + "x" + game.size')
-        td
-          img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
-          span(ng-bind='game.challenger.alias')
-          | &nbsp; vs. &nbsp;
-          img.ui.avatar.image(ng-src='{{game.challengee.photo}}')
-          span(ng-bind='game.challengee.alias')
-        td(ng-bind='game.name')
-        td
-          a.ui.right.floated.mini.button(ng-click='view(game._id)') Watch
+        table.ui.basic.table
+          tbody
+            tr(ng-repeat='game in running')
+              td(ng-bind='game.size + "x" + game.size')
+              td
+                img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
+                span(ng-bind='game.challenger.alias')
+                | &nbsp; vs. &nbsp;
+                img.ui.avatar.image(ng-src='{{game.challengee.photo}}')
+                span(ng-bind='game.challengee.alias')
+              td(ng-bind='game.name')
+              td
+                a.ui.right.floated.mini.button(ng-click='view(game._id)') Watch

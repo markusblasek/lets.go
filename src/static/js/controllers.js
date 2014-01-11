@@ -15,6 +15,8 @@ angular.module('letsGo.controllers', [])
       $('.ui.dropdown').dropdown();
     });
 
+    userManager.check();
+
     $scope.user = null;
     $scope.online = 0;
     $scope.logout = userManager.logout;
@@ -37,6 +39,16 @@ angular.module('letsGo.controllers', [])
     });
   })
 
+  .controller('IndexCtrl', function($scope, $location, userManager) {
+    $scope.newUser = {};
+
+    $scope.register = function() {
+      return userManager.register($scope.newUser).then(function(user) {
+        $location.path('/');
+      });
+    };
+  })
+
   // ==== User Controllers ====
 
   .controller('UserLoginCtrl', function($scope, $location, userManager) {
@@ -56,7 +68,7 @@ angular.module('letsGo.controllers', [])
       return userManager.register($scope.user).then(function(user) {
         $location.path('/');
       });
-    }
+    };
   })
 
   .controller('UserEditCtrl', function($scope, userManager) {
