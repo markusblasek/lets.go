@@ -1,4 +1,4 @@
-.ui.page.grid
+#games-list.ui.page.grid
   .one.column.row
     .column
       a.ui.right.floated.mini.labeled.icon.button(href='#/games/create')
@@ -11,22 +11,24 @@
         table.ui.small.basic.table
           thead
             tr
-              th Configuration
-              th Challenger
-              th
-              th Challengee
+              th.four.wide Configuration
+              th.four.wide Opponent
               th Description
-              th
+              th.one.wide
           tbody
             tr(ng-repeat='game in my')
-              td(ng-bind='game.size + "x" + game.size')
-              td(ng-class='{me: user._id === game.challenger._id}')
-                img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
-                span(ng-bind='game.challenger.alias')
-              td vs.
-              td(ng-class='{me: user._id === game.challengee._id}')
-                img.ui.avatar.image(ng-src='{{game.challengee.photo}}')
-                span(ng-bind='game.challengee.alias')
+              td.ui.small.labels
+                .ui.black.label(ng-bind='game.size + "x" + game.size')
+                .ui.green.label(ng-show='game.komi > 0', ng-bind='"+" + game.komi')
+                .ui.red.label(ng-bind='game.color.substr(0, 1)')
+                .ui.blue.label(ng-show='game.private') Priv.
+              td
+                span(ng-if='game.challenger._id !== user._id')
+                  img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
+                  span(ng-bind='game.challenger.alias')
+                span(ng-if='game.challengee._id !== user._id')
+                  img.ui.avatar.image(ng-src='{{game.challengee.photo}}')
+                  span(ng-bind='game.challengee.alias')
               td(ng-bind='game.name')
               td
                 a.ui.right.floated.green.mini.button(ng-click='view(game._id)') Play!
@@ -37,13 +39,17 @@
         table.ui.small.basic.table
           thead
             tr
-              th Configuration
-              th Challenger
+              th.four.wide Configuration
+              th.four.wide Challenger
               th Description
-              th
+              th.one.wide
           tbody
             tr(ng-repeat='game in open')
-              td(ng-bind='game.size + "x" + game.size')
+              td.ui.small.labels
+                .ui.black.label(ng-bind='game.size + "x" + game.size')
+                .ui.green.label(ng-show='game.komi > 0', ng-bind='"+" + game.komi')
+                .ui.red.label(ng-bind='game.color.substr(0, 1)')
+                .ui.blue.label(ng-show='game.private') Priv.
               td(ng-class='{me: user._id === game.challenger._id}')
                 img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
                 span(ng-bind='game.challenger.alias')
@@ -59,22 +65,25 @@
         table.ui.small.basic.table
           thead
             tr
-              th Configuration
-              th Challenger
-              th
-              th Challengee
+              th.four.wide Configuration
+              th.six.wide Challenger <span class='vs'>vs.</span> Challengee
               th Description
-              th
+              th.one.wide
           tbody
             tr(ng-repeat='game in running')
-              td(ng-bind='game.size + "x" + game.size')
+              td.ui.small.labels
+                .ui.black.label(ng-bind='game.size + "x" + game.size')
+                .ui.green.label(ng-show='game.komi > 0', ng-bind='"+" + game.komi')
+                .ui.red.label(ng-bind='game.color.substr(0, 1)')
+                .ui.blue.label(ng-show='game.private') Priv.
               td
-                img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
-                span(ng-bind='game.challenger.alias')
-              td vs.
-              td
-                img.ui.avatar.image(ng-src='{{game.challengee.photo}}')
-                span(ng-bind='game.challengee.alias')
+                span(ng-class='{me: user._id === game.challenger._id}')
+                  img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
+                  span(ng-bind='game.challenger.alias')
+                span.vs vs.
+                span(ng-class='{me: user._id === game.challengee._id}')
+                  img.ui.avatar.image(ng-src='{{game.challengee.photo}}')
+                  span(ng-bind='game.challengee.alias')
               td(ng-bind='game.name')
               td
                 a.ui.right.floated.mini.button(ng-click='view(game._id)') Watch

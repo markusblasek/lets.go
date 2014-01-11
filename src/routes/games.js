@@ -20,8 +20,11 @@ exports.create = function(req, res) {
 };
 
 exports.list = function(req, res) {
+  // TODO: No private, unless its the game of the user
+  //.where('private').eq(false)
   Game
     .find()
+    .where('state').ne('over')
     .populate('challenger')
     .populate('challengee')
     .exec(function(err, games) {
