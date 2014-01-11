@@ -1,37 +1,41 @@
-lg-validated-form(lg-button='Create', lg-submit='create()')
-  lg-validated-field(lg-field='name', lg-label='Name')
-    input(placeholder='Game description (Optional)', name='name', type='text', ng-model='game.name')
-  lg-validated-field(lg-field='size', lg-label='Board Size')
-    div.ui.selection.dropdown
-      input(name='size', type='text', value='9', ng-model='game.size' style='display:none')
-      div.text 9x9
-      i.dropdown.icon
-      div.menu.transition.hidden
-        div.item.active(data-value='9', ng-click='game.size = 9') 9x9
-        div.item(data-value='13', ng-click='game.size = 13') 13x13
-        div.item(data-value='19', ng-click='game.size = 19') 19x19
-  lg-validated-field(lg-field='color', lg-label='Your Color')
-    div.ui.selection.dropdown
-      input(name='color', type='text', value='random', ng-model='game.color' style='display:none')
-      div.text Random
-      i.dropdown.icon
-      div.menu.transition.hidden
-        div.item.active(data-value='random', ng-click='game.color = "random"') Random
-        div.item(data-value='black', ng-click='game.color = "black"') Black
-        div.item(data-value='white', ng-click='game.color = "white"') White
-  lg-validated-field(lg-field='komi', lg-label='Komi')
-    div.ui.selection.dropdown
-      input(name='komi', type='text', value='6.5', ng-model='game.komi' style='display:none')
-      div.text 6.5
-      i.dropdown.icon
-      div.menu.transition.hidden
-        div.item(data-value='0', ng-click='game.komi = 0') 0
-        div.item(data-value='0.5', ng-click='game.komi = 0.5') 0.5
-        div.item(data-value='4.5', ng-click='game.komi = 4.5') 4.5
-        div.item(data-value='5.5', ng-click='game.komi = 5.5') 5.5
-        div.item.active(data-value='6.5', ng-click='game.komi = 6.5') 6.5
-        div.item(data-value='7.5', ng-click='game.komi = 7.5') 7.5
-  lg-validated-field(lg-field='private', lg-label='Private Game')
-    div.ui.checkbox
-      input#private-game(name='private', type='checkbox', ng-model='game.private')
-      label(for='private-game') Block spectators from watching the game
+#games-create
+  .ui.attached.blue.message
+    .ui.header Create a new game
+    p Challenge other players by creating a new game they can accept.
+  lg-validated-form(lg-button='Create', lg-submit='create()')
+    lg-validated-field(lg-field='name', lg-label='Name')
+      input(placeholder='Game description (Optional)', name='name', type='text', ng-model='game.name')
+    lg-validated-field(lg-field='size', lg-label='Board Size')
+      div.ui.selection.dropdown
+        input(name='size', type='text', value='9', ng-model='game.size' style='display:none')
+        div.text 9x9
+        i.dropdown.icon
+        div.menu.transition.hidden
+          div.item.active(data-value='9', ng-click='game.size = 9') 9x9
+          div.item(data-value='13', ng-click='game.size = 13') 13x13
+          div.item(data-value='19', ng-click='game.size = 19') 19x19
+    lg-validated-field(lg-field='color', lg-label='Your Color')
+      div.ui.selection.dropdown
+        input(name='color', type='text', value='random', ng-model='game.color' style='display:none')
+        div.text Random
+        i.dropdown.icon
+        div.menu.transition.hidden
+          div.item.active(data-value='random', ng-click='game.color = "random"') Random
+          div.item(data-value='black', ng-click='game.color = "black"') Black
+          div.item(data-value='white', ng-click='game.color = "white"') White
+    lg-validated-field(lg-field='komi', lg-label='Komi')
+      div.ui.selection.dropdown
+        input(name='komi', type='text', value='6.5', ng-model='game.komi' style='display:none')
+        div.text 6.5
+        i.dropdown.icon
+        div.menu.transition.hidden
+          div.item(data-value='0', ng-click='game.komi = 0') 0
+          div.item(data-value='0.5', ng-click='game.komi = 0.5') 0.5
+          div.item(data-value='4.5', ng-click='game.komi = 4.5') 4.5
+          div.item(data-value='5.5', ng-click='game.komi = 5.5') 5.5
+          div.item.active(data-value='6.5', ng-click='game.komi = 6.5') 6.5
+          div.item(data-value='7.5', ng-click='game.komi = 7.5') 7.5
+    lg-validated-field(lg-field='private', lg-label='Private Game')
+      div.ui.checkbox
+        input#private-game(name='private', type='checkbox', ng-model='game.private')
+        label(for='private-game') Block spectators from watching the game
