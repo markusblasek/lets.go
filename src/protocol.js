@@ -289,7 +289,7 @@ module.exports = function(io) {
 
     // counting: mark stone/group as dead
     addGameHandler('dead', deadSchema, 'counting', function(game, data, done) {
-      if (game.board[data.row * game.size * data.column] === ' ') {
+      if (game.board[data.row * game.size + data.column] === ' ') {
         return log.warn('The marked position must be occupied');
       }
 

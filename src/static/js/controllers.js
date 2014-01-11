@@ -134,12 +134,13 @@ angular.module('letsGo.controllers', [])
     var update = function() {
       Game.query(function(games) {
         var states = _.groupBy(games, 'state');
-        $scope.my = _.filter(states.live || [], function(game) {
+        var notOver = (states.live || []).concat(states.counting || []);
+        $scope.my = _.filter(notOver, function(game) {
           return game.challenger._id === $scope.user._id ||
                  game.challengee._id === $scope.user._id;
         });
         $scope.open = states.waiting || [];
-        $scope.running = _.filter((states.live || []).concat(states.counting || []), function(game) {
+        $scope.running = _.filter(notOver, function(game) {
           return game.challenger._id !== $scope.user._id &&
                  game.challengee._id !== $scope.user._id;
         });
@@ -175,9 +176,8 @@ angular.module('letsGo.controllers', [])
     }
 
     $scope.game = {};
-    $scope.board = [];
 
-    $scope.cell = function(column, row) {
+    $scope.click = function(column, row) {
       var index = $scope.game.size *row + column;
 
       if ($scope.game.state === 'live' && $scope.game.board[index] === ' ') {
@@ -212,25 +212,6 @@ angular.module('letsGo.controllers', [])
     $scope.$on('gameState', function(event, game) {
       $scope.$apply(function() {
         $scope.game = game;
-
-        $scope.board = [];
-        for (var i = 0; i < game.board.length; ++i) {
-          if (i % game.size == 0) {
-            $scope.board.push([]);
-          }
-
-          var cell = {
-            cell: game.board[i]
-          };
-
-          if (game.state === 'counting') {
-            cell.dead = game.dead[i] === 'X';
-            cell.countWhite = game.territory[i] === 'W';
-            cell.countBlack = game.territory[i] === 'B';
-          }
-
-          $scope.board[parseInt(i/game.size)].push(cell);
-        }
       });
     });
 

@@ -153,6 +153,8 @@ var territory = function(board, dead) {
           territory = replace(territory, stone, colors.B ? 'B' : 'W');
         });
       }
+
+      _(grp).each(checked.push.bind(checked));
     }
     return territory;
   }, new Array(board.length + 1).join(' '));

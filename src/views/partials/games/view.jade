@@ -1,45 +1,40 @@
-h2.ui.header
-  i.icon.inverted.circular.green.gamepad
-  span(ng-bind='game.challenger.alias')
-  |  vs.
-  span(ng-bind='game.challengee.alias')
-  span(ng-bind='game.state')
+#games-view.ui.stackable.page.grid
+  .one.column.row
+    .column
+      .ui.header
+        i.inverted.circular.green.gamepad.icon
+        .content
+          span(ng-bind='game.challenger.alias')
+          span.vs vs.
+          span(ng-bind='game.challengee.alias')
+          .sub.header.
+            The game is <span ng-bind='game.state'></span>.
 
-div.ui.grid.vertical.segment
-  div.twelve.wide.column
-    div.ui.segment
-      div.board
+  .row
+    .twelve.wide.center.aligned.column
+      lg-board(lg-game='game', lg-click='click(column, row)')
+      //div.board.size-9
         div.row(ng-repeat='row in board')
           div.cell(ng-repeat='item in row')
             div.stone(ng-class='{black: item.cell === "B", white: item.cell === "W", dead: item.dead, countblack: item.countBlack, countwhite: item.countWhite}',
                       ng-click='cell($index, $parent.$index)')
-  div.four.wide.column
-    div.ui.segment(ng-class='{red: game.turn == game.challenger._id}')
-      div.ui.top.attached.label(ng-bind='game.challenger.alias',
-                                ng-class='{red: game.winner === game.challengee._id, green: game.winner === game.challenger._id}')
-      p
-        | Score:
-        span(ng-bind='game.score.challenger')
-    div.ui.segment(ng-class='{red: game.turn == game.challengee._id}')
-      div.ui.top.attached.label(ng-bind='game.challengee.alias'
-                                ng-class='{red: game.winner === game.challenger._id, green: game.winner === game.challengee._id}')
-      p
-        | Score:
-        span(ng-bind='game.score.challengee')
-    div(ng-if='game.state === "live"')
-      div.ui.hover.button(ng-click='pass()') Pass
-      div.ui.hover.button(ng-click='surrender()') Surrender
-    div(ng-if='game.state === "counting"')
-      div.ui.hover.button(ng-click='resume()') Resume
-      div.ui.hover.button(ng-click='done()') Done
-lg-message-box(lg-target-type='game', lg-target-id='{{ game._id }}')
-
-div(style="clear:both")
-div.videochat
-    video(style="width: 250px; height: 200px; float: left;", id="video_callee", autoplay="true")
-    video(style="width: 100px; height: 75px; float: left;", id="video_caller", muted="true", autoplay="true")
-    div(style="clear:both")
-    input(value="Connect", type="button", ng-click="videoChatConnectChat()")
-    input(value="Stop", type="button", ng-click="videoChatCloseChat();")
-script(src='/static/lib/webrtc/adapter.js')
-script(src='/static/lib/webrtc/webrtc.js')
+    .four.wide.column
+      div.ui.segment(ng-class='{red: game.turn == game.challenger._id}')
+        div.ui.top.attached.label(ng-bind='game.challenger.alias',
+                                  ng-class='{red: game.winner === game.challengee._id, green: game.winner === game.challenger._id}')
+        p
+          | Score:
+          span(ng-bind='game.score.challenger')
+      div.ui.segment(ng-class='{red: game.turn == game.challengee._id}')
+        div.ui.top.attached.label(ng-bind='game.challengee.alias'
+                                  ng-class='{red: game.winner === game.challenger._id, green: game.winner === game.challengee._id}')
+        p
+          | Score:
+          span(ng-bind='game.score.challengee')
+      div(ng-if='game.state === "live"')
+        div.ui.hover.button(ng-click='pass()') Pass
+        div.ui.hover.button(ng-click='surrender()') Surrender
+      div(ng-if='game.state === "counting"')
+        div.ui.hover.button(ng-click='resume()') Resume
+        div.ui.hover.button(ng-click='done()') Done
+//lg-message-box(lg-target-type='game', lg-target-id='{{ game._id }}')
