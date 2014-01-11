@@ -33,10 +33,6 @@ angular.module('letsGo.controllers', [])
         $scope.online = online;
       });
     });
-
-    $scope.$on('gameStarted', function(event, game) {
-      $location.path('/games/' + game._id);
-    });
   })
 
   .controller('IndexCtrl', function($scope, $location, userManager) {
@@ -117,6 +113,7 @@ angular.module('letsGo.controllers', [])
   // ==== Game Controllers ====
 
   .controller('GamesListCtrl', function($scope, $location, $timeout, Game, socketManager) {
+    $scope.my = [];
     $scope.open = [];
     $scope.running = [];
 
@@ -137,8 +134,15 @@ angular.module('letsGo.controllers', [])
     var update = function() {
       Game.query(function(games) {
         var states = _.groupBy(games, 'state');
+        $scope.my = _.filter(states.live || [], function(game) {
+          return game.challenger._id === $scope.user._id ||
+                 game.challengee._id === $scope.user._id;
+        });
         $scope.open = states.waiting || [];
-        $scope.running = (states.live || []).concat(states.counting || []);
+        $scope.running = _.filter((states.live || []).concat(states.counting || []), function(game) {
+          return game.challenger._id !== $scope.user._id &&
+                 game.challengee._id !== $scope.user._id;
+        });
       });
     };
 

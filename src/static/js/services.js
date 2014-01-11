@@ -133,33 +133,24 @@ angular.module('letsGo.services', [])
       connect: function() {
         if (!socket) {
           socket = io.connect('/');
-
           socket.on('status', statusHandler);
-          socket.on('start',createHandler('gameStarted'));
           socket.on('game', createHandler('gameState'));
           socket.on('message', createHandler('message'));
           socket.on('list', createHandler('gameList'));
-
         } else if (!connected) {
           // due to https://github.com/LearnBoost/socket.io-client/issues/251
           socket.socket.reconnect();
         } else {
           return false;
         }
-
-        connected = true;
-
-        return true;
+        return (connected = true);
       },
       disconnect: function() {
         if (!connected) {
           return false;
         }
-
         socket.disconnect();
-        connected = false;
-
-        return true;
+        return !(connected = false);
       },
       accept: acceptAction,
       join: joinAction,
