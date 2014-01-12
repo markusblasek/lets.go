@@ -25,9 +25,9 @@ exports.list = function(req, res) {
   if (req.query.own !== undefined) {
     query.or([{challenger: req.user._id}, {challengee: req.user._id}]);
   } else {
-    // TODO: No private, unless its the game of the user
-    //.where('private').eq(false)
-    query.where('state').ne('over');
+    query
+      .where('state').ne('over')
+      .or([{challenger: req.user._id}, {challengee: req.user._id}, {private: false}, {state: 'waiting'}]);
   }
 
   query.exec(function(err, games) {
