@@ -84,13 +84,13 @@ angular.module('letsGo.controllers', [])
     $scope.gamesDraw = 0;
     $scope.gamesPlayed = 0;
 
-    User.get({ id: $routeParams.userId}, function(user) {
+    User.get({id: $routeParams.userId}, function(user) {
       $scope.user = user;
     }, function() {
       $location.path('/');
     });
 
-    Game.query({own: true}, function(games) {
+    Game.query({player: $routeParams.userId}, function(games) {
       $scope.games = games;
       $scope.gamesPlayed = games.length;
       _.each(games, function(game) {
@@ -214,7 +214,7 @@ angular.module('letsGo.controllers', [])
           $scope.game.turn === $scope.user._id) {
         socketManager.move($scope.game._id, type, column, row);
       }
-    }
+    };
 
     $scope.game = {};
 

@@ -26,8 +26,8 @@ exports.list = function(req, res) {
     .populate('challengee')
     .sort('-created');
 
-  if (req.query.own !== undefined) {
-    query.or([{challenger: req.user._id}, {challengee: req.user._id}]);
+  if (req.query.player !== undefined) {
+    query.or([{challenger: req.query.player}, {challengee: req.query.player}]);
   } else {
     query
       .where('state').ne('over')
