@@ -77,6 +77,20 @@ angular.module('letsGo.controllers', [])
     };
   })
 
+  .controller('UserViewCtrl', function($scope, $routeParams, $location, User) {
+    $scope.user = {};
+
+    User.get({ id: $routeParams.userId}, function(user) {
+      if(user){
+        $scope.user = user;
+      }
+      else {
+        $location.path('/');
+      }
+    });
+
+  })
+
   // ==== Message Controllers ====
 
   .controller('MessagesCtrl', function($scope, $window, User, Message) {
