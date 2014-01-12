@@ -102,36 +102,43 @@ angular.module('letsGo.controllers', [])
 
   // ==== Message Controllers ====
 
-  .controller('MessagesCtrl', function($scope, $window, User, Message) {
-    $scope.users = [];
-    $scope.messages = [];
+    .controller('MessagesCtrl', function($scope, $window, User, Message) {
+        $scope.users = [];
+        $scope.messages = [];
+        $scope.model = {
+            curName: '',
+            curID: '',
+            subject: '',
+            content: ''
+        };
 
-    User.query(function(users) {
-      $scope.users = users;
-    });
+        User.query(function(users) {
+            $scope.users = users;
+        });
 
-    var update = function() {
-      Message.query(function(messages) {
-        $scope.messages = messages;
-      });
-    };
+        var update = function() {
+            Message.query(function(messages) {
+                $scope.messages = messages;
+            });
+        };
 
-    update();
+        update();
 
-    $scope.sendMessage = function() {
-      Message.save({
-        senderID: $scope.user._id,
-        senderAlias: $scope.user.alias,
-        acceptorID: $scope.name,
-        subject: $scope.subject,
-        content: $scope.content
-      }, update);
-    };
+        $scope.sendMessage = function() {
+            Message.save({
+                senderID: $scope.user._id,
+                senderAlias: $scope.user.alias,
+                acceptorID: $scope.model.curID,
+                acceptorAlias: $scope.model.curName,
+                subject: $scope.model.subject,
+                content: $scope.model.content
+            }, update);
+        };
 
-    $scope.removeMessage = function(id) {
-      Message.remove({id: id}, update);
-    };
-  })
+        $scope.removeMessage = function(id) {
+            Message.remove({id: id}, update);
+        };
+    })
 
   // ==== Game Controllers ====
 

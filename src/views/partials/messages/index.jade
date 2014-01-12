@@ -3,57 +3,49 @@
     div.ui.two.column.middle.aligned.relaxed.grid.basic.segment
         div.column
             div.ui.vertical.menu
-                div.item(ng-init='curName="Please select someone."', ng-click='curName="something"')
+                div.item(ng-init='model.curName="Please select someone."')
                     i.users.icon
                     | Users
                     hr
                 div(ng-repeat='userObj in users')
-                    a.item(ng-if="user._id != userObj._id", ng-click='curName="userObj.alias"'){{userObj.alias}}
-                        //a.item(ng-if="user._id != userObj._id", href='#/games/create'){{userObj.alias}}
+                    a.item(ng-if="user._id != userObj._id", ng-click='model.curName=userObj.alias; model.curID = userObj._id'){{userObj.alias}}
         div.column
-            form(name='form', ng-submit='sendMessage()')
-                table.ui.basic
-                    tbody
-                        tr
-                            td
-                                b To:
-                            td {{curName}}
-                        tr
-                            td
-                                b Subject:
-                            td
-                                input(type:'text', ng-model='subject')
-                        tr
-                            td(colspan=2)
-                                <textarea ng-model='content', cols='50', rows='10'>
-                                </textarea>
-                        tr
-                            td
-                            td
-                            td
-                                button.ui.blue.submit.button(type='submit') Send message
+            div.ui.form.segment
+              form(name='form', ng-submit='sendMessage()')
+                div.field
+                    label
+                        b To:
+                    input(type='text', ng-model = 'model.curName')
+                div.field
+                    label
+                        b Subject:
+                    input(type='text', ng-model = 'model.subject')
+                div.field
+                    textarea(ng-model='model.content')
+                button.ui.blue.submit.button(type='submit') Send message
+
     div.ui.buttons
       div.ui.button(ng-click='switchMess=1') My messages
       div.or
       div.ui.button(ng-click='switchMess=2') Send messages
 
     div(ng-if='switchMess == 1', ng-repeat='mess in messages')
-        div.ui.fitted.divider(ng-if='mess.acceptorID == user._id')
-        table.ui.three.column.table.segment(ng-if='mess.acceptorID == user._id')
+        div.ui.fitted.divider(ng-if='(mess.acceptorID == user._id)&&(mess.delFromAcceptor == "false")')
+        table.ui.three.column.table.segment(ng-if='(mess.acceptorID == user._id)&&(mess.delFromAcceptor == "false")')
             tr
-                td From: {{mess.senderID}}
+                td From: {{mess.senderAlias}}
                 td Subject: {{mess.subject}}
                 td
-                    a.ui.right.floated.red.mini.button(ng-click='removeMessage(mess._id)') Remove
+                    a.ui.right.floated.red.mini.button(ng-click='(removeMessage(mess._id))&&(mess.delFromAcceptor == "false")') Remove
             tr
                 td.three.column {{mess.content}}
 
 
     div(ng-if='switchMess==2', ng-repeat='mess in messages')
-        div.ui.fitted.divider(ng-if='mess.senderID == user._id')
-        table.ui.three.column.table.segment(ng-if='mess.senderID == user._id')
+        div.ui.fitted.divider(ng-if='(mess.senderID == user._id)&&(mess.delFromSender == "false")')
+        table.ui.three.column.table.segment(ng-if='(mess.senderID == user._id)&&(mess.delFromSender == "false")')
             tr
-                td To: {{mess.acceptorID}}
+                td To: {{mess.acceptorAlias}}
                 td Subject: {{mess.subject}}
                 td
                   a.ui.right.floated.red.mini.button(ng-click='removeMessage(mess._id)') Remove
