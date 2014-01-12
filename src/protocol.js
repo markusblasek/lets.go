@@ -12,7 +12,7 @@ var messageSchema = {
     target: {
       type: 'object',
       properties: {
-        type: { type: 'string', enum: ['player', 'game'], required: true },
+        type: { type: 'string', enum: ['player', 'game', 'global'], required: true },
         id: { type: 'string', required: true }
       }
     },
@@ -74,7 +74,6 @@ module.exports = function(io) {
     io.sockets.emit('status', {
       online: Object.keys(users).length
     });
-
 
     // helper method to add a game callback, it checks the schema, retrieves
     // the game, checks the user rights and saves/distributes the game
@@ -153,6 +152,8 @@ module.exports = function(io) {
           return log.warn('User is not allowed to message to that game.');
         }
         io.sockets.in(data.target.id).emit('message', data);
+      } else if (data.target.type === 'global') {
+        io.sockets.emit('message', data);
       }
     });
 

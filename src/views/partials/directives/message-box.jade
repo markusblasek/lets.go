@@ -1,10 +1,7 @@
-//.ui.attached.small.message
-  .header Chat
-.ui.dividing.header Chat
 .chat
   table
     tr(ng-repeat='message in messages')
-      td(ng-init='done($last)', ng-bind='message.time')
+      td.time(ng-init='done($last)', ng-bind='message.time')
       td.user
         a(href='#/user/{{message.user._id}}', ng-bind='message.user.alias')
         | &nbsp;:

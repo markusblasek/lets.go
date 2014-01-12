@@ -49,6 +49,10 @@ angular.module('letsGo', [
       controller: 'UserEditCtrl',
       resolve: {loggedIn: check}
     })
+    .when('/chat', {
+      templateUrl: '/static/partials/chat/index.jade',
+      resolve: {loggedIn: check}
+    })
     .when('/messages', {
       templateUrl: '/static/partials/messages/index.jade',
       controller: 'MessagesCtrl',
