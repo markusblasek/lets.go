@@ -246,6 +246,7 @@ module.exports = function(io) {
         saveMove();
       }
       // pass: check if passed two times in a row and start counting
+      // TODO; check the performance of that mongo query!
       else if (data.type === 'pass') {
         Move
           .find({game: game._id})
@@ -270,9 +271,9 @@ module.exports = function(io) {
       }
       // surrender
       else if (data.type === 'surrender') {
+        game.winner = game.next;
         game.state = 'over';
-        // TODO: Result!
-
+        game.reason = 'surrender';
         saveMove();
       }
     }, function(game) {
@@ -284,6 +285,7 @@ module.exports = function(io) {
     // counting: let's continue playing
     addGameHandler('resume', resumeSchema, 'counting', function(game, data, done) {
       game.state = 'live';
+      game.accepted = [];
       done();
     });
 
@@ -311,6 +313,7 @@ module.exports = function(io) {
       game.accepted.addToSet(user._id);
       if (game.accepted.length === 2) {
         game.state = 'over';
+        game.reason = 'score';
         if (game.score.challenger > game.score.challengee) {
           game.winner = game.challenger._id;
         } else if (game.score.challenger < game.score.challengee) {
@@ -319,7 +322,6 @@ module.exports = function(io) {
           game.winner = null;
         }
       }
-
       done();
     }, function(game) {
       if (game.state === 'over') {

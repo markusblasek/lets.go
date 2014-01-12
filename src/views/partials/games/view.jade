@@ -4,37 +4,74 @@
       .ui.header
         i.inverted.circular.green.gamepad.icon
         .content
-          span(ng-bind='game.challenger.alias')
+          span(ng-bind='game.challenger.alias', ng-class='{loose: game.challenger.loser, win: game.challenger.winner, draw: game.draw}')
           span.vs vs.
-          span(ng-bind='game.challengee.alias')
-          .sub.header.
-            The game is <span ng-bind='game.state'></span>.
+          span(ng-bind='game.challengee.alias', ng-class='{loose: game.challengee.loser, win: game.challengee.winner, draw: game.draw}')
+          .sub.header
+            | The game is <span ng-bind='game.state'></span>.&nbsp;
+            span(ng-show='game.over && !game.winner') No one has won.
+            span(ng-show='game.over && game.winner')
+              b(ng-bind='game.winner === game.challenger._id ? game.challenger.alias : game.challengee.alias')
+              | &nbsp;has won through <span ng-bind="game.reason"></span>.
 
   .row
-    .twelve.wide.center.aligned.column
+    .eleven.wide.center.aligned.column
       lg-board(lg-game='game', lg-click='click(column, row)')
-      //div.board.size-9
-        div.row(ng-repeat='row in board')
-          div.cell(ng-repeat='item in row')
-            div.stone(ng-class='{black: item.cell === "B", white: item.cell === "W", dead: item.dead, countblack: item.countBlack, countwhite: item.countWhite}',
-                      ng-click='cell($index, $parent.$index)')
-    .four.wide.column
-      div.ui.segment(ng-class='{red: game.turn == game.challenger._id}')
-        div.ui.top.attached.label(ng-bind='game.challenger.alias',
-                                  ng-class='{red: game.winner === game.challengee._id, green: game.winner === game.challenger._id}')
-        p
-          | Score:
-          span(ng-bind='game.score.challenger')
-      div.ui.segment(ng-class='{red: game.turn == game.challengee._id}')
-        div.ui.top.attached.label(ng-bind='game.challengee.alias'
-                                  ng-class='{red: game.winner === game.challenger._id, green: game.winner === game.challengee._id}')
-        p
-          | Score:
-          span(ng-bind='game.score.challengee')
-      div(ng-if='game.state === "live"')
-        div.ui.hover.button(ng-click='pass()') Pass
-        div.ui.hover.button(ng-click='surrender()') Surrender
-      div(ng-if='game.state === "counting"')
-        div.ui.hover.button(ng-click='resume()') Resume
-        div.ui.hover.button(ng-click='done()') Done
+    .five.wide.column
+      .ui.icon.message(ng-if='game.over', ng-class='{info: game.draw || !game.player, green: game.win, red: game.loose}')
+        i.frown.icon(ng-show='game.loose')
+        i.smile.icon(ng-show='game.win')
+        i.meh.icon(ng-show='game.draw && game.player')
+        .ui.content
+          .ui.header(ng-show='game.draw') Draw!
+          .ui.header(ng-show='game.win') You won!
+          .ui.header(ng-show='game.loose') You lost!
+          .ui.header(ng-show='!game.player')
+            span(ng-show='game.winner === game.challenger._id', ng-bind='game.challenger.alias')
+            span(ng-show='game.winner === game.challengee._id', ng-bind='game.challengee.alias')
+            | &nbsp; won.
+
+      .two.fluid.ui.buttons(ng-if='game.player', ng-show='game.state === "live"')
+        .ui.black.button(ng-click='pass()', ng-class='{disabled: game.turn !== user._id}') Pass
+        .or
+        .ui.red.button(ng-click='surrender()', ng-class='{disabled: game.turn !== user._id}') Surrender
+
+      .two.fluid.ui.buttons(ng-if='game.player', ng-show='game.state === "counting"')
+        .ui.green.button(ng-click='done()',
+                         ng-class='{disabled: game.accepted.indexOf(user._id) >= 0}',
+                         ng-bind='game.accepted.indexOf(user._id) >= 0 ? "Waiting" : "Accept"')
+        .or
+        .ui.blue.button(ng-click='resume()') Resume
+
+      .ui.section.divider(ng-show='game.player && !game.over')
+
+      .ui.basic.profile.segment(ng-class='{turn: game.over || game.challenger._id === game.turn}')
+        .ui.header
+          img.ui.avatar.image(ng-src='{{game.challenger.photo}}', ng-if='game.challenger.photo')
+          span(ng-bind='game.challenger.alias')
+        .ui.tiny.bulleted.list
+          .item
+            | Color&nbsp;&nbsp;
+            span.color
+              img.ui.tiny.image(ng-show='game.black === game.challenger._id', src='/static/img/black.png')
+              img.ui.tiny.image(ng-show='game.black !== game.challenger._id', src='/static/img/white.png')
+          .item
+            | Score&nbsp;&nbsp;
+            .ui.label(ng-bind='"+" + game.score.challenger')
+
+      .ui.horizontal.section.divider vs.
+
+      .ui.basic.profile.segment(ng-class='{turn: game.over || game.challengee._id === game.turn}')
+        .ui.header
+          img.ui.avatar.image(ng-src='{{game.challengee.photo}}', ng-if='game.challengee.photo')
+          span(ng-bind='game.challengee.alias')
+        .ui.tiny.bulleted.list
+          .item
+            | Color&nbsp;&nbsp;
+            span.color
+              img.ui.tiny.image(ng-show='game.black === game.challengee._id', src='/static/img/black.png')
+              img.ui.tiny.image(ng-show='game.black !== game.challengee._id', src='/static/img/white.png')
+          .item
+            | Score&nbsp;&nbsp;
+            .ui.label(ng-bind='"+" + game.score.challengee')
 //lg-message-box(lg-target-type='game', lg-target-id='{{ game._id }}')

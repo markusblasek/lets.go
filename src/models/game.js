@@ -54,6 +54,7 @@ var gameSchema = new mongoose.Schema({
 
   // once its over, the game has a result
   winner: {type: ObjectId},
+  reason: {type: String, enum: ['score', 'surrender']},
 
   created: {type: Date, default: Date.now}
 });

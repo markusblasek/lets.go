@@ -137,7 +137,7 @@ var territory = function(board, dead) {
   // get all territory groups
   var checked = [];
   return _(board).reduce(function(territory, stone, index) {
-    if (!_(checked).contains(index) && board[index] === ' ') {
+    if (!_(checked).contains(index) && stone === ' ') {
       var grp = group(board, n, index % n, Math.floor(index / n));
       var colors = _
         .chain(grp)
@@ -154,7 +154,9 @@ var territory = function(board, dead) {
         });
       }
 
-      _(grp).each(checked.push.bind(checked));
+      _(grp).each(function(stone) {
+        checked.push(stone);
+      });
     }
     return territory;
   }, new Array(board.length + 1).join(' '));

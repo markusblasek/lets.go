@@ -20,7 +20,6 @@ angular.module('letsGo.controllers', [])
     $scope.user = null;
     $scope.online = 0;
     $scope.logout = userManager.logout;
-    $scope.running_games = [];
 
     $scope.$watch(function() {
       return userManager.user;
@@ -210,6 +209,18 @@ angular.module('letsGo.controllers', [])
     };
 
     $scope.$on('gameState', function(event, game) {
+      game.over = game.state === "over";
+      game.player = $scope.user._id === game.challenger._id || $scope.user._id === game.challengee._id;
+      game.draw = game.over && !game.winner;
+      game.win = game.over && game.winner === $scope.user._id;
+      game.loose = game.over && game.winner !== $scope.user._id && game.player;
+      game.challenger.alias = game.challenger._id === $scope.user._id ? 'You' : game.challenger.alias;
+      game.challenger.winner = game.over && game.winner && game.winner === game.challenger._id;
+      game.challenger.loser = game.over && game.winner && game.winner !== game.challenger._id;
+      game.challengee.alias = game.challengee._id === $scope.user._id ? 'You' : game.challengee.alias;
+      game.challengee.winner = game.over && game.winner && game.winner === game.challengee._id;
+      game.challengee.loser = game.over && game.winner && game.winner !== game.challengee._id;
+
       $scope.$apply(function() {
         $scope.game = game;
       });

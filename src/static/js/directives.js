@@ -118,76 +118,130 @@ angular.module('letsGo.directives', [])
         game: '=lgGame',
         click: '&lgClick'
       },
-      template: '<canvas width="500" height="500"></canvas>',
+      template: '<canvas class="board" width="0" height="0"></canvas>',
       link: function(scope, element, attrs) {
-        var ctx = element.get(0).getContext('2d');
-        var width = element.width();
-        var height = element.height();
-        var total = Math.min(width, height);
+        var canvas = element.get(0);
+        var ctx = canvas.getContext('2d');
 
-        var cell = 0;
-        var stone = 0;
-        var offset = 0;
-        var length = 0;
+        var cell = 0, offsetX = 0, offsetY = 0, length = 0, highlight = -1;
 
-        element.click(function(event) {
-          var position = element.position();
-          var x = Math.floor((event.pageX - position.left) / cell);
-          var y = Math.floor((event.pageY - position.top) / cell);
-          if (x >= 0 && y >= 0 && x <= scope.game.size && y <= scope.game.size && attrs.lgClick) {
-            scope.click({column: x, row: y});
-          }
-        });
+        var draw = function(game) {
+          if (!game || !game.board) return;
 
-        scope.$watch('game', function(game, oldGame) {
-          ctx.clearRect(0, 0, width, height);
+          length = Math.min(canvas.width, canvas.height);
+          cell = length / game.size;
+          offsetX = (canvas.width - length + cell) / 2;
+          offsetY = (canvas.height - length + cell) / 2;
+          length -= cell;
 
-          cell = total / game.size;
-          stone = cell * .8;
-          offset = cell / 2;
-          length = total - cell;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // markers
+          var markers = {
+            9: [2, 4, 6],
+            13: [3, 6, 9],
+            19: [3, 9, 15]
+          };
 
           // grid
-          ctx.lineWidth = 2;
-          ctx.strokeStyle = '#666666';
-          ctx.beginPath();
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = '#4a362d';
+          ctx.fillStyle = '#4a362d';
           for (var i = 0; i < game.size; ++i) {
-            ctx.moveTo(offset + i*cell, offset);
-            ctx.lineTo(offset + i*cell, offset + length);
-            ctx.moveTo(offset, offset + i*cell);
-            ctx.lineTo(offset + length, offset + i*cell);
+            var x = Math.round(offsetX + i*cell) - .5;
+            var y = Math.round(offsetY + i*cell) - .5;
+            ctx.beginPath();
+            ctx.moveTo(x, Math.round(offsetY) - .5);
+            ctx.lineTo(x, Math.round(offsetY + length) - .5);
+            ctx.moveTo(Math.round(offsetX) - .5, y);
+            ctx.lineTo(Math.round(offsetX + length) - .5, y);
+            ctx.stroke();
+
+            var ms = markers[game.size] || [];
+            ctx.beginPath();
+            for (var j = 0; ms.indexOf(i) >= 0 && j < ms.length; ++j) {
+              ctx.arc(x, Math.round(offsetY + ms[j]*cell), cell/13, 0, 2*Math.PI);
+            }
+            ctx.fill();
           }
-          ctx.stroke();
 
           var counting = game.state === 'counting';
 
           // stones
-          for (var i = 0; game.board && i < game.board.length; ++i) {
-            var color = game.board[i];
-            var x = i % game.size;
-            var y = Math.floor(i / game.size);
-            if (color !== ' ') {
+          ctx.lineWidth = 1;
+          for (var i = 0; i < game.board.length; ++i) {
+            var image = null;
+            var s = cell;
 
-              var dead = counting && game.dead[i] === 'X';
-
-              ctx.beginPath();
-              ctx.arc(offset + x * cell, offset + y * cell, stone/2, 0, 2 * Math.PI);
-              ctx.strokeStyle = 'rgba(50, 50, 50, ' + (dead ? .3 : 1) + ')';
-              ctx.fillStyle = (color === 'W') ? 'rgba(255, 255, 255, ' + (dead ? .3 : 1) + ')' : ctx.strokeStyle;
-              ctx.fill();
-              ctx.stroke();
+            ctx.save();
+            if (game.board[i] !== ' ') {
+              ctx.globalAlpha = (counting && game.dead[i] === 'X') ? .5 : 1.;
+              image = (game.board[i] === 'W') ? white : black;
+            } else if (game.state === 'live' && highlight === i && game.turn === scope.$parent.user._id) {
+              image = (game.black === scope.$parent.user._id) ? black : white;
+              ctx.globalAlpha = .5;
+            } else if (counting && game.territory[i] !== ' ') {
+              image = game.territory[i] === 'W' ? white : black;
+              ctx.globalAlpha = .5;
+              s /= 2;
+            } else {
+              continue;
             }
 
-            else if (counting && game.territory[i] !== ' ') {
-              ctx.beginPath();
-              ctx.arc(offset + x * cell, offset + y * cell, stone/4, 0, 2 * Math.PI);
-              ctx.strokeStyle = 'rgba(50, 50, 50, .3)';
-              ctx.fillStyle = (game.territory[i] === 'W') ? 'rgba(255, 255, 255, .3)' : 'rgba(0,0,0,.3)';
-              ctx.fill();
-              ctx.stroke();
-            }
+            ctx.drawImage(image, Math.round(offsetX + (i % game.size)*cell - s/2),
+                          Math.round(offsetY + Math.floor(i / game.size)*cell - s/2), s, s);
+            ctx.restore();
           }
-        }, true);
+        };
+
+        // load image resources
+        var black= new Image(), white = new Image();
+        black.onload = white.onload = function() { draw(scope.game); };
+        black.src = '/static/img/black.png';
+        white.src = '/static/img/white.png';
+
+        // calculate mouse position
+        var coords = function(event) {
+          var position = element.position();
+          var x = Math.floor((event.pageX - position.left) / cell);
+          var y = Math.floor((event.pageY - position.top) / cell);
+          if (x >= 0 && y >= 0 && x <= scope.game.size && y <= scope.game.size) {
+            return {x: x, y: y};
+          }
+        };
+
+        element
+          .mouseout(function(event) {
+            highlight = -1;
+            draw(scope.game);
+          })
+          .mousemove(function(event) {
+            var position = coords(event);
+            if (scope.game.state === 'live' && position && attrs.lgClick) {
+              var newHighlight = position.y * scope.game.size + position.x;
+              if (highlight != newHighlight) {
+                draw(scope.game);
+                highlight = newHighlight;
+              }
+            }
+          })
+          .click(function(event) {
+            var position = coords(event);
+            if (position) {
+              scope.click({column: position.x, row: position.y});
+            }
+          });
+
+        scope.$watch('game', draw);
+
+        var resize = function() {
+          var w = Math.min(element.parent().width() / scope.game.size, 50) * scope.game.size;
+          canvas.height = canvas.width = Math.floor(w);
+          draw(scope.game);
+        };
+        scope.resize = resize;
+        window.addEventListener('resize', resize, false);
+        setTimeout(resize, 100);
       }
     }
   });
