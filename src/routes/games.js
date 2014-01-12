@@ -20,19 +20,22 @@ exports.create = function(req, res) {
 };
 
 exports.list = function(req, res) {
-  // TODO: No private, unless its the game of the user
-  //.where('private').eq(false)
-  Game
-    .find()
-    .where('state').ne('over')
-    .populate('challenger')
-    .populate('challengee')
-    .exec(function(err, games) {
-      if (err || !games) {
-        return res.send(404, err);
-      }
-      res.send(games);
-    });
+  var query = Game.find().populate('challenger').populate('challengee');
+
+  if (req.query.own !== undefined) {
+    query.or([{challenger: req.user._id}, {challengee: req.user._id}]);
+  } else {
+    // TODO: No private, unless its the game of the user
+    //.where('private').eq(false)
+    query.where('state').ne('over');
+  }
+
+  query.exec(function(err, games) {
+    if (err || !games) {
+      return res.send(404, err);
+    }
+    res.send(games);
+  });
 };
 
 exports.get = function(req, res) {
