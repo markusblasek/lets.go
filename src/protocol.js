@@ -271,7 +271,7 @@ module.exports = function(io) {
       }
       // surrender
       else if (data.type === 'surrender') {
-        game.winner = game.next;
+        game.winner = game.turn;
         game.state = 'over';
         game.reason = 'surrender';
         saveMove();
