@@ -51,7 +51,8 @@
                 .ui.red.label(ng-bind='game.color.substr(0, 1)')
                 .ui.blue.label(ng-show='game.private') Priv.
               td(ng-class='{me: user._id === game.challenger._id}')
-                img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
+                a(href='#/user/view/{{user._id}}')
+                  img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
                 span(ng-bind='game.challenger.alias')
               td(ng-bind='game.name')
               td(ng-if='game.challenger._id == user._id')

@@ -31,6 +31,11 @@ angular.module('letsGo', [
       templateUrl: '/static/partials/index.jade',
       controller: 'IndexCtrl'
     })
+    .when('/user/view/:userId', {
+      templateUrl: '/static/partials/user/view.jade',
+      controller: 'UserViewCtrl',
+      resolve: {loggedIn: check}
+    })
     .when('/user/login', {
       templateUrl: '/static/partials/user/login.jade',
       controller: 'UserLoginCtrl'
