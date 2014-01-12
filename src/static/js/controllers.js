@@ -78,23 +78,34 @@ angular.module('letsGo.controllers', [])
 
   .controller('UserViewCtrl', function($scope, $routeParams, $location, User, Game) {
     $scope.user = {};
+    $scope.games = [];
     $scope.gamesWon = 0;
+    $scope.gamesLost = 0;
+    $scope.gamesDraw = 0;
     $scope.gamesPlayed = 0;
 
     User.get({ id: $routeParams.userId}, function(user) {
-      if(user){
-        $scope.user = user;
-      }
-      else {
-        $location.path('/');
-      }
+      $scope.user = user;
+    }, function() {
+      $location.path('/');
     });
 
     Game.query({own: true}, function(games) {
+      $scope.games = games;
       $scope.gamesPlayed = games.length;
       _.each(games, function(game) {
         if(game.winner == $routeParams.userId) {
           $scope.gamesWon += 1;
+          game.result = 'Won +' + Math.abs(game.score.challenger - game.score.challengee);
+          game.won = true;
+        } else if (!game.winner) {
+          $scope.gamesDraw += 1;
+          game.result = 'Draw';
+          game.draw = true;
+        } else {
+          $scope.gamesLost += 1;
+          game.result = 'Lost -' + Math.abs(game.score.challenger - game.score.challengee);
+          game.lost = true;
         }
       });
     });
@@ -244,7 +255,7 @@ angular.module('letsGo.controllers', [])
       game.player = $scope.user._id === game.challenger._id || $scope.user._id === game.challengee._id;
       game.draw = game.over && !game.winner;
       game.win = game.over && game.winner === $scope.user._id;
-      game.loose = game.over && game.winner !== $scope.user._id && game.player;
+      game.loose = game.over && game.winner && game.winner !== $scope.user._id && game.player;
       game.challenger.alias = game.challenger._id === $scope.user._id ? 'You' : game.challenger.alias;
       game.challenger.winner = game.over && game.winner && game.winner === game.challenger._id;
       game.challenger.loser = game.over && game.winner && game.winner !== game.challenger._id;

@@ -20,7 +20,11 @@ exports.create = function(req, res) {
 };
 
 exports.list = function(req, res) {
-  var query = Game.find().populate('challenger').populate('challengee');
+  var query = Game
+    .find()
+    .populate('challenger')
+    .populate('challengee')
+    .sort('-created');
 
   if (req.query.own !== undefined) {
     query.or([{challenger: req.user._id}, {challengee: req.user._id}]);

@@ -1,7 +1,7 @@
 .chat
   table
     tr(ng-repeat='message in messages')
-      td.time(ng-init='done($last)', ng-bind='message.time')
+      td.time(ng-init='done($last)', ng-bind='message.date | date:"h:mm a"')
       td.user
         a(href='#/user/{{message.user._id}}', ng-bind='message.user.alias')
         | &nbsp;:

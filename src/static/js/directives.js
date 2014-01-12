@@ -15,9 +15,7 @@ angular.module('letsGo.directives', [])
         $scope.$on('message', function(event, message) {
           if (message.target.type === $scope.targetType &&
               message.target.id === $scope.targetId) {
-            var now = new Date();
-            message.date = now.getMonth() + 1 + '/' + now.getDate() + '/' + now.getFullYear();
-            message.time = now.getHours() + ':' + now.getMinutes();
+            message.date = new Date();
             $scope.$apply(function() {
               $scope.messages.push(message);
             });

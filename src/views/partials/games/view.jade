@@ -1,7 +1,7 @@
 #games-view.ui.stackable.page.grid
   .one.column.row
     .column
-      .ui.header
+      h2.ui.header
         i.inverted.circular.green.gamepad.icon
         .content
           span(ng-bind='game.challenger.alias', ng-class='{loose: game.challenger.loser, win: game.challenger.winner, draw: game.draw}')

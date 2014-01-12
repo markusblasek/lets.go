@@ -31,11 +31,6 @@ angular.module('letsGo', [
       templateUrl: '/static/partials/index.jade',
       controller: 'IndexCtrl'
     })
-    .when('/user/:userId', {
-      templateUrl: '/static/partials/user/view.jade',
-      controller: 'UserViewCtrl',
-      resolve: {loggedIn: check}
-    })
     .when('/user/login', {
       templateUrl: '/static/partials/user/login.jade',
       controller: 'UserLoginCtrl'
@@ -47,6 +42,11 @@ angular.module('letsGo', [
     .when('/user/edit', {
       templateUrl: '/static/partials/user/edit.jade',
       controller: 'UserEditCtrl',
+      resolve: {loggedIn: check}
+    })
+    .when('/user/:userId', {
+      templateUrl: '/static/partials/user/view.jade',
+      controller: 'UserViewCtrl',
       resolve: {loggedIn: check}
     })
     .when('/chat', {

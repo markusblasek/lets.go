@@ -1,39 +1,58 @@
-#user-view.ui.page.grid
+#user-view.ui.stackable.page.grid
   .one.column.row
     .column
-      .ui.attached.grey.message
-        .ui.header
-          i.user.icon
-            | &nbsp
-            span(ng-bind='user.alias')
-  .four.column.row
-    .one.wide.column
-      img.ui.image.small(ng-src='{{user.photo}}')
-    .ten.wide.column
+      h2.ui.header
+        i.circular.inverted.user.blue.icon
+        | {{user.alias}}'s profile
+  .row
+    .four.wide.column
+      img.ui.image(ng-src='{{user.photo}}')
+    .six.wide.column
       .ui.divided.list
         .item
-          .content.header.ui.ribbon.label
-            |Username
-        span(ng-bind='user.name')
+          .header Name
+          span(ng-bind='user.name')
         .item
-          .content.header.ui.ribbon.label
-            |Alias
-        span(ng-bind='user.alias')
+          .header Alias
+          span(ng-bind='user.alias')
         .item
-          .content.header.ui.ribbon.label
-            |#Games played
-        span(ng-bind='gamesPlayed')
-        .item
-          .content.header.ui.ribbon.label
-            |#Games won
-        span(ng-bind='gamesWon')
-
-
-
-
-
-
-
-
-
-
+          .header Statistics
+          span.win(ng-bind='gamesWon')
+          | &nbsp;-&nbsp;
+          span.draw(ng-bind='gamesDraw')
+          | &nbsp;-&nbsp;
+          span.loose(ng-bind='gamesLost')
+          | &nbsp;of total&nbsp;
+          span(ng-bind='gamesPlayed')
+          | &nbsp;games
+  .row
+    .column
+      h3.ui.header Recently played games
+      table.ui.basic.small.table
+        thead
+          tr
+            th Result
+            th Opponent
+            th Configuration
+            th Date
+            th
+        tbody
+          tr(ng-repeat='game in games')
+            td
+              .ui.label(ng-show='game.state === "over"', ng-bind='game.result', ng-class='{red: game.lost, green: game.won}')
+              span(ng-show='game.state !== "over"') Live..
+            td
+              a(ng-if='game.challenger._id !== user._id', href='#/user/{{game.challenger._id}}')
+                img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
+                span(ng-bind='game.challenger.alias')
+              a(ng-if='game.challengee._id !== user._id', href='#/user/{{game.challengee._id}}')
+                img.ui.avatar.image(ng-src='{{game.challengee.photo}}')
+                span(ng-bind='game.challengee.alias')
+            td.ui.small.labels
+              .ui.label(ng-bind='game.size + "x" + game.size')
+              .ui.label(ng-show='game.komi > 0', ng-bind='"+" + game.komi')
+              .ui.label(ng-bind='game.color.substr(0, 1)')
+              .ui.label(ng-show='game.private') Priv.
+            td(ng-bind='game.created | date:"MM/dd/yyyy @ h:mma"')
+            td
+              a.ui.right.floated.tiny.button(href='#/games/{{game._id}}') Show
