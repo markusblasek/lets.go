@@ -1,28 +1,28 @@
 .ui.one.column.page.grid
   .column
-    div.ui.two.column.middle.aligned.relaxed.grid.basic.segment
+    div.ui.one.column.middle.aligned.relaxed.grid.basic.segment
         div.column
-            div.ui.vertical.menu
-                div.item(ng-init='model.curName="Please select someone."')
-                    i.users.icon
-                    | Users
-                    hr
-                div(ng-repeat='userObj in users')
-                    a.item(ng-if="user._id != userObj._id", ng-click='model.curName=userObj.alias; model.curID = userObj._id'){{userObj.alias}}
-        div.column
+          div.ui.attached.blue.message
+              ui.header Write message:
             div.ui.form.segment
               form(name='form', ng-submit='sendMessage()')
-                div.field
-                    label
-                        b To:
-                    input(type='text', ng-model = 'model.curName')
+                label
+                  b To:
+                br
+                div.ui.selection.dropdown
+                  input(name='name', type='text', ng-model='model.curName' style='display:none')
+                  div.text {{model.curName}}
+                  i.dropdown.icon
+                  div.menu.transition.hidden
+                      div(ng-repeat='userObj in users')
+                          div.item(ng-click='model.curName=userObj.alias; model.curID = userObj._id') {{userObj.alias}}
                 div.field
                     label
                         b Subject:
                     input(type='text', ng-model = 'model.subject')
                 div.field
                     textarea(ng-model='model.content')
-                button.ui.blue.submit.button(type='submit') Send message
+                button.ui.blue.submit.button(type='submit') Send
 
     div.ui.buttons
       div.ui.button(ng-click='switchMess=1') My messages
