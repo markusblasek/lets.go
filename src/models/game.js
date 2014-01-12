@@ -15,7 +15,7 @@ var gameSchema = new mongoose.Schema({
   },
 
   // defined by the creator
-  name: {type: String},
+  name: {type: String, required: true},
   size: {
     type: Number,
     min: 9,
@@ -46,6 +46,7 @@ var gameSchema = new mongoose.Schema({
     challengee: {type: Number, min: 0}
   },
   turn: {type: ObjectId},
+  last: {type: Number},
 
   // used while counting
   dead: {type: String},

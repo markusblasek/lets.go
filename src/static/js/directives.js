@@ -118,7 +118,7 @@ angular.module('letsGo.directives', [])
         game: '=lgGame',
         click: '&lgClick'
       },
-      template: '<canvas class="board" width="0" height="0"></canvas>',
+      template: '<canvas class="board"></canvas>',
       link: function(scope, element, attrs) {
         var canvas = element.get(0);
         var ctx = canvas.getContext('2d');
@@ -128,6 +128,8 @@ angular.module('letsGo.directives', [])
         var draw = function(game) {
           if (!game || !game.board) return;
 
+          var w = Math.min(element.parent().width() / game.size, 50) * game.size;
+          canvas.height = canvas.width = Math.floor(w);
           length = Math.min(canvas.width, canvas.height);
           cell = length / game.size;
           offsetX = (canvas.width - length + cell) / 2;
@@ -165,7 +167,7 @@ angular.module('letsGo.directives', [])
             ctx.fill();
           }
 
-          var counting = game.state === 'counting';
+          var counting = game.state === 'counting' || game.state === 'over';
 
           // stones
           ctx.lineWidth = 1;
@@ -180,7 +182,23 @@ angular.module('letsGo.directives', [])
             } else if (game.state === 'live' && highlight === i && game.turn === scope.$parent.user._id) {
               image = (game.black === scope.$parent.user._id) ? black : white;
               ctx.globalAlpha = .5;
-            } else if (counting && game.territory[i] !== ' ') {
+            }
+            if (image) {
+              ctx.drawImage(image, Math.round(offsetX + (i % game.size)*cell - s/2),
+                Math.round(offsetY + Math.floor(i / game.size)*cell - s/2), s, s);
+            }
+
+            if (game.last === i && !counting) {
+              ctx.lineWidth = 2;
+              ctx.strokeStyle = '#d15d5d';
+              ctx.beginPath();
+              ctx.arc(Math.round(offsetX + (i % game.size)*cell),
+                Math.round(offsetY + Math.floor(i / game.size)*cell), cell/5, 0, 2*Math.PI);
+              ctx.stroke();
+            }
+            ctx.globalAlpha = 1.;
+
+            if (counting && game.territory[i] !== ' ') {
               image = game.territory[i] === 'W' ? white : black;
               ctx.globalAlpha = .5;
               s /= 2;
@@ -220,12 +238,16 @@ angular.module('letsGo.directives', [])
             if (scope.game.state === 'live' && position && attrs.lgClick) {
               var newHighlight = position.y * scope.game.size + position.x;
               if (highlight != newHighlight) {
-                draw(scope.game);
                 highlight = newHighlight;
+                draw(scope.game);
               }
             }
           })
+          .mousedown(function(event) {
+            event.preventDefault();
+          })
           .click(function(event) {
+            event.preventDefault();
             var position = coords(event);
             if (position) {
               scope.click({column: position.x, row: position.y});
@@ -239,9 +261,8 @@ angular.module('letsGo.directives', [])
           canvas.height = canvas.width = Math.floor(w);
           draw(scope.game);
         };
-        scope.resize = resize;
         window.addEventListener('resize', resize, false);
-        setTimeout(resize, 100);
+        resize();
       }
     }
   });

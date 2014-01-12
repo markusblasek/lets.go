@@ -204,6 +204,7 @@ module.exports = function(io) {
       }
 
       game.turn = game.next;
+      game.last = null;
 
       var saveMove = function() {
         move.save(function(err) {
@@ -240,6 +241,7 @@ module.exports = function(io) {
 
         move.board = board;
         game.board = board;
+        game.last = move.row * game.size + move.column;
         game.prisoners.challenger += prisoners[game.hasColor(game.challenger)] || 0;
         game.prisoners.challengee += prisoners[game.hasColor(game.challengee)] || 0;
 

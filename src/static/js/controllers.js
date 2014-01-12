@@ -15,7 +15,7 @@ angular.module('letsGo.controllers', [])
       $('.ui.dropdown').dropdown();
     });
 
-    userManager.check();
+    userManager.check(false);
 
     $scope.user = null;
     $scope.online = 0;

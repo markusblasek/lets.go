@@ -18,13 +18,15 @@ angular.module('letsGo.services', [])
 
     var service = {
       user: null,
-      check: function() {
+      check: function(redirect) {
         var deferred = $q.defer();
 
         User.me(function(user) {
           if (!user || user._id === undefined) {
             deferred.reject();
-            $location.path('/user/login');
+            if (redirect === undefined || !!redirect) {
+              $location.path('/user/login');
+            }
             setUser(null);
           } else {
             setUser(user);

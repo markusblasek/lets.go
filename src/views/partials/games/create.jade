@@ -6,7 +6,10 @@
         p Challenge other players by creating a new game they can accept.
       lg-validated-form(lg-button='Create', lg-submit='create()')
         lg-validated-field(lg-field='name', lg-label='Name')
-          input(placeholder='Game description (Optional)', name='name', type='text', ng-model='game.name')
+          .ui.left.labeled.input
+            input(placeholder='Game description', name='name', type='text', ng-model='game.name', required)
+            .ui.corner.label
+              i.asterisk.icon
         lg-validated-field(lg-field='size', lg-label='Board Size')
           div.ui.selection.dropdown
             input(name='size', type='text', value='9', ng-model='game.size' style='display:none')
