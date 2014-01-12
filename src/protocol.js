@@ -1,10 +1,11 @@
 var jsonschema = require('jsonschema');
 var _ = require('underscore');
 
-var log = require('./log'),
-  logic = require('./logic'),
-  Game = require('./models/game'),
-  Move = require('./models/move');
+var log = require('./log');
+var logic = require('./logic');
+var Game = require('./models/game');
+var Move = require('./models/move');
+var User = require('./models/user');
 
 var messageSchema = {
   type: 'object',
@@ -129,16 +130,20 @@ module.exports = function(io) {
           }
         }
 
-        (typeof schema === 'function' ? schema : cb)(data);
+        User.findById(user._id, function(err, aUser) {
+          if (err || !aUser) {
+            return log.warn('Unable to retrieve user ', err);
+          }
+          user = aUser;
+          (typeof schema === 'function' ? schema : cb)(data);
+        })
       });
     };
 
 
     // messaging
     addHandler('message', messageSchema, function(data) {
-      // TODO user object shall be updated if user edited
       data.user = user;
-
       if (data.target.type === 'user') {
         var target = users[data.target.id];
 
