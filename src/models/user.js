@@ -18,7 +18,7 @@ var transform = function(doc, ret, options) {
   delete ret.salt;
   ret.photo = doc.photo || ('http://robohash.org/' +
                             crypto.createHash('md5').update(doc.identifier).digest('hex') +
-                            '.png?size=50x50&bgset=bg2');
+                            '.png?bgset=bg2');
 };
 userSchema.set('toJSON', {transform: transform});
 userSchema.set('toObject', {transform: transform});

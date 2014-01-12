@@ -25,7 +25,7 @@
           | &nbsp;of total&nbsp;
           span(ng-bind='gamesPlayed')
           | &nbsp;games
-  .row
+  .row(ng-if='games.length')
     .column
       h3.ui.header Recently played games
       table.ui.basic.small.table

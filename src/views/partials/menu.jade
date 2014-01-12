@@ -18,6 +18,7 @@
         img.ui.avatar.image(ng-src='{{user.photo}}', ng-if='user.photo')
         b(ng-bind='user.alias')
         div.menu.left
+          a.item(href='#/user/{{user._id}}') Account
           a.item(href='#/user/edit') Edit
           a.item(href='#', ng-click='logout()') Logout
 
