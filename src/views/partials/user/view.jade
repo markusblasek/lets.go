@@ -1,2 +1,39 @@
-#user-view
-  b(ng-bind='user.alias')
+#user-view.ui.page.grid
+  .one.column.row
+    .column
+      .ui.attached.grey.message
+        .ui.header
+          i.user.icon
+            | &nbsp
+            span(ng-bind='user.alias')
+  .four.column.row
+    .one.wide.column
+      img.ui.image.small(ng-src='{{user.photo}}')
+    .ten.wide.column
+      .ui.divided.list
+        .item
+          .content.header.ui.ribbon.label
+            |Username
+        span(ng-bind='user.name')
+        .item
+          .content.header.ui.ribbon.label
+            |Alias
+        span(ng-bind='user.alias')
+        .item
+          .content.header.ui.ribbon.label
+            |#Games played
+        span(ng-bind='gamesPlayed')
+        .item
+          .content.header.ui.ribbon.label
+            |#Games won
+        span(ng-bind='gamesWon')
+
+
+
+
+
+
+
+
+
+

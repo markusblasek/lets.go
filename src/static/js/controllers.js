@@ -76,8 +76,10 @@ angular.module('letsGo.controllers', [])
     };
   })
 
-  .controller('UserViewCtrl', function($scope, $routeParams, $location, User) {
+  .controller('UserViewCtrl', function($scope, $routeParams, $location, User, Game) {
     $scope.user = {};
+    $scope.gamesWon = 0;
+    $scope.gamesPlayed = 0;
 
     User.get({ id: $routeParams.userId}, function(user) {
       if(user){
@@ -88,6 +90,14 @@ angular.module('letsGo.controllers', [])
       }
     });
 
+    Game.query({own: true}, function(games) {
+      $scope.gamesPlayed = games.length;
+      _.each(games, function(game) {
+        if(game.winner == $routeParams.userId) {
+          $scope.gamesWon += 1;
+        }
+      });
+    });
   })
 
   // ==== Message Controllers ====
