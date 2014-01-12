@@ -1,7 +1,14 @@
-h2.ui.header
-  i.icon.inverted.circular.blue.comment
-  | Chat
-div.ui.comments(style='height: 200px; overflow:auto;')
-div.ui.small.fluid.icon.input
-  input.text(placeholder='Message...', type='text')
+//.ui.attached.small.message
+  .header Chat
+.ui.dividing.header Chat
+.chat
+  table
+    tr(ng-repeat='message in messages')
+      td(ng-init='done($last)', ng-bind='message.time')
+      td.user
+        a(href='#/user/{{message.user._id}}', ng-bind='message.user.alias')
+        | &nbsp;:
+      td.text(ng-bind='message.text')
+.ui.small.fluid.icon.input
+  input.message(placeholder='Message...', type='text')
   i.mail.icon

@@ -23,10 +23,10 @@
                 .ui.red.label(ng-bind='game.color.substr(0, 1)')
                 .ui.blue.label(ng-show='game.private') Priv.
               td
-                span(ng-if='game.challenger._id !== user._id')
+                a(ng-if='game.challenger._id !== user._id', href='#/user/{{game.challenger._id}}')
                   img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
                   span(ng-bind='game.challenger.alias')
-                span(ng-if='game.challengee._id !== user._id')
+                a(ng-if='game.challengee._id !== user._id', href='#/user/{{game.challengee._id}}')
                   img.ui.avatar.image(ng-src='{{game.challengee.photo}}')
                   span(ng-bind='game.challengee.alias')
               td(ng-bind='game.name')
@@ -51,9 +51,10 @@
                 .ui.red.label(ng-bind='game.color.substr(0, 1)')
                 .ui.blue.label(ng-show='game.private') Priv.
               td(ng-class='{me: user._id === game.challenger._id}')
-                a(href='#/user/view/{{user._id}}')
+                a(href='#/user/{{user._id}}')
                   img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
-                span(ng-bind='game.challenger.alias')
+                  span(ng-bind='game.challenger.alias', ng-show='user._id !== game.challenger._id')
+                  span(ng-show='user._id === game.challenger._id') You
               td(ng-bind='game.name')
               td(ng-if='game.challenger._id == user._id')
                 a.ui.right.floated.red.mini.button(ng-click='remove(game._id)') Remove
@@ -78,11 +79,11 @@
                 .ui.red.label(ng-bind='game.color.substr(0, 1)')
                 .ui.blue.label(ng-show='game.private') Priv.
               td
-                span(ng-class='{me: user._id === game.challenger._id}')
+                a(ng-class='{me: user._id === game.challenger._id}', href='#/user/{{game.challenger._id}}')
                   img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
                   span(ng-bind='game.challenger.alias')
                 span.vs vs.
-                span(ng-class='{me: user._id === game.challengee._id}')
+                a(ng-class='{me: user._id === game.challengee._id}', href='#/user/{{game.challengee._id}}')
                   img.ui.avatar.image(ng-src='{{game.challengee.photo}}')
                   span(ng-bind='game.challengee.alias')
               td(ng-bind='game.name')

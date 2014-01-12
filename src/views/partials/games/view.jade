@@ -14,7 +14,7 @@
               b(ng-bind='game.winner === game.challenger._id ? game.challenger.alias : game.challengee.alias')
               | &nbsp;has won through <span ng-bind="game.reason"></span>.
 
-  .row
+  .middle.aligned.row
     .eleven.wide.center.aligned.column
       lg-board(lg-game='game', lg-click='click(column, row)')
     .five.wide.column
@@ -74,4 +74,7 @@
           .item
             | Score&nbsp;&nbsp;
             .ui.label(ng-bind='"+" + game.score.challengee')
-//lg-message-box(lg-target-type='game', lg-target-id='{{ game._id }}')
+
+      lg-message-box(lg-target-type='game', lg-target-id='{{ game._id }}')
+  .one.column.row
+    .column

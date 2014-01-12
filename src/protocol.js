@@ -137,7 +137,8 @@ module.exports = function(io) {
 
     // messaging
     addHandler('message', messageSchema, function(data) {
-      data.user = user.alias;
+      // TODO user object shall be updated if user edited
+      data.user = user;
 
       if (data.target.type === 'user') {
         var target = users[data.target.id];
@@ -188,13 +189,6 @@ module.exports = function(io) {
     addGameHandler('join', joinSchema, '*', function(game) {
       socket.join(game.id);
       socket.emit('game', game);
-
-      // TODO: proper messaging
-      io.sockets.in(game.id).emit('message', {
-        target: {type: 'game', id: game.id},
-        user: 'System',
-        text: 'User ' + user.alias + ' joined.'
-      });
     });
 
     // making a move: play, pass or surrender
