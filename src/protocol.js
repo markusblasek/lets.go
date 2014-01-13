@@ -71,24 +71,23 @@ var rtcSchema = {
   }
 };
 
-// user id -> socket
+// user id -> [socket]
 var users = {};
 // game id -> [user id]
 var spectators = {};
-// user id -> [game id]
+// user id -> (game id -> [socket])
 var spectating = {};
 
 module.exports = function(io) {
   io.sockets.on('connection', function(socket) {
     var user = socket.handshake.user;
 
-    users[user.id] = socket;
+    // there might be multiple websockets per user
+    users[user.id] = users[user.id] || [];
+    users[user.id].push(socket);
 
-    log.info('New socket.io connection from %s', user.email);
-
-    io.sockets.emit('status', {
-      online: Object.keys(users).length
-    });
+    log.info('New socket.io connection from %s (#%d)', user.email, users[user.id].length);
+    io.sockets.emit('status', {online: Object.keys(users).length});
 
     // helper method to add a game callback, it checks the schema, retrieves
     // the game, checks the user rights and saves/distributes the game
@@ -170,7 +169,9 @@ module.exports = function(io) {
           return log.warn('User does not exist or is offline.');
         }
 
-        target.emit('message', data);
+        _(target).each(function(socket) {
+          socket.emit('message', data);
+        });
       } else if (data.target.type === 'game') {
         if (io.sockets.clients(data.target.id).indexOf(socket) === -1) {
           return log.warn('User is not allowed to message to that game.');
@@ -212,30 +213,61 @@ module.exports = function(io) {
 
     // joining a game
     addGameHandler('join', joinSchema, '*', function(game, data, done) {
-      if (!spectating[user.id] || spectating[user.id].indexOf(game.id) === -1) {
-        spectating[user.id] = spectating[user.id] || [];
-        spectating[user.id].push(game.id);
-
-        spectators[game.id] = spectators[game.id] || [];
-        spectators[game.id].push(user.id);
-
-        done();
+      var games = spectating[user.id];
+      if (!games) {
+        spectating[user.id] = (games = {});
       }
 
-      socket.join(game.id);
+      var sockets = games[game.id];
+      if (!sockets) {
+        games[game.id] = (sockets = []);
+      }
+
+      if (sockets.indexOf(socket) === -1) {
+        sockets.push(socket);
+        socket.join(game.id);
+      }
+
+      var users = spectators[game.id];
+      if (!users) {
+        spectators[game.id] = (users = []);
+      }
+
+      if (users.indexOf(user.id) === -1) {
+        users.push(user.id)
+        done();
+      } else {
+        var gameObject = game.toJSON();
+        gameObject.spectators = users;
+        socket.emit('game', gameObject);
+      }
     });
 
     // leaving a game
     addGameHandler('leave', leaveSchema, '*', function(game, data, done) {
-      if (spectating[user.id] && spectating[user.id].indexOf(game.id) >= 0) {
-        var games = spectating[user.id];
-        games.splice(games.indexOf(game.id), 1);
+      var games = spectating[user.id];
+      if (games) {
+        var sockets = games[game.id];
 
-        var users = spectators[game.id];
-        users.splice(users.indexOf(user.id), 1);
+        if (sockets && sockets.indexOf(socket) >= 0) {
+          socket.leave(game.id);
 
-        socket.leave(game.id);
-        done();
+          if (sockets.length === 1) {
+            delete games[game.id];
+
+            var users = spectators[game.id];
+            if (users && users.indexOf(user.id) >= 0) {
+              if (users.length === 1) {
+                delete spectators[game.id];
+              } else {
+                users.splice(users.indexOf(user.id), 1);
+              }
+              done();
+            }
+          } else {
+            sockets.splice(sockets.indexOf(socket), 1);
+          }
+        }
       }
     });
 
@@ -388,37 +420,55 @@ module.exports = function(io) {
       }
       // set the id of the caller, so the callee does know who is calling
       data.sender = user.id;
-      target.emit('rtc', data);
+      // TODO thats probably not very smart
+      _(target).each(function(socket) {
+        socket.emit('rtc', data);
+      });
     });
 
     // a user disconnected
     addHandler('disconnect', function() {
-      log.info('User %s disconnected.', user.email);
+      if (spectating[user.id]) {
+        _(spectating[user.id]).each(function(sockets, gameId, games) {
+          if (sockets.indexOf(socket) >= 0) {
+            if (sockets.length === 1) {
+              delete games[gameId];
 
-      _(spectating[user.id]).each(function(gameId) {
-        var users = spectators[gameId];
-        users.splice(users.indexOf(user.id), 1);
+              var users = spectators[gameId];
+              users.splice(users.indexOf(user.id), 1);
 
-        Game
-          .findById(gameId)
-          .populate('challenger')
-          .populate('challengee')
-          .exec(function(err, game) {
-            if (err || !game) {
-              return log.warn('Unable to find game by id %s: ', gameId, err);
+              Game
+                .findById(gameId)
+                .populate('challenger')
+                .populate('challengee')
+                .exec(function(err, game) {
+                  if (err || !game) {
+                    return log.warn('Unable to find game by id %s: ', game.id, err);
+                  }
+
+                  var gameObject = game.toJSON();
+                  gameObject.spectators = spectators[game.id] || [];
+
+                  io.sockets.in(game.id).emit('game', gameObject);
+                });
+            } else {
+              sockets.splice(sockets.indexOf(socket), 1);
             }
+          }
+        });
 
-            var gameObject = game.toJSON();
-            gameObject.spectators = spectators[game.id] || [];
+        if (spectating[user.id].length === 0) {
+          delete spectating[user.id];
+        }
+      }
 
-            io.sockets.in(gameId).emit('game', gameObject);
-          });
-      });
+      if (users[user.id].length === 1) {
+        delete users[user.id];
+      } else {
+        users[user.id].splice(users[user.id].indexOf(socket), 1);
+      }
 
-      delete spectating[user.id];
-
-      delete users[user.id];
-
+      log.info('User %s disconnected. (#%d)', user.email, users[user.id] ? users[user.id].length : 0);
       io.sockets.emit('status', {online: Object.keys(users).length});
     });
   });
