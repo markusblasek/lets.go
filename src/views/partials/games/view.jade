@@ -61,7 +61,8 @@
           .item(ng-if='game.player')
             .ui.button(ng-click='communicate(true)', ng-show='game.challenger._id === user._id && !game.communicate.challenger') Share Audio/Video
             i.facetime.video.icon(ng-show='game.communicate.challenger')
-        div(style='width: 100px; height: 100px; background: red', id='{{game._id}}-{{user._id}}')
+          .item
+            div(style='width: 100px; height: 100px; background: red', id='{{game._id}}-{{user._id}}')
 
       .ui.horizontal.section.divider vs.
 
@@ -81,7 +82,8 @@
           .item(ng-if='game.player')
             .ui.button(ng-click='communicate(true)', ng-show='game.challengee._id === user._id && !game.communicate.challengee') Share Audio/Video
             i.facetime.video.icon(ng-show='game.communicate.challengee')
-        div(style='width: 100px; height: 100px; background: red', id='{{game._id}}-{{user._id}}')
+          .item
+            div(style='width: 100px; height: 100px; background: red', id='{{game._id}}-{{user._id}}')
 
       .ui.section.divider
 

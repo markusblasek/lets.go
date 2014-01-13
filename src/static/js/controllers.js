@@ -271,12 +271,12 @@ angular.module('letsGo.controllers', [])
       game.challengee.winner = game.over && game.winner && game.winner === game.challengee._id;
       game.challengee.loser = game.over && game.winner && game.winner !== game.challengee._id;
 
-      if (!rtcStarted && game.communicate.challenger && game.communicate.challengee) {
+      if (game.player && !rtcStarted && game.communicate.challenger && game.communicate.challengee) {
         rtcStarted = true;
         var opponent = $scope.user._id === game.challenger._id ? game.challengee._id : game.challenger._id;
         var elements = {caller: game._id + '-' + $scope.user._id, callee: game._id + '-' + opponent};
         console.log('start rtc to ', opponent, ' elements ', elements);
-        rtcManager.start(opponent, elements)
+        rtcManager.start(opponent, elements);
       }
 
       $scope.$apply(function() {
