@@ -286,5 +286,10 @@ angular.module('letsGo.controllers', [])
       });
     });
 
+    $scope.$on('$destroy', function() {
+      console.log('lets go !');
+      socketManager.leave(gameId);
+    });
+
     socketManager.join(gameId);
   });

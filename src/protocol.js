@@ -29,6 +29,7 @@ var acceptSchema = {
 };
 
 var joinSchema = acceptSchema;
+var leaveSchema = acceptSchema;
 
 var moveSchema = {
   type: 'object',
@@ -70,7 +71,12 @@ var rtcSchema = {
   }
 };
 
+// user id -> socket
 var users = {};
+// game id -> [user id]
+var spectators = {};
+// user id -> [game id]
+var spectating = {};
 
 module.exports = function(io) {
   io.sockets.on('connection', function(socket) {
@@ -104,8 +110,9 @@ module.exports = function(io) {
             if (game.state !== 'waiting' &&
                 game.challenger.id !== user.id &&
                 game.challengee.id !== user.id &&
-                !(event === 'join' && !game.private)) {
-              return log.warn('User is not participating in the game and game is private');
+                !(event === 'join' && !game.private) &&
+                !(event === 'leave' && !game.private)) {
+              return log.warn('User is not participating in this private private');
             }
 
             cb(game, data, function(save) {
@@ -114,7 +121,11 @@ module.exports = function(io) {
                   if (err) {
                     return log.warn('Failed to save new game state: ', err);
                   }
-                  io.sockets.in(game.id).emit('game', game);
+
+                  var gameObject = game.toJSON();
+                  gameObject.spectators = spectators[game.id] || [];
+
+                  io.sockets.in(game.id).emit('game', gameObject);
 
                   if (typeof saved === 'function') {
                     saved(game);
@@ -200,9 +211,32 @@ module.exports = function(io) {
     });
 
     // joining a game
-    addGameHandler('join', joinSchema, '*', function(game) {
+    addGameHandler('join', joinSchema, '*', function(game, data, done) {
+      if (!spectating[user.id] || spectating[user.id].indexOf(game.id) === -1) {
+        spectating[user.id] = spectating[user.id] || [];
+        spectating[user.id].push(game.id);
+
+        spectators[game.id] = spectators[game.id] || [];
+        spectators[game.id].push(user.id);
+
+        done();
+      }
+
       socket.join(game.id);
-      socket.emit('game', game);
+    });
+
+    // leaving a game
+    addGameHandler('leave', leaveSchema, '*', function(game, data, done) {
+      if (spectating[user.id] && spectating[user.id].indexOf(game.id) >= 0) {
+        var games = spectating[user.id];
+        games.splice(games.indexOf(game.id), 1);
+
+        var users = spectators[game.id];
+        users.splice(users.indexOf(user.id), 1);
+
+        socket.leave(game.id);
+        done();
+      }
     });
 
     // making a move: play, pass or surrender
@@ -360,8 +394,32 @@ module.exports = function(io) {
     // a user disconnected
     addHandler('disconnect', function() {
       log.info('User %s disconnected.', user.email);
+
+      _(spectating[user.id]).each(function(gameId) {
+        var users = spectators[gameId];
+        users.splice(users.indexOf(user.id), 1);
+
+        Game
+          .findById(gameId)
+          .populate('challenger')
+          .populate('challengee')
+          .exec(function(err, game) {
+            if (err || !game) {
+              return log.warn('Unable to find game by id %s: ', gameId, err);
+            }
+
+            var gameObject = game.toJSON();
+            gameObject.spectators = spectators[game.id] || [];
+
+            io.sockets.in(gameId).emit('game', gameObject);
+          });
+      });
+
+      delete spectating[user.id];
+
       delete users[user.id];
+
       io.sockets.emit('status', {online: Object.keys(users).length});
     });
   });
-}
+};

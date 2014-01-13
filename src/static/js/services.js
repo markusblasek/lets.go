@@ -88,6 +88,12 @@ angular.module('letsGo.services', [])
       }
     };
 
+    var leaveAction = function(gameId) {
+      if (connected) {
+        socket.emit('leave', {gameId: gameId});
+      }
+    };
+
     var messageAction = function(type, target, text) {
       if (connected) {
         socket.emit('message', {
@@ -177,6 +183,7 @@ angular.module('letsGo.services', [])
       },
       accept: acceptAction,
       join: joinAction,
+      leave: leaveAction,
       message: messageAction,
       move: moveAction,
       resume: resumeAction,

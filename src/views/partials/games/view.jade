@@ -88,3 +88,7 @@
       .ui.section.divider
 
       lg-message-box(lg-target-type='game', lg-target-id='{{ game._id }}')
+
+      div
+        | spectating
+        span(ng-bind='game.spectators.length')
