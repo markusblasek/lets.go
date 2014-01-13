@@ -27,7 +27,9 @@ exports.list = function(req, res) {
     .sort('-created');
 
   if (req.query.player !== undefined) {
-    query.or([{challenger: req.query.player}, {challengee: req.query.player}]);
+    query
+      .where('state').ne('waiting')
+      .or([{challenger: req.query.player}, {challengee: req.query.player}]);
   } else {
     query
       .where('state').ne('over')
