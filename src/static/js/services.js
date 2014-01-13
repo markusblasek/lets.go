@@ -176,6 +176,17 @@ angular.module('letsGo.services', [])
     };
   })
 
+  .service('rtcManager', function() {
+
+    // code
+
+    return {
+      start: function(opponentId) {
+
+      }
+    };
+  })
+
   // ==== REST Resources ====
 
   .service('User', function($resource) {

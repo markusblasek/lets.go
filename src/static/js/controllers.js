@@ -206,7 +206,7 @@ angular.module('letsGo.controllers', [])
     };
   })
 
-  .controller('GamesViewCtrl', function($scope, $http, $location, $routeParams, socketManager) {
+  .controller('GamesViewCtrl', function($scope, $http, $location, $routeParams, socketManager, rtcManager) {
     var gameId = $routeParams.gameId;
 
     var move = function(type, column, row) {
@@ -229,6 +229,8 @@ angular.module('letsGo.controllers', [])
         socketManager.dead($scope.game._id, column, row);
       }
     };
+
+    //rtcManager.start(game.challenger._id);
 
     $scope.pass = function() {
       move('pass');
