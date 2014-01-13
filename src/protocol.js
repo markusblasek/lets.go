@@ -53,6 +53,14 @@ var deadSchema = {
 
 var doneSchema = acceptSchema;
 
+var communicateSchema = {
+  type: 'object',
+  properties: {
+    gameId: {type: 'string', required: true},
+    communicate: {type: 'boolean', required: true}
+  }
+};
+
 var videoChatSchema = {
     type: 'object',
     properties: {
@@ -329,6 +337,13 @@ module.exports = function(io) {
       if (game.state === 'over') {
         io.sockets.emit('list');
       }
+    });
+
+    // rtc in a game
+    addGameHandler('communicate', communicateSchema, '*', function(game, data, done) {
+      var player = (user.id === game.challenger._id.toString()) ? 'challenger' : 'challengee';
+      game.communicate[player] = data.communicate;
+      done();
     });
 
     // video chat yeah yeah

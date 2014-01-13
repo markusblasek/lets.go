@@ -115,6 +115,12 @@ angular.module('letsGo.services', [])
       }
     };
 
+    var communicateAction = function(gameId, value) {
+      if (connected) {
+        socket.emit('communicate', {gameId: gameId, communicate: value});
+      }
+    };
+
     var deadAction = function(gameId, column, row) {
       if (connected) {
         socket.emit('dead', {
@@ -161,6 +167,7 @@ angular.module('letsGo.services', [])
       resume: resumeAction,
       dead: deadAction,
       done: doneAction,
+      communicate: communicateAction,
 
       //temporary solution
       emit: function(event, data){

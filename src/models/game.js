@@ -14,6 +14,12 @@ var gameSchema = new mongoose.Schema({
     required: true
   },
 
+  // web rtc
+  communicate: {
+    challenger: {type: Boolean, default: false, required: true},
+    challengee: {type: Boolean, default: false, required: true}
+  },
+
   // defined by the creator
   name: {type: String, required: true},
   size: {

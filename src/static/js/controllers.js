@@ -230,7 +230,13 @@ angular.module('letsGo.controllers', [])
       }
     };
 
+    var rtcStarted = false;
+
     //rtcManager.start(game.challenger._id);
+
+    $scope.communicate = function(value) {
+      socketManager.communicate($scope.game._id, value);
+    };
 
     $scope.pass = function() {
       move('pass');
@@ -264,6 +270,14 @@ angular.module('letsGo.controllers', [])
       game.challengee.alias = game.challengee._id === $scope.user._id ? 'You' : game.challengee.alias;
       game.challengee.winner = game.over && game.winner && game.winner === game.challengee._id;
       game.challengee.loser = game.over && game.winner && game.winner !== game.challengee._id;
+
+      if (!rtcStarted && game.communicate.challenger && game.communicate.challengee) {
+        rtcStarted = true;
+        var opponent = $scope.user._id === game.challenger._id ? game.challengee._id : game.challenger._id;
+        var elements = {caller: game._id + '-' + $scope.user._id, callee: game._id + '-' + opponent};
+        console.log('start rtc to ', opponent, ' elements ', elements);
+        rtcManager.start(opponent, elements)
+      }
 
       $scope.$apply(function() {
         $scope.game = game;
