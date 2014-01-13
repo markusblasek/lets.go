@@ -61,13 +61,13 @@ var communicateSchema = {
   }
 };
 
-var videoChatSchema = {
-    type: 'object',
-    properties: {
-        idcallee: { type: 'string', required: true },
-        type: { type: 'string', enum: ['sdp', 'candidate', 'callend'], required: true },
-        message: { type: 'string', required: true }
-    }
+var rtcSchema = {
+  type: 'object',
+  properties: {
+    type: {type: 'string', enum: ['sdp', 'candidate', 'callend'], required: true},
+    target: {type: 'string', required: true},
+    message: {type: 'string', required: true}
+  }
 };
 
 var users = {};
@@ -347,14 +347,14 @@ module.exports = function(io) {
     });
 
     // video chat yeah yeah
-    addHandler('videochat', videoChatSchema, function(data) {
-      var target = users[data.idcallee];
+    addHandler('rtc', rtcSchema, function(data) {
+      var target = users[data.target];
       if (!target) {
         return log.warn('User does not exist or is offline.');
       }
       // set the id of the caller, so the callee does know who is calling
-      data.idcaller = user.id;
-      target.emit('videochat', data);
+      data.sender = user.id;
+      target.emit('rtc', data);
     });
 
     // a user disconnected
