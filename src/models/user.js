@@ -9,7 +9,8 @@ var userSchema = new mongoose.Schema({
   email: {type: String, required: true, unique: true, index: true},
   alias: {type: String, required: true},
   name: String,
-  photo: String
+  photo: String,
+  bigPhoto: String
 });
 
 var transform = function(doc, ret, options) {

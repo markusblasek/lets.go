@@ -41,6 +41,7 @@ exports.setup = function(app) {
           user.email = profile.emails[0].value;
           if (profile.photos && profile.photos[0]) {
             user.photo = profile.photos[0].value;
+            user.bigPhoto = 'https://graph.facebook.com/' + profile.id + '/picture?type=large';
           }
           if (update) {
             update(user, profile);
@@ -84,6 +85,7 @@ exports.setup = function(app) {
   }, strategyHandler(function(user, profile) {
     if (profile._json['picture']) {
       user.photo = profile._json['picture'];
+      user.bigPhoto = 'https://plus.google.com/s2/photos/profile/' + profile.id + '?sz=300';
     }
   })));
 
