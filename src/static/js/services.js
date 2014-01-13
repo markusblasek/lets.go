@@ -188,7 +188,7 @@ angular.module('letsGo.services', [])
     // code
 
     return {
-      start: function(opponentId, elements) {
+      start: function(opponentId, elements, initiate) {
           var idcaller = '';
           var idcallee = opponentId;
           var videochat_candidate = {'type': 'candidate', 'message': null, 'idcaller': idcaller, 'idcallee': idcallee};
@@ -247,7 +247,7 @@ angular.module('letsGo.services', [])
           function localDescCreated(desc) {
               pcLocal.setLocalDescription(desc, function () {
                   videochat_sdp.message = JSON.stringify(pcLocal.localDescription);
-                  socket.emit('videochat', videochat_sdp);
+                  socketManager.emit('videochat', videochat_sdp);
               }, onfailure);
           }
           function closeStreamAndPeerConn(){
@@ -262,13 +262,6 @@ angular.module('letsGo.services', [])
               video_callee.src = '';
               video_caller.src = '';
           }
-          /*function getUrlVars() {
-              var vars = {};
-              var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-                  vars[key] = value;
-              });
-              return vars;
-          }*/
           // Listening on video chat events
           socketManager.on('videochat',
               function (data) {
@@ -276,6 +269,7 @@ angular.module('letsGo.services', [])
                   //trace(data);
                   if(typeof data.type === 'string' && (data.type === 'candidate' || data.type === 'sdp' || data.type === 'callend')){
                       if(data.type === 'candidate'){
+                          console.log(data.message);
                           pcLocal.addIceCandidate(new RTCIceCandidate(JSON.parse(data.message)));
                       }else if(data.type === 'sdp'){
                           if(!pcLocal){
@@ -311,7 +305,7 @@ angular.module('letsGo.services', [])
               pcLocal.onicecandidate = function (evt) {
                   if (evt.candidate){
                       videochat_candidate.message = JSON.stringify(evt.candidate);
-                      socket.emit('videochat', videochat_candidate);
+                      socketManager.emit('videochat', videochat_candidate);
                   }
               };
 
@@ -332,6 +326,10 @@ angular.module('letsGo.services', [])
               socket.emit('videochat', videochat_callend);
               closeStreamAndPeerConn();
           };
+
+        if (initiate) {
+          connectChat();
+        }
       }
     };
   })

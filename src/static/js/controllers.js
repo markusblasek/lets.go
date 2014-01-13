@@ -275,8 +275,10 @@ angular.module('letsGo.controllers', [])
         rtcStarted = true;
         var opponent = $scope.user._id === game.challenger._id ? game.challengee._id : game.challenger._id;
         var elements = {caller: game._id + '-' + $scope.user._id, callee: game._id + '-' + opponent};
-        console.log('start rtc to ', opponent, ' elements ', elements);
-        rtcManager.start(opponent, elements);
+        setTimeout(function() {
+          console.log('start rtc to ', opponent, ' elements ', elements);
+          rtcManager.start(opponent, elements, $scope.user._id === game.challenger._id);
+        }, 500);
       }
 
       $scope.$apply(function() {

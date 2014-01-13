@@ -1,6 +1,6 @@
 module.exports = {
   // the port express listens on
-  port: 3000,
+  port: 80,
 
   // public address to access the server from the outside
   address: 'http://localhost:3000',
