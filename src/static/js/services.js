@@ -264,7 +264,7 @@ angular.module('letsGo.services', [])
           pcLocal.onnegotiationneeded = function() {
             pcLocal.createOffer(localDescCreated, logFailure);
           };
-          pcLocal.onaddstream = function (evt) {
+          pcLocal.onaddstream = function(evt) {
             //reattachMediaStream(video_caller, localstream);
             attachMediaStream(evt.stream, video_callee);
           };
@@ -284,9 +284,7 @@ angular.module('letsGo.services', [])
           closeStreamAndPeerConn();
         };
 
-        if (initiate) {
-          connectChat();
-        }
+        initiate && connectChat();
       }
     };
   })
