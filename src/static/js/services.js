@@ -176,13 +176,155 @@ angular.module('letsGo.services', [])
     };
   })
 
-  .service('rtcManager', function() {
+  .service('rtcManager', function(socketManager) {
 
     // code
 
     return {
-      start: function(opponentId) {
+      start: function(opponentId, elements) {
+          var idcaller = '';
+          var idcallee = opponentId;
+          var videochat_candidate = {'type': 'candidate', 'message': null, 'idcaller': idcaller, 'idcallee': idcallee};
+          var videochat_sdp = {'type': 'sdp', 'message': '', 'idcaller': idcaller, 'idcallee': idcallee};
+          var videochat_callend = {'type': 'callend', 'message': null, 'idcaller': idcaller, 'idcallee': idcallee};
 
+          //enter ids of the video tags
+          var id_video_caller = elements.caller;
+          var id_video_callee = elements.callee;
+
+          var video_callee = document.getElementById(id_video_callee);
+          var video_caller = document.getElementById(id_video_caller);
+
+          var pcLocal, localstream;
+          //Enter the configuration like stun-servers and ice-servers
+          var rtcPeerConfiguration = { "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] };
+
+          //Enter the session constrains of the offer
+          var sdpConstraints = {'mandatory': {
+              'OfferToReceiveAudio':true,
+              'OfferToReceiveVideo':true
+          }};
+          var constraints = {
+              "audio": true,
+              "video": {
+                  "mandatory": {
+                      "minWidth": "320",
+                      "maxWidth": "720",
+                      "minHeight": "180",
+                      "maxHeight": "480",
+                      "minFrameRate": "30"
+                  },
+                  "optional": []
+              }
+          };
+          // Some helper functions....
+          function gotStream(stream){
+              trace("Received local stream");
+
+              localstream = stream;
+              //Attach a stream to a video tag
+              attachMediaStream(video_caller, localstream);
+
+              var videoTracks = localstream.getVideoTracks();
+              var audioTracks = localstream.getAudioTracks();
+              if (videoTracks.length > 0)
+                  trace('Using Video device: ' + videoTracks[0].label);
+              if (audioTracks.length > 0)
+                  trace('Using Audio device: ' + audioTracks[0].label);
+
+              pcLocal.addStream(localstream);
+          }
+          function onfailure(error){
+              trace(error);
+          }
+          function localDescCreated(desc) {
+              pcLocal.setLocalDescription(desc, function () {
+                  videochat_sdp.message = JSON.stringify(pcLocal.localDescription);
+                  socket.emit('videochat', videochat_sdp);
+              }, onfailure);
+          }
+          function closeStreamAndPeerConn(){
+              //Close the peerconnection and close the localstream
+              if(pcLocal)
+                  pcLocal.close();
+              pcLocal = null;
+              if(localstream)
+                  localstream.stop();
+              localstream = null;
+              //Reset the video-tags.
+              video_callee.src = '';
+              video_caller.src = '';
+          }
+          /*function getUrlVars() {
+              var vars = {};
+              var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+                  vars[key] = value;
+              });
+              return vars;
+          }*/
+          // Listening on video chat events
+          socket.on('videochat',
+              function (data) {
+                  trace("received videochat of type '" + data.type + "'");
+                  //trace(data);
+                  if(typeof data.type === 'string' && (data.type === 'candidate' || data.type === 'sdp' || data.type === 'callend')){
+                      if(data.type === 'candidate'){
+                          pcLocal.addIceCandidate(new RTCIceCandidate(JSON.parse(data.message)));
+                      }else if(data.type === 'sdp'){
+                          if(!pcLocal){
+                              connectChat();
+                          }
+                          pcLocal.setRemoteDescription(new RTCSessionDescription(JSON.parse(data.message)), function () {
+                              // if we received an offer, we need to answer
+                              if (pcLocal.remoteDescription.type == 'offer'){
+                                  pcLocal.createAnswer(localDescCreated, onfailure);
+                              }
+                          }, onfailure);
+                      }else if(data.type === 'callend'){
+                          trace("Callee stopped video chat.");
+                          closeStreamAndPeerConn();
+                      }else{
+                          trace("ERROR: received video chat of not implemented type '" + data.type + "'");
+                      }
+                  }else{
+                      trace("ERROR: received video chat of UNKNOWN type '" + data.type + "'");
+                  }
+              });
+
+          //Try to connect to videochat
+          //function connectChat(){
+              pcLocal = new RTCPeerConnection(rtcPeerConfiguration, {"optional": [{"DtlsSrtpKeyAgreement": true}]});
+              pcLocal.oniceconnectionstatechange =
+                  function(evt){
+                      if(evt.currentTarget.iceConnectionState === 'disconnected'){
+                          trace("remote peerconnection disconnected");
+                          closeStreamAndPeerConn();
+                      }
+                  };
+              pcLocal.onicecandidate = function (evt) {
+                  if (evt.candidate){
+                      videochat_candidate.message = JSON.stringify(evt.candidate);
+                      socket.emit('videochat', videochat_candidate);
+                  }
+              };
+
+              pcLocal.onnegotiationneeded = function () {
+                  pcLocal.createOffer(localDescCreated, onfailure);
+              }
+
+              pcLocal.onaddstream = function (evt) {
+                  //reattachMediaStream(video_caller, localstream);
+                  attachMediaStream(video_callee, evt.stream);
+              };
+
+              getUserMedia(constraints,
+                  gotStream, onfailure);
+          //};
+          /*function closeChat(){
+              trace("Ending call");
+              socket.emit('videochat', videochat_callend);
+              closeStreamAndPeerConn();
+          };*/
       }
     };
   })
