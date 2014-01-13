@@ -17,10 +17,10 @@ var transform = function(doc, ret, options) {
   delete ret.identifier;
   delete ret.hash;
   delete ret.salt;
-  ret.photo = doc.photo || ('http://robohash.org/' +
+  ret.photo = doc.photo || ('https://robohash.org/' +
                             crypto.createHash('md5').update(doc.identifier).digest('hex') +
                             '.png?size=50x50&bgset=bg2');
-  ret.bigPhoto = doc.bigPhoto || ('http://robohash.org/' +
+  ret.bigPhoto = doc.bigPhoto || ('https://robohash.org/' +
                                   crypto.createHash('md5').update(doc.identifier).digest('hex') +
                                  '.png?bgset=bg2');
 };
