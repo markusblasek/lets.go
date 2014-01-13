@@ -270,7 +270,7 @@ angular.module('letsGo.services', [])
               return vars;
           }*/
           // Listening on video chat events
-          socket.on('videochat',
+          socketManager.on('videochat',
               function (data) {
                   trace("received videochat of type '" + data.type + "'");
                   //trace(data);
@@ -299,7 +299,7 @@ angular.module('letsGo.services', [])
               });
 
           //Try to connect to videochat
-          //function connectChat(){
+          function connectChat(){
               pcLocal = new RTCPeerConnection(rtcPeerConfiguration, {"optional": [{"DtlsSrtpKeyAgreement": true}]});
               pcLocal.oniceconnectionstatechange =
                   function(evt){
@@ -326,12 +326,12 @@ angular.module('letsGo.services', [])
 
               getUserMedia(constraints,
                   gotStream, onfailure);
-          //};
-          /*function closeChat(){
+          };
+          function closeChat(){
               trace("Ending call");
               socket.emit('videochat', videochat_callend);
               closeStreamAndPeerConn();
-          };*/
+          };
       }
     };
   })
