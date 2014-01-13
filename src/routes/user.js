@@ -9,21 +9,6 @@ var User = require('../models/user');
 var log = require('../log');
 var config = require('../config');
 
-// LOCALHOST
-var FACEBOOK_APP_ID = '723348891027933';
-var FACEBOOK_APP_SECRET = 'b82698180e06348651c4cf1a8285f54b';
-var GOOGLE_CLIENT_ID = '179733906984-b3cg0psdbp97ou2th4689o7ia4qt34lg.apps.googleusercontent.com';
-var GOOGLE_CLIENT_SECRET = 'S8IkqL0X3uWnSFOMxFQw2VMe';
-
-// REAKTOR42.de
-/*
-var FACEBOOK_APP_ID = '259268590897864';
-var FACEBOOK_APP_SECRET = '5e833bb4b8d90406a0a7dfc73622504b';
-var GOOGLE_CLIENT_ID = '179733906984-0774u6lq7mu0fof6am7gbk7bms1dl2io.apps.googleusercontent.com';
-var GOOGLE_CLIENT_SECRET = 'BGryGckhim__F2B8dh_uFCHt';
-*/
-
-
 // setup
 
 exports.setup = function(app) {
@@ -79,8 +64,8 @@ exports.setup = function(app) {
 
   // add google strategy
   passport.use(new passportGoogleOauth.OAuth2Strategy({
-    clientID: GOOGLE_CLIENT_ID,
-    clientSecret: GOOGLE_CLIENT_SECRET,
+    clientID: config.google.id,
+    clientSecret: config.google.secret,
     callbackURL: config.address + '/user/auth/google/callback'
   }, strategyHandler(function(user, profile) {
     if (profile._json['picture']) {
@@ -91,8 +76,8 @@ exports.setup = function(app) {
 
   // add facebook strategy
   passport.use(new passportFacebook.Strategy({
-    clientID: FACEBOOK_APP_ID,
-    clientSecret: FACEBOOK_APP_SECRET,
+    clientID: config.facebook.id,
+    clientSecret: config.facebook.secret,
     callbackURL: config.address + '/user/auth/facebook/callback',
     profileFields: ['name', 'displayName', 'emails', 'photos']
   }, strategyHandler()));
