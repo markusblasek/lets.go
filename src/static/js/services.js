@@ -254,6 +254,7 @@ angular.module('letsGo.services', [])
           pcLocal.oniceconnectionstatechange = function(e) {
             if (e.currentTarget.iceConnectionState === 'disconnected') {
               console.log('Remote peer connection disconnected');
+              closeStreamAndPeerConn();
             }
           };
           pcLocal.onicecandidate = function(e) {
