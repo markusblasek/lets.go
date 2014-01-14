@@ -265,4 +265,163 @@ angular.module('letsGo.directives', [])
         resize();
       }
     }
+  })
+
+  .directive('lgRtc', function() {
+    return {
+      restrict: 'E',
+      replace: true,
+      scope: {
+        active: '=lgActive',
+        target: '=lgTarget',
+        initiator: '=lgInitiator'
+      },
+      templateUrl: '/static/partials/directives/rtc.jade',
+      controller: function($scope, $sce, socketManager) {
+        var localMediaConstraints = {
+          video: true,
+          audio: true,
+          optional: [{
+            maxWidth: 640,
+            maxHeight: 480,
+            maxFps: 30,
+            minWidth: 320,
+            minHeight: 240,
+            minFps: 25
+          }]
+        };
+
+        var sdpConstraints = {
+          mandatory: {
+            OfferToReceiveAudio: true,
+            OfferToReceiveVideo: true
+          }
+        };
+
+        $scope.user = $scope.$parent.user;
+
+        // globals describing the runtime
+        var localStream = null;
+        var peerConnection = null;
+        var started = false;
+
+        var logFailure = function(name) {
+          return function(error) {
+            console.log(name + ' failed: ', error);
+          };
+        };
+
+        var getLocalMedia = function(cb) {
+          if (localStream) console.error('localStream shouldnt be set')
+          getUserMedia(localMediaConstraints, function(stream) {
+            console.log('RTC: Add local stream');
+            localStream = stream;
+            peerConnection.addStream(stream);
+            $scope.$apply(function() {
+              var url = URL.createObjectURL(stream);
+              $scope.local = $sce.trustAsResourceUrl(url);
+            });
+            cb(stream);
+          }, logFailure('navigator.getUserMedia'));
+
+        };
+
+        var createPeerConnection = function() {
+          if (peerConnection) console.error('peerConnection shouldnt be set');
+          peerConnection = new RTCPeerConnection({iceServers: [{url: 'stun:stun.l.google.com:19302'}]});
+          peerConnection.onicecandidate = function(e) {
+            if (e.candidate) {
+              socketManager.rtc('candidate', $scope.target, JSON.stringify(e.candidate));
+            }
+          };
+          peerConnection.onaddstream = function(e) {
+            console.log('RTC: Add remote stream')
+            $scope.$apply(function() {
+              var url = URL.createObjectURL(e.stream);
+              $scope.remote = $sce.trustAsResourceUrl(url);
+            });
+          };
+        };
+
+        var sendSdp = function(type) {
+          return function(sdp) {
+            var localSdp = new RTCSessionDescription(sdp);
+            peerConnection.setLocalDescription(localSdp, function() {
+              socketManager.rtc(type, $scope.target, JSON.stringify(sdp))
+              console.log('RTC: Send ' + type);
+            }, logFailure('RTCPeerConnection.setLocalDescription'));
+          };
+        };
+
+        // only one has to call this function to start the peering
+        var start = function(type) {
+          if (!started) {
+            console.log('RTC: Initiate call with ' + (type || 'offer'));
+            started = true;
+
+            createPeerConnection();
+            getLocalMedia(function() {
+              peerConnection.createOffer(sendSdp(type || 'offer'),
+                logFailure('RTCPeerConnection.createOffer'), sdpConstraints);
+            });
+          }
+        };
+
+        // stop and remove everything
+        var stop = function() {
+          if (started) {
+            console.log('RTC: End call');
+
+            $scope.local = $scope.remove = null;
+
+            if (peerConnection) {
+              localStream = null;
+              peerConnection.close();
+              peerConnection = null;
+            }
+
+            started = false;
+          }
+        };
+
+        $scope.$on('rtc', function(event, rtc) {
+          if (rtc.sender === $scope.target) {
+            if (!peerConnection) {
+              createPeerConnection();
+              started = true;
+              console.log('RTC: Started as callee');
+            }
+
+            if (rtc.type === 'candidate') {
+              peerConnection.addIceCandidate(
+                new RTCIceCandidate(JSON.parse(rtc.message)));
+            } else if (rtc.type === 'offer' || rtc.type === 'answer') {
+              console.log('RTC: Received ' + rtc.type);
+              peerConnection.setRemoteDescription(
+                new RTCSessionDescription(JSON.parse(rtc.message)));
+            }
+
+            if (rtc.type === 'offer') {
+              getLocalMedia(function() {
+                peerConnection.createAnswer(sendSdp('answer'),
+                  logFailure('RTCPeerConnection.createAnswer'), sdpConstraints);
+              });
+            }
+          }
+        });
+
+        $scope.$watch(function() {
+          if ($scope.initiator !== undefined && $scope.active !== undefined && $scope.target !== undefined) {
+            if ($scope.initiator === true && $scope.active === true) {
+              start();
+            }
+            if (!$scope.active) {
+              stop();
+            }
+          }
+        });
+
+        $scope.$on('$destroy', stop);
+      }
+    }
   });

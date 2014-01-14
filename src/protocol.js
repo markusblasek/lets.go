@@ -65,7 +65,7 @@ var communicateSchema = {
 var rtcSchema = {
   type: 'object',
   properties: {
-    type: {type: 'string', enum: ['sdp', 'candidate', 'callend'], required: true},
+    type: {type: 'string', enum: ['candidate', 'offer', 'answer'], required: true},
     target: {type: 'string', required: true},
     message: {type: 'string', required: true}
   }
@@ -234,7 +234,7 @@ module.exports = function(io) {
       }
 
       if (users.indexOf(user.id) === -1) {
-        users.push(user.id)
+        users.push(user.id);
         done();
       } else {
         var gameObject = game.toJSON();
@@ -273,7 +273,7 @@ module.exports = function(io) {
 
     // making a move: play, pass or surrender
     addGameHandler('move', moveSchema, 'live', function(game, data, done) {
-      if (game.turn.toString() !== user.id) {
+      if (game.turn.toString() !== user.id && data.type !== 'surrender') {
         return log.warn('User is not allowed to make a move, not his turn.');
       }
 
@@ -322,7 +322,6 @@ module.exports = function(io) {
         saveMove();
       }
       // pass: check if passed two times in a row and start counting
-      // TODO; check the performance of that mongo query!
       else if (data.type === 'pass') {
         Move
           .find({game: game._id})
@@ -347,7 +346,7 @@ module.exports = function(io) {
       }
       // surrender
       else if (data.type === 'surrender') {
-        game.winner = game.turn;
+        game.winner = user.id === game.challenger.id ? game.challengee._id : game.challenger._id;
         game.state = 'over';
         game.reason = 'surrender';
         saveMove();

@@ -1,5 +1,5 @@
 #games-view.ui.stackable.page.grid
-  .one.column.row
+  //.one.column.row
     .column
       h2.ui.header
         i.inverted.circular.green.gamepad.icon
@@ -14,8 +14,22 @@
               b(ng-bind='game.winner === game.challenger._id ? game.challenger.alias : game.challengee.alias')
               | &nbsp;has won through <span ng-bind="game.reason"></span>.
 
-  .middle.aligned.row
+  .row
     .eleven.wide.center.aligned.column
+      .ui.grid
+        .center.aligned.row
+          .seven.wide.column
+            .ui.large.header
+              img.ui.avatar.image(ng-src='{{game.challenger.photo}}', ng-if='game.challenger.photo')
+              span(ng-bind='game.challenger.alias')
+              .ui.divided.list
+                .item Eins
+                .item Eins
+          .two.wide.column vs.
+          .seven.wide.column
+            .ui.header
+              img.ui.avatar.image(ng-src='{{game.challengee.photo}}', ng-if='game.challengee.photo')
+              span(ng-bind='game.challengee.alias')
       lg-board(lg-game='game', lg-click='click(column, row)')
     .five.wide.column
       .ui.icon.message(ng-if='game.over', ng-class='{info: game.draw || !game.player, green: game.win, red: game.loose}')
@@ -34,7 +48,7 @@
       .two.fluid.ui.buttons(ng-if='game.player', ng-show='game.state === "live"')
         .ui.black.button(ng-click='pass()', ng-class='{disabled: game.turn !== user._id}') Pass
         .or
-        .ui.red.button(ng-click='surrender()', ng-class='{disabled: game.turn !== user._id}') Surrender
+        .ui.red.button(ng-click='surrender()') Surrender
 
       .two.fluid.ui.buttons(ng-if='game.player', ng-show='game.state === "counting"')
         .ui.green.button(ng-click='done()',
@@ -61,8 +75,6 @@
           .item(ng-if='game.player')
             .ui.button(ng-click='communicate(true)', ng-show='game.challenger._id === user._id && !game.communicate.challenger') Share Audio/Video
             i.facetime.video.icon(ng-show='game.communicate.challenger')
-          .item
-            video(style='width: 100px; height: 100px; background: red', id='{{game._id}}-{{game.challenger._id}}', autoplay='true')
 
       .ui.horizontal.section.divider vs.
 
@@ -82,9 +94,9 @@
           .item(ng-if='game.player')
             .ui.button(ng-click='communicate(true)', ng-show='game.challengee._id === user._id && !game.communicate.challengee') Share Audio/Video
             i.facetime.video.icon(ng-show='game.communicate.challengee')
-          .item
-            video(style='width: 100px; height: 100px; background: red', id='{{game._id}}-{{game.challengee._id}}', autoplay='true')
 
+      .ui.section.divider
+      lg-rtc(lg-active='rtc', lg-target='opponent', lg-initiator='user._id === game.challenger._id')
       .ui.section.divider
 
       lg-message-box(lg-target-type='game', lg-target-id='{{ game._id }}')

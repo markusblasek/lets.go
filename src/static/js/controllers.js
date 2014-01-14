@@ -206,12 +206,12 @@ angular.module('letsGo.controllers', [])
     };
   })
 
-  .controller('GamesViewCtrl', function($scope, $http, $location, $routeParams, socketManager, rtcManager) {
+  .controller('GamesViewCtrl', function($scope, $http, $location, $routeParams, socketManager) {
     var gameId = $routeParams.gameId;
 
     var move = function(type, column, row) {
       if ($scope.game.state === 'live' &&
-          $scope.game.turn === $scope.user._id) {
+        ($scope.game.turn === $scope.user._id || type === 'surrender')) {
         socketManager.move($scope.game._id, type, column, row);
       }
     };
@@ -229,10 +229,6 @@ angular.module('letsGo.controllers', [])
         socketManager.dead($scope.game._id, column, row);
       }
     };
-
-    var rtcStarted = false;
-
-    //rtcManager.start(game.challenger._id);
 
     $scope.communicate = function(value) {
       socketManager.communicate($scope.game._id, value);
@@ -259,7 +255,7 @@ angular.module('letsGo.controllers', [])
     };
 
     $scope.$on('gameState', function(event, game) {
-      game.over = game.state === "over";
+      game.over = game.state === 'over';
       game.player = $scope.user._id === game.challenger._id || $scope.user._id === game.challengee._id;
       game.draw = game.over && !game.winner;
       game.win = game.over && game.winner === $scope.user._id;
@@ -271,23 +267,16 @@ angular.module('letsGo.controllers', [])
       game.challengee.winner = game.over && game.winner && game.winner === game.challengee._id;
       game.challengee.loser = game.over && game.winner && game.winner !== game.challengee._id;
 
-      if (game.player && !rtcStarted && game.communicate.challenger && game.communicate.challengee) {
-        rtcStarted = true;
-        var opponent = $scope.user._id === game.challenger._id ? game.challengee._id : game.challenger._id;
-        var elements = {caller: game._id + '-' + $scope.user._id, callee: game._id + '-' + opponent};
-        setTimeout(function() {
-          console.log('start rtc to ', opponent, ' elements ', elements);
-          rtcManager.start(opponent, elements, $scope.user._id === game.challenger._id);
-        }, 500);
-      }
-
       $scope.$apply(function() {
         $scope.game = game;
+
+        $scope.opponent = $scope.user._id === game.challenger._id ? game.challengee._id : game.challenger._id;
+        $scope.rtc = game.communicate.challenger && game.communicate.challengee && game.player &&
+          _(game.spectators).contains(game.challenger._id) && _(game.spectators).contains(game.challengee._id);
       });
     });
 
     $scope.$on('$destroy', function() {
-      console.log('lets go !');
       socketManager.leave(gameId);
     });
 
