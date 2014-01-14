@@ -43,10 +43,9 @@ div.ui.one.column.page.grid(ng-if='model.switchMess == 2')
                                 i {{mess.content}}
 p
 div.ui.one.column.page.grid
-    //(ng-if='model.switchMess == 3')
     div.column
         div.ui.attached.blue.message
-            ui.header Write new message: (soll nur angezeigt werden wenn "write new message" ausgewählt ist...funktioniert mit dem ng-if auch...aber dann funzt das dropdown net mehr :(
+            ui.header(ng-if='model.switchMess == 3') Write new message:
             div.ui.form.segment
                 form(name='form', ng-submit='sendMessage()')
                     div.field
