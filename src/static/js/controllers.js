@@ -120,7 +120,8 @@ angular.module('letsGo.controllers', [])
             curName: '',
             curID: '',
             subject: '',
-            content: ''
+            content: '',
+            switchMess: 1
         };
 
         User.query(function(users) {
@@ -144,6 +145,13 @@ angular.module('letsGo.controllers', [])
                 subject: $scope.model.subject,
                 content: $scope.model.content
             }, update);
+            $scope.model = {
+                curName: '',
+                curID: '',
+                subject: '',
+                content: '',
+                switchMess: 2
+            };
         };
 
         $scope.removeMessage = function(id) {
