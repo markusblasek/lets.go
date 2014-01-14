@@ -343,13 +343,8 @@ angular.module('letsGo.directives', [])
         var getLocalMedia = function(cb) {
           if (localStream) console.error('localStream shouldnt be set')
           getUserMedia(localMediaConstraints, function(stream) {
-            console.log('RTC: Add local stream', stream);
+            console.log('RTC: Add local stream');
             localStream = stream;
-
-            var v = stream.getVideoTracks();
-            var a = v[0];
-            console.log('video ', v, a);
-
             peerConnection.addStream(stream);
             $scope.$apply(function() {
               var url = URL.createObjectURL(stream);
@@ -409,7 +404,10 @@ angular.module('letsGo.directives', [])
             $scope.local = $scope.remote = null;
 
             if (peerConnection) {
-              localStream = null;
+              if (localStream) {
+                localStream.stop();
+                localStream = null;
+              }
               peerConnection.close();
               peerConnection = null;
             }
