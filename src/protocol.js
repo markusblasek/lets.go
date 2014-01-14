@@ -348,6 +348,8 @@ module.exports = function(io) {
       else if (data.type === 'surrender') {
         game.winner = user.id === game.challenger.id ? game.challengee._id : game.challenger._id;
         game.state = 'over';
+        game.dead = new Array(game.size * game.size + 1).join(' ');
+        game.territory = new Array(game.size * game.size + 1).join(' ');
         game.reason = 'surrender';
         saveMove();
       }

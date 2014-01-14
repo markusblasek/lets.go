@@ -277,10 +277,38 @@ angular.module('letsGo.directives', [])
         initiator: '=lgInitiator'
       },
       templateUrl: '/static/partials/directives/rtc.jade',
+      link: function(scope, element, attrs) {
+        var remote = element.find('.remote');
+        var local = element.find('.local');
+
+        // resize event
+        var resize = function() {
+          var width = element.width();
+          var remoteRatio = remote.prop('videoWidth') / remote.prop('videoHeight');
+          if (isNaN(remoteRatio)) {
+            remoteRatio = 1.33;
+          }
+          remote.width(width).height(width / remoteRatio);
+
+          var localRatio = local.prop('videoWidth') / local.prop('videoHeight');
+          if (isNaN(localRatio)) {
+            localRatio = 1.33;
+          }
+          local.width(width *.33).height((width *.33) / localRatio);
+        };
+
+        remote.on('canplay canplaythrough', resize);
+        local.on('canplay canplaythrough', resize);
+        remote.on('playing', remote.show.bind(remote));
+        local.on('playing', local.show.bind(local));
+        remote.on('ended abort', remote.hide.bind(remote));
+        local.on('ended abort', local.hide.bind(local));
+      },
       controller: function($scope, $sce, socketManager) {
         var localMediaConstraints = {
           video: true,
           audio: true,
+          /*
           optional: [{
             maxWidth: 640,
             maxHeight: 480,
@@ -289,6 +317,7 @@ angular.module('letsGo.directives', [])
             minHeight: 240,
             minFps: 25
           }]
+          */
         };
 
         var sdpConstraints = {
@@ -314,8 +343,13 @@ angular.module('letsGo.directives', [])
         var getLocalMedia = function(cb) {
           if (localStream) console.error('localStream shouldnt be set')
           getUserMedia(localMediaConstraints, function(stream) {
-            console.log('RTC: Add local stream');
+            console.log('RTC: Add local stream', stream);
             localStream = stream;
+
+            var v = stream.getVideoTracks();
+            var a = v[0];
+            console.log('video ', v, a);
+
             peerConnection.addStream(stream);
             $scope.$apply(function() {
               var url = URL.createObjectURL(stream);
@@ -372,7 +406,7 @@ angular.module('letsGo.directives', [])
           if (started) {
             console.log('RTC: End call');
 
-            $scope.local = $scope.remove = null;
+            $scope.local = $scope.remote = null;
 
             if (peerConnection) {
               localStream = null;

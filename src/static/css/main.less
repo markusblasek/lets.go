@@ -197,19 +197,15 @@ canvas.board {
 .rtc {
   position: relative;
   width: 100%;
-  height: 200px;
-  .remote {
-    width: 100%;
-    height: 100%;
-    background: red;
-  }
   .local {
+    display: none;
     position: absolute;
-    top: 0px;
-    right: 0px;
-    width: 20%;
-    height: 100%;
-
-    background: green;
+    top: 0;
+    right: 0;
+    background: black;
+  }
+  .remote {
+    display: none;
+    background: black;
   }
 }
