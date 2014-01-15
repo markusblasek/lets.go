@@ -42,10 +42,10 @@ div.ui.one.column.page.grid(ng-if='model.switchMess == 2')
                             div.column
                                 i {{mess.content}}
 p
-div.ui.one.column.page.grid
+div.ui.one.column.page.grid(ng-show='model.switchMess == 3')
     div.column
         div.ui.attached.blue.message
-            ui.header(ng-if='model.switchMess == 3') Write new message:
+            ui.header Write new message:
             div.ui.form.segment
                 form(name='form', ng-submit='sendMessage()')
                     div.field
