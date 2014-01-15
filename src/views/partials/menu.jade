@@ -1,4 +1,4 @@
-#menu.ui.page.grid(ng-if='user')
+#menu.ui.page.grid(ng-show='user')
   .ui.secondary.pointing.menu
     a.logo.item(href='#/')
       | &nbsp;
@@ -6,7 +6,6 @@
     a.item(href='#/chat', ng-class="{active: activePath =='/chat'}")
       i.users.icon
       | CHAT
-      div.ui.small.teal.label(ng-bind='online')
     a.item(href='#/messages', ng-class="{active: activePath =='/messages'}")
       i.mail.icon
       | MESSAGES
@@ -14,15 +13,18 @@
       i.gamepad.icon
       | GAMES
     .right.menu.borderless
-      div.ui.dropdown.item.simple.fitted
+      .ui.online.fitted.item
+        .ui.circular.label(ng-bind='"#" + online')
+        | &nbsp;online
+      .ui.dropdown.item.simple.fitted
         img.ui.avatar.image(ng-src='{{user.photo}}', ng-if='user.photo')
         b(ng-bind='user.alias')
-        div.menu.left
+        .menu.left
           a.item(href='#/user/{{user._id}}') Account
           a.item(href='#/user/edit') Edit
           a.item(href='#', ng-click='logout()') Logout
 
-#menu-unknown(ng-if='!user')
+#menu-unknown(ng-show='!user')
   .ui.one.column.page.grid
     .column
       a.ui.right.floated.small.button(href='#/user/login') Sign in
