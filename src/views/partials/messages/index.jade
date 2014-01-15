@@ -1,9 +1,11 @@
-div.ui.large.buttons(align='center')
-    div.ui.button(ng-click='model.switchMess=1', ng-class='{green: model.switchMess == "1"}') My messages
-    div.or
-    div.ui.button(ng-click='model.switchMess=2', ng-class='{green: model.switchMess == "2"}') Send messages
-    div.or
-    div.ui.button(ng-click='model.switchMess=3', ng-class='{green: model.switchMess == "3"}') Write new message
+div.ui.one.column.page.grid
+    div.column
+      div.ui.large.buttons
+        div.ui.button(ng-click='model.switchMess=1', ng-class='{green: model.switchMess == "1"}') My messages
+        div.or
+        div.ui.button(ng-click='model.switchMess=2', ng-class='{green: model.switchMess == "2"}') Send messages
+        div.or
+        div.ui.button(ng-click='model.switchMess=3', ng-class='{green: model.switchMess == "3"}') Write new message
 
 p
 
