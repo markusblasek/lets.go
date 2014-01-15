@@ -20,6 +20,7 @@ angular.module('letsGo.controllers', [])
     $scope.user = null;
     $scope.online = 0;
     $scope.logout = userManager.logout;
+    $scope.activePath = null;
 
     $scope.$watch(function() {
       return userManager.user;
@@ -31,6 +32,11 @@ angular.module('letsGo.controllers', [])
       $scope.$apply(function() {
         $scope.online = online;
       });
+    });
+
+    $scope.$on('$routeChangeSuccess', function(){
+        $scope.activePath = $location.path();
+        console.log($location.path());
     });
   })
 

@@ -3,14 +3,14 @@
     a.logo.item(href='#/')
       | &nbsp;
       #logo
-    a.item(href='#/chat')
+    a.item(href='#/chat', ng-class="{active: activePath =='/chat'}")
       i.users.icon
       | CHAT
       div.ui.small.teal.label(ng-bind='online')
-    a.item(href='#/messages')
+    a.item(href='#/messages', ng-class="{active: activePath =='/messages'}")
       i.mail.icon
       | MESSAGES
-    a.item(href='#/games')
+    a.item(href='#/games', ng-class="{active: activePath =='/games'}")
       i.gamepad.icon
       | GAMES
     .right.menu.borderless
