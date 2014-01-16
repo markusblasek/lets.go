@@ -100,9 +100,11 @@ angular.module('letsGo.controllers', [])
       $scope.games = games;
       $scope.gamesPlayed = games.length;
       _.each(games, function(game) {
+        var my = $routeParams.userId === game.challenger._id ? game.score.challenger : game.score.challengee;
+        var yours = $routeParams.userId === game.challenger._id ? game.score.challengee : game.score.challenger;
         if(game.winner == $routeParams.userId) {
           $scope.gamesWon += 1;
-          game.result = 'Won +' + Math.abs(game.score.challenger - game.score.challengee);
+          game.result = 'Won ' + (my - yours > 0 ? '+' : '') + (my - yours);
           game.won = true;
         } else if (!game.winner) {
           $scope.gamesDraw += 1;
@@ -110,7 +112,7 @@ angular.module('letsGo.controllers', [])
           game.draw = true;
         } else {
           $scope.gamesLost += 1;
-          game.result = 'Lost -' + Math.abs(game.score.challenger - game.score.challengee);
+          game.result = 'Lost ' + (my - yours > 0 ? '+' : '') + (my - yours);
           game.lost = true;
         }
       });
@@ -244,10 +246,6 @@ angular.module('letsGo.controllers', [])
       }
     };
 
-    $scope.communicate = function(value) {
-      socketManager.communicate($scope.game._id, value);
-    };
-
     $scope.pass = function() {
       move('pass');
     };
@@ -287,7 +285,19 @@ angular.module('letsGo.controllers', [])
         $scope.opponent = $scope.user._id === game.challenger._id ? game.challengee._id : game.challenger._id;
         $scope.rtc = game.communicate.challenger && game.communicate.challengee && game.player &&
           _(game.spectators).contains(game.challenger._id) && _(game.spectators).contains(game.challengee._id);
+
+        $scope.communicate = ($scope.user._id === game.challenger._id) ?
+          {me: game.communicate.challenger, you: game.communicate.challengee} :
+          {me: game.communicate.challengee, you: game.communicate.challenger};
+
+        $scope.allowRtc = $scope.communicate.me;
       });
+    });
+
+    $scope.$watch('allowRtc', function(allowRtc) {
+      if ($scope.game._id && allowRtc !== $scope.communicate.me) {
+        socketManager.communicate($scope.game._id, allowRtc);
+      }
     });
 
     $scope.$on('$destroy', function() {
