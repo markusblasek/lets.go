@@ -39,6 +39,15 @@ angular.module('letsGo.directives', [])
             }
           }
         });
+
+        var resize = function() {
+          if ($('#chat').get(0) !== undefined) {
+            chat.css('height', window.innerHeight - 190 - 50 + 'px');
+          }
+        };
+
+        window.addEventListener('resize', resize, false);
+        resize();
       }
     };
   })
