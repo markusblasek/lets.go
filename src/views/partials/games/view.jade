@@ -53,6 +53,7 @@
             span(ng-show='game.winner === game.challengee._id', ng-bind='game.challengee.alias')
             | &nbsp; won.
 
+
       .two.fluid.ui.buttons(ng-if='game.player', ng-show='game.state === "live"')
         .ui.black.button(ng-click='pass()', ng-class='{disabled: game.turn !== user._id}') Pass
         .or
@@ -76,6 +77,8 @@
 
         .rtc-info(ng-show='communicate.me && !communicate.you') Waiting for opponent…
         .rtc-info(ng-show='!communicate.me && communicate.you') Opponent already waiting for you…
+
+      .ui.message(ng-show='!game.over && !game.player') Game is live..
 
       .ui.section.divider
 
