@@ -18,8 +18,12 @@ div.ui.one.column.page.grid(ng-if='model.switchMess == 1')
                 div.ui.segment(ng-if='(mess.acceptorID == user._id)&&(mess.delFromAcceptor == "false")')
                     div.ui.vertically.divided.grid
                         div.three.column.row
-                            div.column From: {{mess.senderAlias}}
-                            div.column Subject: {{mess.subject}}
+                            div.column
+                                b From:&nbsp
+                                 a(href='#/user/{{mess.senderID}}') {{mess.senderAlias}}
+                            div.column
+                                b Subject:&nbsp
+                                |{{mess.subject}}
                             div.column
                                 a.ui.right.floated.red.mini.button(ng-click='(removeMessage(mess._id))&&(mess.delFromAcceptor == "false")') Remove
                         div.one.column.row(style="color:black")
@@ -36,8 +40,12 @@ div.ui.one.column.page.grid(ng-if='model.switchMess == 2')
                 div.ui.segment(ng-if='(mess.senderID == user._id)&&(mess.delFromSender == "false")')
                     div.ui.vertically.divided.grid
                         div.three.column.row
-                            div.column To: {{mess.acceptorAlias}}
-                            div.column Subject: {{mess.subject}}
+                            div.column
+                                b To:&nbsp
+                                a(href='#/user/{{mess.acceptorID}}') {{mess.acceptorAlias}}
+                            div.column
+                                b Subject:&nbsp
+                                |{{mess.subject}}
                             div.column
                                 a.ui.right.floated.red.mini.button(ng-click='removeMessage(mess._id)') Remove
                         div.one.column.row(style="color:black")
@@ -58,8 +66,7 @@ div.ui.one.column.page.grid(ng-show='model.switchMess == 3')
                             div.text {{model.curName}}
                             i.dropdown.icon
                             div.menu.transition.hidden
-                                div(ng-repeat='userObj in users')
-                                    div.item(ng-click='model.curName=userObj.alias; model.curID = userObj._id') {{userObj.alias}}
+                                div.item(data-value ='userObj.alias' , ng-click='model.curName = userObj.alias; model.curID = userObj._id', ng-repeat='userObj in users') {{userObj.alias}}
                     div.field
                         label
                             b Subject:

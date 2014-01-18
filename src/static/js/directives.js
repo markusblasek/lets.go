@@ -39,6 +39,15 @@ angular.module('letsGo.directives', [])
             }
           }
         });
+
+        var resize = function() {
+          if ($('#chat').get(0) !== undefined) {
+            chat.css('height', window.innerHeight - 190 - 50 + 'px');
+          }
+        };
+
+        window.addEventListener('resize', resize, false);
+        resize();
       }
     };
   })
@@ -303,21 +312,12 @@ angular.module('letsGo.directives', [])
         local.on('playing', local.show.bind(local));
         remote.on('ended abort', remote.hide.bind(remote));
         local.on('ended abort', local.hide.bind(local));
+        window.addEventListener('resize', resize, false);
       },
       controller: function($scope, $sce, socketManager) {
         var localMediaConstraints = {
           video: true,
-          audio: true,
-          /*
-          optional: [{
-            maxWidth: 640,
-            maxHeight: 480,
-            maxFps: 30,
-            minWidth: 320,
-            minHeight: 240,
-            minFps: 25
-          }]
-          */
+          audio: true
         };
 
         var sdpConstraints = {
@@ -326,6 +326,9 @@ angular.module('letsGo.directives', [])
             OfferToReceiveVideo: true
           }
         };
+
+        var iceServers = [{url: 'stun:stun.l.google.com:19302'}];
+        var onlyRelay = false;
 
         $scope.user = $scope.$parent.user;
 
@@ -357,9 +360,9 @@ angular.module('letsGo.directives', [])
 
         var createPeerConnection = function() {
           if (peerConnection) console.error('peerConnection shouldnt be set');
-          peerConnection = new RTCPeerConnection({iceServers: [{url: 'stun:stun.l.google.com:19302'}]});
+          peerConnection = new RTCPeerConnection({iceServers: iceServers});
           peerConnection.onicecandidate = function(e) {
-            if (e.candidate) {
+            if (e.candidate && (!onlyRelay || e.candidate.candidate.indexOf('relay') !== -1)) {
               socketManager.rtc('candidate', $scope.target, JSON.stringify(e.candidate));
             }
           };

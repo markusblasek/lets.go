@@ -48,6 +48,10 @@ html {
   .logo.item {
     width: 160px;
   }
+  .online.item {
+    color: #999;
+    margin-right: 4em;
+  }
   .item:not(.fitted) {
     padding-top: 20px;
     padding-bottom: 20px;
@@ -132,6 +136,24 @@ html {
   .color .ui.image {
     display: inline-block;
   }
+  .ui.profile.header .content {
+    text-align: left;
+  }
+  .ui.profile.header .sub.header {
+    line-height: 16px;
+    font-size: .9rem;
+  }
+  .ui.profile.header .stats {
+    display: inline-block;
+    height: 16px;
+    vertical-align: top;
+  }
+  .ui.profile.header img.color {
+    margin-right: 6px;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+  }
   .ui.profile.segment {
     opacity: .3;
     filter: alpha(opacity=30);
@@ -144,6 +166,10 @@ html {
       opacity: 1;
       filter: alpha(opacity=100);
     }
+  }
+  .rtc-info {
+    font-size: .9rem;
+    font-style: italic;
   }
 }
 
@@ -200,6 +226,9 @@ canvas.board {
 .rtc {
   position: relative;
   width: 100%;
+  background: url('/static/img/rtc.png') center center no-repeat;
+  min-height: 150px;
+  margin: 6px 0;
   .local {
     display: none;
     position: absolute;
@@ -211,4 +240,7 @@ canvas.board {
     display: none;
     background: black;
   }
+}
+.ready .rtc {
+  background: url('/static/img/rtc-active.png') center center no-repeat !important;
 }

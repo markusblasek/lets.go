@@ -14,23 +14,31 @@
               b(ng-bind='game.winner === game.challenger._id ? game.challenger.alias : game.challengee.alias')
               | &nbsp;has won through <span ng-bind="game.reason"></span>.
 
+  .center.middle.aligned.row
+    .seven.wide.column
+      .ui.large.profile.header
+        img.ui.avatar.image(ng-src='{{game.challenger.photo}}', ng-if='game.challenger.photo')
+        .content
+          span(ng-bind='game.challenger.alias', ng-class='{loose: game.challenger.loser, win: game.challenger.winner, draw: game.draw}')
+          .sub.header
+            img.color(ng-show='game.black === game.challenger._id', src='/static/img/black.png')
+            img.color(ng-show='game.black !== game.challenger._id', src='/static/img/white.png')
+            div.stats(ng-bind='"+" + game.score.challenger')
+    .two.wide.column vs.
+    .seven.wide.column
+      .ui.large.profile.header
+        img.ui.avatar.image(ng-src='{{game.challengee.photo}}', ng-if='game.challengee.photo')
+        .content
+          span(ng-bind='game.challengee.alias', ng-class='{loose: game.challengee.loser, win: game.challengee.winner, draw: game.draw}')
+          .sub.header
+            img.color(ng-show='game.black === game.challengee._id', src='/static/img/black.png')
+            img.color(ng-show='game.black !== game.challengee._id', src='/static/img/white.png')
+            div.stats(ng-bind='"+" + game.score.challengee')
+  .row
   .row
     .eleven.wide.center.aligned.column
-      .ui.grid
-        .center.aligned.row
-          .seven.wide.column
-            .ui.large.header
-              img.ui.avatar.image(ng-src='{{game.challenger.photo}}', ng-if='game.challenger.photo')
-              span(ng-bind='game.challenger.alias')
-              .ui.divided.list
-                .item Eins
-                .item Eins
-          .two.wide.column vs.
-          .seven.wide.column
-            .ui.header
-              img.ui.avatar.image(ng-src='{{game.challengee.photo}}', ng-if='game.challengee.photo')
-              span(ng-bind='game.challengee.alias')
       lg-board(lg-game='game', lg-click='click(column, row)')
+
     .five.wide.column
       .ui.icon.message(ng-if='game.over', ng-class='{info: game.draw || !game.player, green: game.win, red: game.loose}')
         i.frown.icon(ng-show='game.loose')
@@ -45,6 +53,7 @@
             span(ng-show='game.winner === game.challengee._id', ng-bind='game.challengee.alias')
             | &nbsp; won.
 
+
       .two.fluid.ui.buttons(ng-if='game.player', ng-show='game.state === "live"')
         .ui.black.button(ng-click='pass()', ng-class='{disabled: game.turn !== user._id}') Pass
         .or
@@ -52,55 +61,25 @@
 
       .two.fluid.ui.buttons(ng-if='game.player', ng-show='game.state === "counting"')
         .ui.green.button(ng-click='done()',
-                         ng-class='{disabled: game.accepted.indexOf(user._id) >= 0}',
-                         ng-bind='game.accepted.indexOf(user._id) >= 0 ? "Waiting" : "Accept"')
+        ng-class='{disabled: game.accepted.indexOf(user._id) >= 0}',
+        ng-bind='game.accepted.indexOf(user._id) >= 0 ? "Waiting" : "Accept"')
         .or
         .ui.blue.button(ng-click='resume()') Resume
 
-      .ui.section.divider(ng-show='game.player && !game.over')
+      div(ng-show='game.player', ng-class='{ready: communicate.me && communicate.you}')
+        .ui.section.divider
+        div
+          .ui.checkbox
+            input#rtc-allow(type='checkbox', ng-model='allowRtc')
+            label(for='rtc-allow') Allow video chat
 
-      .ui.basic.profile.segment(ng-class='{turn: game.over || game.challenger._id === game.turn}')
-        .ui.header
-          img.ui.avatar.image(ng-src='{{game.challenger.photo}}', ng-if='game.challenger.photo')
-          span(ng-bind='game.challenger.alias')
-        .ui.tiny.bulleted.list
-          .item
-            | Color&nbsp;&nbsp;
-            span.color
-              img.ui.tiny.image(ng-show='game.black === game.challenger._id', src='/static/img/black.png')
-              img.ui.tiny.image(ng-show='game.black !== game.challenger._id', src='/static/img/white.png')
-          .item
-            | Score&nbsp;&nbsp;
-            .ui.label(ng-bind='"+" + game.score.challenger')
-          .item(ng-if='game.player')
-            .ui.button(ng-click='communicate(true)', ng-show='game.challenger._id === user._id && !game.communicate.challenger') Share Audio/Video
-            i.facetime.video.icon(ng-show='game.communicate.challenger')
+        lg-rtc(lg-active='rtc', lg-target='opponent', lg-initiator='user._id === game.challenger._id')
 
-      .ui.horizontal.section.divider vs.
+        .rtc-info(ng-show='communicate.me && !communicate.you') Waiting for opponent…
+        .rtc-info(ng-show='!communicate.me && communicate.you') Opponent already waiting for you…
 
-      .ui.basic.profile.segment(ng-class='{turn: game.over || game.challengee._id === game.turn}')
-        .ui.header
-          img.ui.avatar.image(ng-src='{{game.challengee.photo}}', ng-if='game.challengee.photo')
-          span(ng-bind='game.challengee.alias')
-        .ui.tiny.bulleted.list
-          .item
-            | Color&nbsp;&nbsp;
-            span.color
-              img.ui.tiny.image(ng-show='game.black === game.challengee._id', src='/static/img/black.png')
-              img.ui.tiny.image(ng-show='game.black !== game.challengee._id', src='/static/img/white.png')
-          .item
-            | Score&nbsp;&nbsp;
-            .ui.label(ng-bind='"+" + game.score.challengee')
-          .item(ng-if='game.player')
-            .ui.button(ng-click='communicate(true)', ng-show='game.challengee._id === user._id && !game.communicate.challengee') Share Audio/Video
-            i.facetime.video.icon(ng-show='game.communicate.challengee')
+      .ui.message(ng-show='!game.over && !game.player') Game is live..
 
-      .ui.section.divider
-      lg-rtc(lg-active='rtc', lg-target='opponent', lg-initiator='user._id === game.challenger._id')
       .ui.section.divider
 
       lg-message-box(lg-target-type='game', lg-target-id='{{ game._id }}')
-
-      div
-        | spectating
-        span(ng-bind='game.spectators.length')
