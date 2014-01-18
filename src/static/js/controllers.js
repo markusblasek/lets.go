@@ -40,14 +40,38 @@ angular.module('letsGo.controllers', [])
     });
   })
 
-  .controller('IndexCtrl', function($scope, $location, userManager) {
+  .controller('IndexCtrl', function($scope, $location, userManager, User, Game) {
     $scope.newUser = {};
+    $scope.userList = [];
+    $scope.games = [];
 
     $scope.register = function() {
       return userManager.register($scope.newUser).then(function(user) {
         $location.path('/');
       });
     };
+
+    if($scope.user) {
+        User.query(function(users) {
+            $scope.userList = users;
+        });
+
+        Game.query({player: $scope.user._id}, function(games) {
+            $scope.games = games;
+            _.each(games, function(game) {
+                if(game.winner == $scope.user._id) {
+                    game.result = 'Won +' + Math.abs(game.score.challenger - game.score.challengee);
+                    game.won = true;
+                } else if (!game.winner) {
+                    game.result = 'Draw';
+                    game.draw = true;
+                } else {
+                    game.result = 'Lost -' + Math.abs(game.score.challenger - game.score.challengee);
+                    game.lost = true;
+                }
+            });
+        });
+    }
   })
 
   // ==== User Controllers ====
