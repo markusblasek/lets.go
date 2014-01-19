@@ -1,122 +1,89 @@
 // index page for users
 .ui.stackable.page.grid(ng-if='user')
-   .row
-      .column
-          .ui.large.header
-            img.ui.avatar.image(ng-src='{{user.photo}}', ng-if='user.photo')
-            | Welcome,&nbsp;
-            b(ng-bind='user.name' ng-if='user.name')
-            b(ng-bind='user.alias' ng-if='!user.name')
-            | !
-          .ui.divider
-   .row
+  .row.middle.aligned
+    .twelve.wide.column
+      .ui.large.header
+        .content
+          | Hej&nbsp;
+          b(ng-bind='user.alias')
+          | , welcome back!
+          .sub.header Catch up on the stuff you missed since your last visit…
+    .four.wide.column
+      //a.ui.mini.labeled.green.right.floated.create.icon.button(href='#/games/create')
+        i.add.icon
+        | New Challenge
+  .row
+    .column.eleven.wide
       .column.eleven.wide
-          .ui.basic.segment
-              .ui.blue.ribbon.label
-                  b Recent Games
-              table.ui.small.basic.table
-                  thead
-                      tr
-                          th Result
-                          th Opponent
-                          th Configuration
-                          th Date
-                          th &nbsp;
-                  tbody
-                      tr(ng-repeat='game in games')
-                          td
-                              .ui.label(ng-show='game.state === "over"', ng-bind='game.result', ng-class='{red: game.lost, green: game.won}')
-                              span(ng-show='game.state !== "over"') Live..
-                          td
-                              a(ng-if='game.challenger._id !== user._id', href='#/user/{{game.challenger._id}}')
-                                  img.ui.avatar.image(ng-src='{{game.challenger.photo}}')
-                                  span(ng-bind='game.challenger.alias')
-                              a(ng-if='game.challengee._id !== user._id', href='#/user/{{game.challengee._id}}')
-                                  img.ui.avatar.image(ng-src='{{game.challengee.photo}}')
-                                  span(ng-bind='game.challengee.alias')
-                          td.ui.small.labels
-                              .ui.label(ng-bind='game.size + "x" + game.size')
-                              .ui.label(ng-show='game.komi > 0', ng-bind='"+" + game.komi')
-                              .ui.label(ng-bind='game.color.substr(0, 1)')
-                              .ui.label(ng-show='game.private') Priv.
-                          td(ng-bind='game.created | date:"MM/dd/yyyy @ h:mma"')
-                          td
-                            a.ui.right.floated.tiny.button(href='#/games/{{game._id}}') Show
-      .column.five.wide
-          .ui.segment
-              .ui.blue.ribbon.label
-                  b Friends
-              table.ui.table.small.segment
-                  tbody
-                      tr(ng-repeat='userObj in userList', ng-if='user._id != userObj._id')
-                          td
-                              a(href='#/user/{{userObj._id}}')
-                                  img.ui.avatar.image(ng-src='{{userObj.photo}}', ng-if='userObj.photo')
-                                  span(ng-bind='userObj.alias')
-                  tfoot
-                      tr
-                          th
-                              .ui.blue.labeled.icon.tiny.disabled.button Add Friend
-                                  i.user.icon
-   .row
-      .column.eleven.wide
-          .ui.small.feed.piled.segment
-              h3 Recent Activity
-              .event
-                  .label
-                      i.circular.pencil.icon
-                  .content
-                      .date Just a moment ago...
-                      .summary
-                          | You left a comment on &nbsp;
-                          a(href='#/') Johnny's
-                          | &nbsp;Profile
-                      .extra.text Hey Johnny your game against Carl was amazing ;-)
-              .event
-                  .label
-                      img(ng-src='{{user.photo}}', ng-if='user.photo')
-                  .content
-                      .date 1 minute ago
-                      .summary
-                          a(href='#/') Johnny
-                          | &nbsp; added you as a friend. Leave a comment on his profile...
-              .event
-                  .label
-                      i.circular.gamepad.icon
-                  .content
-                      .date 1 day ago
-                      .summary
-                          | You won a game against&nbsp;
-                          a(href='#/') Pablo
-      .column.five.wide
-          .ui.small.feed.segment
-              .ui.blue.ribbon.label
-                  b News
-              .event
-                  .label
-                      i.small.circular.pencil.icon
-                  .content
-                      .summary
-                          a(href='#/') Awesome gaming website called "Let's Go" appeared
-              .event
-                  .label
-                      i.small.circular.wrench.icon
-                  .content
-                      .summary
-                          a(href='#/') New WebRTC freature implemented
-              .event
-                  .label
-                      i.small.circular.github.icon
-                  .content
-                      .summary
-                          a(href='https://github.com/markusblasek/lets.go') Watch our repository on GitHub
-              .event
-                  .label
-                      i.small.circular.info.letter.icon
-                  .content
-                      .summary
-                          a(href='#/') Go Gaming Community grows more and more...
-
+        .ui.small.feed.piled.segment
+          h3 Recent Activity
+          .event
+            .label
+              i.circular.pencil.icon
+            .content
+              .date Just a moment ago...
+              .summary
+                | You left a comment on &nbsp;
+                a(href='#/') Johnny's
+                | &nbsp;Profile
+              .extra.text Hey Johnny your game against Carl was amazing ;-)
+          .event
+            .label
+              img(ng-src='{{user.photo}}', ng-if='user.photo')
+            .content
+              .date 1 minute ago
+              .summary
+                a(href='#/') Johnny
+                | &nbsp; added you as a friend. Leave a comment on his profile...
+          .event
+            .label
+              i.circular.gamepad.icon
+            .content
+              .date 1 day ago
+              .summary
+                | You won a game against&nbsp;
+                a(href='#/') Pablo
+          .event
+            .label
+              i.circular.signal.icon
+            .content
+              .date 1.5 days ago
+              .summary You reached a strength of <b>26kyu</b>, congratulations!
+          .event
+            .label
+              i.circular.gamepad.icon
+            .content
+              .date 2 days ago
+              .summary
+                | You lost a game against&nbsp;
+                a(href='#/') Roger
+    .column.five.wide
+      .ui.small.feed
+        .ui.dividing.header What's New?
+        .event
+          .label
+            i.small.circular.wrench.icon
+          .content
+            .summary
+              a(href='#/') New WebRTC freature implemented
+        .event
+          .label
+            i.small.circular.github.icon
+          .content
+            .summary
+              a(href='https://github.com/markusblasek/lets.go') Watch our repository on GitHub
+        .event
+          .label
+            i.small.circular.info.letter.icon
+          .content
+            .summary
+              a(href='#/') Go Gaming Community grows more and more...
+        .event
+          .label
+            i.small.circular.pencil.icon
+          .content
+            .summary
+              a(href='#/') Awesome gaming website called "Let's Go" appeared
 
 // landing page for unknown users
 .ui.stackable.page.grid#landing(ng-if='!user')
