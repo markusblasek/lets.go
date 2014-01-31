@@ -26,7 +26,6 @@ exports.list = function(req, res) {
 };
 
 exports.remove = function(req, res) {
-  // TODO: That's a security flaw, we should also include checks if that is a mesage of the user!!!
     var delFlag = false;
     var saveFlag = false;
 
